@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
 
     # Custom apps
     'core',
+    'userauths',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +134,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Jazzmin settings
+JAZZMIN_SETTINGS = {
+    "site_title": "Grocerly Admin",
+    "site_header": "Grocerly Administration",
+    "site_brand": "Grocerly Administration",
+    # "site_logo": "",
+    "copyright": "Grocerly",
+    "welcome_sign": "Welcome to the Grocerly Admin Panel",
+    }
+
+
+AUTH_USER_MODEL = 'userauths.User'
