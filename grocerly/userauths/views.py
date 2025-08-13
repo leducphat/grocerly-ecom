@@ -4,8 +4,9 @@ from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth import logout
+from django.contrib.auth.models import User
 
-User = settings.AUTH_USER_MODEL
+# User = settings.AUTH_USER_MODEL
 
 # Create your views here.
 def register_view(request):
@@ -41,17 +42,20 @@ def login_view(request):
 
         try:
             user = User.objects.get(email=email)
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome back {user.username}!')
+                return redirect('core:index')
+            else:
+                messages.warning(request, 'User does not exist. Please try again.')
+
         except:
             messages.warning(request, f'User with email {email} does not exist.')
         
-        user = authenticate(request, email=email, password=password)
 
-        if user is not None:
-            login(request, user)
-            messages.success(request, f'Welcome back {user.username}!')
-            return redirect('core:index')
-        else:
-            messages.warning(request, 'User does not exist. Please try again.')
+
+    
 
     context = {
 
