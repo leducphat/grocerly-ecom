@@ -16,7 +16,7 @@ def register_view(request):
         if form.is_valid():
             new_user = form.save()
             username = form.cleaned_data.get('username')
-            messages.success(request, f'Hey {username}, your account has been created successfully!')
+            messages.success(request, f'Welcome, {username}! Your account has been created successfully!')
             new_user = authenticate(username=form.cleaned_data['email'],
                                     password=form.cleaned_data['password1'])
             login(request, new_user)
@@ -33,7 +33,7 @@ def register_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        messages.warning(request, 'Hey, you are already logged in!')
+        messages.warning(request, 'You are already logged in!')
         return redirect('core:index')
     
     if request.method == 'POST':
