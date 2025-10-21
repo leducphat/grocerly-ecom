@@ -84,6 +84,8 @@ class Product(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True)
+
 
     price = models.DecimalField(max_digits=999999999999, decimal_places=3, default=0.000)
     old_price = models.DecimalField(max_digits=999999999999, decimal_places=3, default=1.000)
@@ -101,7 +103,7 @@ class Product(models.Model):
     sku = ShortUUIDField(unique=True, length=10, max_length=20, prefix="sku", alphabet="1234567890")
 
     date = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(null=True, blank=True, auto_now=True)
+    updated = models.DateTimeField(null=True, blank=True)
 
 
     # quantity = models.IntegerField(default=1)
