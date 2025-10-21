@@ -89,7 +89,7 @@ class Product(models.Model):
     old_price = models.DecimalField(max_digits=999999999999, decimal_places=3, default=1.000)
 
     specification = models.TextField(null=True, blank=True, default="No product's specification available")
-    tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
+    # tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
 
     product_status = models.CharField(max_length=10, choices=STATUS, default='in_review')
 
@@ -147,6 +147,7 @@ class CartOrder(models.Model):
 
 class CartOrderItem(models.Model):
     order = models.ForeignKey(CartOrder, on_delete=models.CASCADE)
+    invoice_no = models.CharField(max_length=200)
     product_status = models.CharField(max_length=200)
     item = models.CharField(max_length=200)
     image = models.CharField(max_length=200)
@@ -171,9 +172,36 @@ class CartOrderItem(models.Model):
 class ProductReview(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    review = models.TextField(null=True, blank=True)
-    rating = models.IntegerField(choices=RATING, default=5)
+    review = models.TextField()
+    rating = models.IntegerField(choices=RATING, default=None)
     date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Product Reviews"
 
     def __str__(self):
         return self.product.title
+    
+    def get_rating(self):
+        return self.rating
+
+
+class Wishlist(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Wishlists"
+
+    def __str__(self):
+        return self.product.title
+
+
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    address = models.CharField(max_length=100, null=True)
+    status = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural = "Addresses"
