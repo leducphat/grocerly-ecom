@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from core.models import Category, Tag, Vendor, Product, ProductReview, ProductImage, CartOrder, CartOrderItem, Wishlist, Address
 
 
@@ -34,3 +33,15 @@ def product_list_view(request):
     }
 
     return render(request, 'core/product-list.html', context)
+
+
+def category_product_list_view(request, c_id):
+    category = Category.objects.get(c_id=c_id) # cid = category id
+    products = Product.objects.filter(category=category, product_status='published').order_by('-id')
+
+    context = {
+        'category': category,
+        'products': products
+    }
+
+    return render(request, 'core/category-product-list.html', context)
