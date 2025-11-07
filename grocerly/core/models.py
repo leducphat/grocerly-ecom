@@ -67,6 +67,7 @@ class Vendor(models.Model):
 
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def vendor_image(self):
         return mark_safe(f'<img src="{self.image.url}" width="50" height="50" />')
@@ -84,7 +85,7 @@ class Product(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='category')
-    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True)
+    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, related_name='vendor')
 
 
     price = models.DecimalField(max_digits=999999999999, decimal_places=3, default=0.000)
