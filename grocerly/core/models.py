@@ -55,6 +55,7 @@ class Vendor(models.Model):
 
     name = models.CharField(max_length=100, default="Vendor Name")
     image = models.ImageField(upload_to=user_directory_path, default="vendors.jpg")
+    cover_image = models.ImageField(upload_to=user_directory_path, default="vendors.jpg")
     description = models.TextField(null=True, blank=True, default="No vendor's description available")
 
     address = models.CharField(max_length=100, default="123 Main Street")

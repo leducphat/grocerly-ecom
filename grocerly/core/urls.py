@@ -14,4 +14,5 @@ urlpatterns = [
 
     # Vendor
     path('vendors/', views.vendor_list_view, name='vendor-list'),
+    path('vendors/<v_id>/', views.vendor_detail_view, name='vendor-detail'),
 ]
