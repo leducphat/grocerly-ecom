@@ -55,6 +55,7 @@ class Vendor(models.Model):
 
     name = models.CharField(max_length=100, default="Vendor Name")
     image = models.ImageField(upload_to=user_directory_path, default="vendors.jpg")
+    cover_image = models.ImageField(upload_to=user_directory_path, default="vendors.jpg")
     description = models.TextField(null=True, blank=True, default="No vendor's description available")
 
     address = models.CharField(max_length=100, default="123 Main Street")
@@ -67,6 +68,7 @@ class Vendor(models.Model):
 
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def vendor_image(self):
         return mark_safe(f'<img src="{self.image.url}" width="50" height="50" />')
@@ -83,12 +85,18 @@ class Product(models.Model):
     description = models.TextField(null=True, blank=True, default="No product's description available")
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
+    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, related_name='products')
+
 
     price = models.DecimalField(max_digits=999999999999, decimal_places=3, default=0.000)
     old_price = models.DecimalField(max_digits=999999999999, decimal_places=3, default=1.000)
 
     specification = models.TextField(null=True, blank=True, default="No product's specification available")
+    type = models.CharField(max_length=100, null=True, blank=True, default="General")
+    stock_count = models.IntegerField(default=0, null=True, blank=True)
+    expiry_period = models.CharField(max_length=100, null=True, blank=True, default="N/A")
+    mfd = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     # tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
 
     product_status = models.CharField(max_length=10, choices=STATUS, default='in_review')
@@ -101,7 +109,7 @@ class Product(models.Model):
     sku = ShortUUIDField(unique=True, length=10, max_length=20, prefix="sku", alphabet="1234567890")
 
     date = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(null=True, blank=True, auto_now=True)
+    updated = models.DateTimeField(null=True, blank=True)
 
 
     # quantity = models.IntegerField(default=1)
@@ -122,7 +130,7 @@ class Product(models.Model):
     
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='p_image')
     image = models.ImageField(upload_to="product-images", default="product.jpg")
     date = models.DateTimeField(auto_now_add=True)
 
