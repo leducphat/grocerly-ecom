@@ -2,6 +2,8 @@ from core.models import Category, Tag, Vendor, Product, ProductReview, ProductIm
 
 def default(request):
     categories = Category.objects.all()
+    address = Address.objects.get(user=request.user)
     return {
-        'categories': categories
+        'categories': categories,
+        'address': address,
     }
