@@ -72,11 +72,13 @@ def product_detail_view(request, p_id):
     product = Product.objects.get(p_id=p_id)
     # reviews = ProductReview.objects.filter(product=product, review_status='approved').order_by('-id')
     images = product.p_image.all()
+    related_products = Product.objects.filter(category=product.category, product_status='published').exclude(p_id=p_id).order_by('-id')[:4]
 
     context = {
         'p': product,
         #'reviews': reviews,
-        'p_image': images
+        'p_image': images,
+        'related_products': related_products
     }
 
     return render(request, 'core/product-detail.html', context)
