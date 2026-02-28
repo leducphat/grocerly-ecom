@@ -1,0 +1,33 @@
+{% for item in w %}
+<tr class="pt-30">
+    <td class="custome-checkbox pl-30">
+        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox{{ item.id }}" value="" />
+        <label class="form-check-label" for="exampleCheckbox{{ item.id }}"></label>
+    </td>
+    <td class="image product-thumbnail pt-40"><img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" /></td>
+    <td class="product-des product-name">
+        <h6><a class="product-name mb-10" href="{% url 'core:product-detail' item.product.p_id %}">{{ item.product.title|truncatechars:30 }}</a></h6>
+    </td>
+    <td class="price" data-title="Price">
+        <span class="text-brand">$</span><span class="text-brand">{{ item.product.price }}</span>
+    </td>
+    <td class="text-center detail-info" data-title="Stock">
+        <span class="stock-status in-stock mb-0">In Stock</span>
+    </td>
+    <td class="text-right" data-title="Cart">
+        <input type="hidden" value="1" class="product-quantity-{{ item.product.id }}">
+        <input type="hidden" class="product-pid-{{ item.product.id }}" value="{{ item.product.p_id }}">
+        <input type="hidden" class="product-image-{{ item.product.id }}" value="{{ item.product.image.url }}">
+        <input type="hidden" class="product-id-{{ item.product.id }}" value="{{ item.product.id }}">
+        <input type="hidden" class="product-title-{{ item.product.id }}" value="{{ item.product.title }}">
+        <button class="btn btn-sm add-to-cart-btn" data-index="{{ item.product.id }}">Add to cart</button>
+    </td>
+    <td class="action text-center" data-title="Remove">
+        <button style="border: none; background: none;" data-wishlist-product="{{ item.id }}" class="text-body delete-wishlist-product"><i class="fi-rs-trash"></i></button>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7"><p>Nothing in wishlist yet...</p></td>
+</tr>
+{% endfor %}

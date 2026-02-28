@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Category, Tag, Vendor, Product, ProductReview, ProductImage, CartOrder, CartOrderItem, Wishlist, Address
+from core.models import Category, Tag, Vendor, Product, ProductReview, ProductImage, CartOrder, CartOrderItem, Wishlist, Address, Coupon
 
 # Register your models here.
 class ProductImagesAdmin(admin.TabularInline):
@@ -16,7 +16,7 @@ class VendorAdmin(admin.ModelAdmin):
     list_display = ['name', 'vendor_image']
 
 class CartOrderAdmin(admin.ModelAdmin):
-    list_display = ['user', 'price', 'paid_status', 'order_date', 'product_status']
+    list_display = ['user', 'price', 'paid_status', 'order_date', 'product_status', 'oid']
 
 class CartOrderItemsAdmin(admin.ModelAdmin):
     list_display = ['order', 'invoice_no', 'item', 'order_image', 'quantity', 'price', 'total']
@@ -28,7 +28,10 @@ class WishlistAdmin(admin.ModelAdmin):
     list_display = ['user', 'product']
 
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ['user', 'address', 'status']
+    list_display = ['user', 'address', 'mobile', 'status']
+
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ['code', 'discount', 'active']
 
 
 admin.site.register(Product, ProductAdmin)
@@ -39,3 +42,4 @@ admin.site.register(CartOrderItem, CartOrderItemsAdmin)
 admin.site.register(ProductReview, ProductReviewAdmin)
 admin.site.register(Wishlist, WishlistAdmin)
 admin.site.register(Address, AddressAdmin)
+admin.site.register(Coupon, CouponAdmin)

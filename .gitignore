@@ -184,3 +184,30 @@ cython_debug/
 .DS_Store
 postman/globals/workspace.postman_globals.json
 .postman/config.json
+
+# Docker & Deployment secrets
+.env
+.env.local
+.env.*.local
+deploy.sh.local
+grocerly-image.tar.gz
+*.tar.gz
+
+# AWS/ECR related
+aws-credentials.json
+ecr-login.log
+
+# SSH keys (just in case)
+*.pem
+*.key
+!*.pub
+
+# Docker volumes
+sqlite-data/
+media-data/
+static-data/
+staticfiles/
+grocerly-deploy_accessKeys.csv
+
+# Original template files
+og_template/

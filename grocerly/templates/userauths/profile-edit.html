@@ -1,0 +1,70 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="main pages">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
+                    <span></span> <a href="{% url 'core:dashboard' %}">Dashboard</a> <span></span> Edit Profile
+                </div>
+            </div>
+        </div>
+        <div class="page-content pt-150 pb-150">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 m-auto">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="mb-0">Edit Profile</h3>
+                            </div>
+                            <div class="card-body">
+                                {% if messages %}
+                                <div class="mb-3">
+                                    {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+
+                                <div class="text-center mb-4">
+                                    {% if profile.image %}
+                                    <img src="{{ profile.image.url }}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%;" alt="Profile Image">
+                                    {% else %}
+                                    <img src="https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%;" alt="Profile Image">
+                                    {% endif %}
+                                </div>
+
+                                <form method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label>Full Name</label>
+                                            <input type="text" class="form-control" name="full_name" value="{{ form.full_name.value|default_if_none:'' }}" placeholder="Full Name">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Phone</label>
+                                            <input type="text" class="form-control" name="phone" value="{{ form.phone.value|default_if_none:'' }}" placeholder="Phone">
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <label>Bio</label>
+                                            <input type="text" class="form-control" name="bio" value="{{ form.bio.value|default_if_none:'' }}" placeholder="Bio">
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <label>Profile Image</label>
+                                            <input type="file" class="form-control" name="image" accept="image/*">
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            <button type="submit" class="btn btn-fill-out submit font-weight-bold">Update Profile</button>
+                                            <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary ml-2">Cancel</a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock content %}

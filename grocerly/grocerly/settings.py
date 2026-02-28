@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+bab1(0x+np=n+**co(_=c^#rrhjx1=7i$j)6xm+%jci&3mf2@'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-+bab1(0x+np=n+**co(_=c^#rrhjx1=7i$j)6xm+%jci&3mf2@')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third Party
+    'taggit',
 
     # Custom apps
     'core',
@@ -82,7 +85,7 @@ WSGI_APPLICATION = 'grocerly.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.environ.get('DJANGO_DB_PATH', BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -149,3 +152,8 @@ JAZZMIN_SETTINGS = {
 
 
 AUTH_USER_MODEL = 'userauths.User'
+
+
+# Stripe settings (use test keys for development)
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', 'pk_test_your_stripe_public_key')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_your_stripe_secret_key')

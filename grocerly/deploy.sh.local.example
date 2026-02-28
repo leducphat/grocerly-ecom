@@ -1,0 +1,20 @@
+#!/bin/bash
+# =============================================================================
+# Deploy Configuration (LOCAL - DO NOT COMMIT)
+# Copy this file to deploy.sh.local and fill in with your actual values
+# =============================================================================
+
+# AWS Configuration
+export AWS_REGION="ap-southeast-1"              # Replace with your region
+export AWS_ACCOUNT_ID="123456789012"            # Replace with your 12-digit AWS account ID
+export ECR_REPOSITORY="grocerly-web"
+
+# EC2 Configuration
+export EC2_HOST="ec2-xx-xx-xx-xx.compute-1.amazonaws.com"  # Replace with your EC2 public IP or hostname
+export EC2_USER="ubuntu"                        # ubuntu for Ubuntu AMI, ec2-user for Amazon Linux
+export SSH_KEY="$HOME/.ssh/grocerly-key.pem"   # Replace with path to your EC2 SSH key
+export REMOTE_DIR="/home/ubuntu/grocerly"      # Adjust if EC2_USER is different
+
+# Optional data sync toggle
+# 0 = normal deploy, 1 = also upload local db.sqlite3 and media/ to EC2 container
+export SYNC_LOCAL_DB="0"
