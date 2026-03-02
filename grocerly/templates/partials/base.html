@@ -1096,15 +1096,10 @@
             });
         });
 
-        // Update cart quantity
-        $(document).on("click", ".update-product", function(){
-            let product_id = $(this).attr("data-product");
-            let this_val = $(this);
-            let product_quantity = $(".product-qty-" + product_id).val();
+        // Update cart quantity automatically on input change
+        let cartQtyUpdateTimer = null;
 
-            console.log("Product ID:", product_id);
-            console.log("Product Quantity:", product_quantity);
-
+        function triggerCartQuantityUpdate(product_id, product_quantity) {
             $.ajax({
                 url: '/update-cart/',
                 data: {
@@ -1112,15 +1107,28 @@
                     'qty': product_quantity,
                 },
                 dataType: 'json',
-                beforeSend: function(){
-                    this_val.hide();
-                },
                 success: function(response){
-                    this_val.show();
                     updateMiniCartCount(response.totalcartitems);
                     $("#cart-list").html(response.data);
                 }
             });
+        }
+
+        $(document).on("input change", ".cart-qty-input", function(){
+            let input = $(this);
+            let product_id = input.attr("data-product");
+            let product_quantity = parseInt(input.val(), 10);
+
+            if (!product_id) return;
+            if (isNaN(product_quantity) || product_quantity < 1) {
+                product_quantity = 1;
+                input.val(1);
+            }
+
+            clearTimeout(cartQtyUpdateTimer);
+            cartQtyUpdateTimer = setTimeout(function(){
+                triggerCartQuantityUpdate(product_id, product_quantity);
+            }, 300);
         });
 
         // Add to wishlist
