@@ -237,11 +237,11 @@
                                 <div class="header-action-icon-2">
                                     <a class="mini-cart-icon" href="{% url 'core:cart' %}">
                                         <img alt="Nest" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}" />
-                                        <span class="pro-count blue" id="cart-count">{{ cart_total_items }}</span>
+                                        <span class="pro-count blue mini-cart-count" id="cart-count">{{ cart_total_items }}</span>
                                     </a>
                                     <a href="{% url 'core:cart' %}"><span class="lable">Cart</span></a>
                                     <div class="cart-dropdown-wrap cart-dropdown-hm2">
-                                        <ul>
+                                        <ul class="mini-cart-items">
                                             {% if request.session.cart_data_obj %}
                                                 {% for product_id, item in request.session.cart_data_obj.items %}
                                                 <li>
@@ -510,10 +510,10 @@
                             <div class="header-action-icon-2">
                                 <a class="mini-cart-icon" href="{% url 'core:cart' %}">
                                     <img alt="Nest" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}" />
-                                    <span class="pro-count white">{{ cart_total_items }}</span>
+                                    <span class="pro-count white mini-cart-count">{{ cart_total_items }}</span>
                                 </a>
                                 <div class="cart-dropdown-wrap cart-dropdown-hm2">
-                                    <ul>
+                                    <ul class="mini-cart-items">
                                         {% if request.session.cart_data_obj %}
                                             {% for product_id, item in request.session.cart_data_obj.items %}
                                             <li>
@@ -562,6 +562,7 @@
                         });
                     }, 3000)
                 </script>
+
             </div>
         </div>
     </header>
@@ -996,6 +997,43 @@
 
     <!-- Add to Cart AJAX -->
     <script>
+        function renderMiniCartItems(cartData) {
+            let html = "";
+            const productIds = Object.keys(cartData || {});
+
+            if (productIds.length === 0) {
+                html = `
+                    <li>
+                        <div class="shopping-cart-title">
+                            <h4>Your cart is empty</h4>
+                        </div>
+                    </li>
+                `;
+            } else {
+                productIds.forEach(function(productId) {
+                    const item = cartData[productId];
+                    const productUrl = `/products/${item.pid}/`;
+                    html += `
+                        <li>
+                            <div class="shopping-cart-img">
+                                <a href="${productUrl}"><img alt="${item.title}" src="${item.image}" /></a>
+                            </div>
+                            <div class="shopping-cart-title">
+                                <h4><a href="${productUrl}">${item.title}</a></h4>
+                                <h4><span>${item.qty} × </span>$${item.price}</h4>
+                            </div>
+                        </li>
+                    `;
+                });
+            }
+
+            $(".mini-cart-items").html(html);
+        }
+
+        function updateMiniCartCount(count) {
+            $(".mini-cart-count").text(count);
+        }
+
         $(document).on("click", ".add-to-cart-btn", function(){
             let this_val = $(this);
             let index = this_val.attr("data-index");
@@ -1031,7 +1069,8 @@
                 success: function(response){
                     this_val.html("&#10004;");
                     console.log("Added to cart successfully!", response);
-                    $("#cart-count").text(response.totalcartitems);
+                    updateMiniCartCount(response.totalcartitems);
+                    renderMiniCartItems(response.data);
                 }
             });
         });
@@ -1051,7 +1090,7 @@
                     this_val.hide();
                 },
                 success: function(response){
-                    $("#cart-count").text(response.totalcartitems);
+                    updateMiniCartCount(response.totalcartitems);
                     $("#cart-list").html(response.data);
                 }
             });
@@ -1078,7 +1117,7 @@
                 },
                 success: function(response){
                     this_val.show();
-                    $("#cart-count").text(response.totalcartitems);
+                    updateMiniCartCount(response.totalcartitems);
                     $("#cart-list").html(response.data);
                 }
             });
