@@ -34,6 +34,7 @@ urlpatterns = [
     path('update-cart/', views.update_cart, name='update-cart'),
 
     # Checkout + Payment
+    path('checkout-info/', views.checkout_info_view, name='checkout-info'),
     path('save-checkout-info/', views.save_checkout_info, name='save_checkout_info'),
     path('api/create-checkout-session/<oid>/', views.create_checkout_session, name='api_checkout_session'),
     path('checkout/<oid>/', views.checkout, name='checkout'),

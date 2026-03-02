@@ -1,6 +1,17 @@
 {% extends 'partials/base.html' %}
 {% load static %}
 {% block content %}
+<div class="page-header breadcrumb-wrap">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
+            <span></span> <a href="{% url 'core:cart' %}">Cart</a>
+            <span></span> <a href="{% url 'core:checkout-info' %}">Checkout Info</a>
+            <span></span> <a href="{% url 'core:checkout' order.oid %}">Checkout</a>
+            <span></span> Payment
+        </div>
+    </div>
+</div>
 <div class="row justify-content-center pt-lg-4 text-center" style="margin-bottom: 200px; margin-top: 100px;">
     <div class="col-lg-5 col-md-7 col-sm-9">
         <h1 class="display-404 py-lg-3">Payment Completed</h1>

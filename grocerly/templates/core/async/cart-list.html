@@ -23,7 +23,7 @@
                     <table class="table table-wishlist">
                         <thead>
                             <tr class="main-heading">
-                                <th scope="col">Product</th>
+                                <th scope="col" class="start pl-30">Product</th>
                                 <th scope="col">Title</th>
                                 <th scope="col">Unit Price</th>
                                 <th scope="col" class="text-center">Quantity</th>
@@ -34,7 +34,7 @@
                         <tbody>
                             {% for product_id, item in cart_data.items %}
                             <tr class="pt-30">
-                                <td class="image product-thumbnail pt-40"><img src="{{ item.image }}" alt="#"></td>
+                                <td class="image product-thumbnail pt-40 pl-30"><img src="{{ item.image }}" alt="#"></td>
                                 <td class="product-des product-name">
                                     <h6 class="mb-5"><a class="product-name mb-10 text-heading" href="{% url 'core:product-detail' item.pid %}">{{ item.title }}</a></h6>
                                 </td>
@@ -82,7 +82,7 @@
                         </table>
                     </div>
                     {% if totalcartitems %}
-                    <a href="{% url 'core:cart' %}" class="btn mb-20 w-100">Proceed To CheckOut<i class="fi-rs-sign-out ml-15"></i></a>
+                    <a href="{% url 'core:checkout-info' %}" class="btn mb-20 w-100">Proceed To CheckOut<i class="fi-rs-sign-out ml-15"></i></a>
                     {% endif %}
                 </div>
             </div>
