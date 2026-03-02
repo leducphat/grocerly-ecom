@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Min, Max
 from django.db.models.functions import ExtractMonth
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -48,10 +48,21 @@ def category_list_view(request):
 def product_list_view(request):
     products = Product.objects.filter(product_status='published').order_by('-id')
     tags = Tag.objects.all().order_by('-id')[:6]
+    categories = Category.objects.all().order_by('title')
+    vendors = Vendor.objects.all().order_by('name')
+    deals_products = Product.objects.filter(product_status='published', featured=True).order_by('-id')[:4]
+
+    price_range = products.aggregate(min_price=Min('price'), max_price=Max('price'))
 
     context = {
         'products': products,
         'tags': tags,
+        'categories': categories,
+        'vendors': vendors,
+        'deals_products': deals_products,
+        'product_count': products.count(),
+        'min_price': price_range.get('min_price') or 0,
+        'max_price': price_range.get('max_price') or 0,
     }
 
     return render(request, 'core/product-list.html', context)
@@ -177,6 +188,35 @@ def search_view(request):
         'query': query,
     }
     return render(request, 'core/search.html', context)
+
+
+def filter_product(request):
+    vendor_ids = request.GET.getlist("vendor[]")
+    min_price = request.GET.get("min_price")
+    max_price = request.GET.get("max_price")
+
+    products = Product.objects.filter(product_status='published').order_by('-id').distinct()
+
+    if min_price:
+        try:
+            products = products.filter(price__gte=float(min_price))
+        except (TypeError, ValueError):
+            pass
+
+    if max_price:
+        try:
+            products = products.filter(price__lte=float(max_price))
+        except (TypeError, ValueError):
+            pass
+
+    if vendor_ids:
+        products = products.filter(vendor__id__in=vendor_ids).distinct()
+
+    data = render_to_string("core/async/product-list.html", {"products": products})
+    return JsonResponse({
+        "data": data,
+        "count": products.count(),
+    })
 
 
 # ======================== Cart (Session-based) ========================
