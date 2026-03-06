@@ -12,6 +12,11 @@ STATUS_CHOICES = (
     ('delivered', 'Delivered'),
 )
 
+PAYMENT_METHOD_CHOICES = (
+    ('online', 'Online'),
+    ('cod', 'Cash on Delivery'),
+)
+
 STATUS = (
     ('draft', 'Draft'),
     ('disabled', 'Disabled'),
@@ -149,7 +154,7 @@ class ProductImage(models.Model):
 
 
 class CartOrder(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     full_name = models.CharField(max_length=100, null=True, blank=True)
     email = models.CharField(max_length=100, null=True, blank=True)
     phone = models.CharField(max_length=100, null=True, blank=True)
@@ -164,6 +169,7 @@ class CartOrder(models.Model):
     coupons = models.ManyToManyField('Coupon', blank=True)
 
     shipping_method = models.CharField(max_length=100, null=True, blank=True)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='online')
     tracking_id = models.CharField(max_length=100, null=True, blank=True)
     tracking_website_address = models.CharField(max_length=100, null=True, blank=True)
 

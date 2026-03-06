@@ -1,5 +1,5 @@
 {% extends 'partials/base.html' %}
-{% load static %}
+{% load static currency_filters %}
 {% block content %}
     <main class="main">
         <div class="page-header breadcrumb-wrap">
@@ -46,8 +46,8 @@
                                         <div class="card-body">
                                             <h5 class="card-title">{{ o.item }}</h5>
                                             <p class="card-text fs-sm">Qty: {{ o.quantity }}</p>
-                                            <p class="card-text fs-sm">Price: ${{ o.price }}</p>
-                                            <p class="card-text fs-sm">Total: ${{ o.total }}</p>
+                                            <p class="card-text fs-sm">Price: {{ o.price|vnd }} ₫</p>
+                                            <p class="card-text fs-sm">Total: {{ o.total|vnd }} ₫</p>
                                         </div>
                                     </div>
                                 </div>
@@ -64,19 +64,19 @@
                         <div>
                             <div class="d-flex justify-content-between mb-2">
                                 <p class="fw-bold">Tax</p>
-                                <p>$0</p>
+                                <p>0 ₫</p>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <p class="fw-bold">Shipping</p>
-                                <p>$0</p>
+                                <p>0 ₫</p>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <p class="fw-bold">Discount</p>
-                                <p>${{ order.saved|floatformat:2 }}</p>
+                                <p>{{ order.saved|vnd }} ₫</p>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <p class="fw-bold">Total</p>
-                                <p>${{ order.price|floatformat:2 }}</p>
+                                <p>{{ order.price|vnd }} ₫</p>
                             </div>
                         </div>
                     </div>
@@ -92,13 +92,17 @@
                     </div>
 
                     <button type="button" class="btn w-100 mb-3" id="checkout-button" style="background-color: blueviolet; color: white;">Pay With Stripe (Credit or Debit Card)</button>
+                    <form action="{% url 'core:place-cod-order' order.oid %}" method="POST" class="mb-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn w-100" style="background-color: #3bb77e; color: white;">Place Order With Cash On Delivery (COD)</button>
+                    </form>
                     <div id="paypal-button-container" class="mt-3"></div>
                 </div>
             </div>
         </div>
     </main>
 
-    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=VND"></script>
     <script src="https://js.stripe.com/v3/"></script>
 
     <script>
@@ -157,3 +161,6 @@
         }
     </script>
 {% endblock content %}
+
+
+

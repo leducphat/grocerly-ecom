@@ -1,5 +1,5 @@
 {% extends 'partials/base.html' %}
-{% load static %}
+{% load static currency_filters %}
 {% block content %}
 
     <main class="main">
@@ -92,8 +92,8 @@
                                             <div class="price-filter-inner">
                                                 <div id="slider-range" class="mb-20"></div>
                                                 <div class="d-flex justify-content-between">
-                                                    <div class="caption">From: <strong id="slider-range-value1" class="text-brand">${{ min_price }}</strong></div>
-                                                    <div class="caption">To: <strong id="slider-range-value2" class="text-brand">${{ max_price }}</strong></div>
+                                                    <div class="caption">From: <strong id="slider-range-value1" class="text-brand">{{ min_price|vnd }} ₫</strong></div>
+                                                    <div class="caption">To: <strong id="slider-range-value2" class="text-brand">{{ max_price|vnd }} ₫</strong></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -209,8 +209,8 @@
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
-                                                    <span>${{ deal.price }}</span>
-                                                    <span class="old-price">${{ deal.old_price }}</span>
+                                                    <span>{{ deal.price|vnd }} ₫</span>
+                                                    <span class="old-price">{{ deal.old_price|vnd }} ₫</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -235,7 +235,9 @@
 {% block extra_js %}
 <script>
     function formatPriceLabel(value){
-        return "$" + Number(value).toFixed(2);
+        const numberValue = Number(value);
+        const safeValue = Number.isFinite(numberValue) ? numberValue : 0;
+        return new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(safeValue) + " ₫";
     }
 
     function initPriceSlider(){
@@ -333,3 +335,6 @@
     });
 </script>
 {% endblock extra_js %}
+
+
+

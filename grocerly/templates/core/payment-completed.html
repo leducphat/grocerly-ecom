@@ -1,4 +1,4 @@
-{% extends 'partials/base.html' %}
+﻿{% extends 'partials/base.html' %}
 {% load static %}
 {% block content %}
 <div class="page-header breadcrumb-wrap">
@@ -14,8 +14,13 @@
 </div>
 <div class="row justify-content-center pt-lg-4 text-center" style="margin-bottom: 200px; margin-top: 100px;">
     <div class="col-lg-5 col-md-7 col-sm-9">
+        {% if order.payment_method == 'cod' %}
+        <h1 class="display-404 py-lg-3">Order Placed</h1>
+        <h2 class="h3 mb-4">Your COD order has been placed successfully. Pay on delivery. Order Id #{{ order.oid }}</h2>
+        {% else %}
         <h1 class="display-404 py-lg-3">Payment Completed</h1>
         <h2 class="h3 mb-4">Your order has been successfully placed. Order Id #{{ order.oid }}</h2>
+        {% endif %}
         <p class="fs-md mb-4">
             <a href="{% url 'core:index' %}">Continue Shopping</a> |
             <a href="#">Contact us</a> if you have any issue or question
@@ -23,3 +28,6 @@
     </div>
 </div>
 {% endblock content %}
+
+
+

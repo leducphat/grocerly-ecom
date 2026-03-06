@@ -37,6 +37,7 @@ urlpatterns = [
     path('checkout-info/', views.checkout_info_view, name='checkout-info'),
     path('save-checkout-info/', views.save_checkout_info, name='save_checkout_info'),
     path('api/create-checkout-session/<oid>/', views.create_checkout_session, name='api_checkout_session'),
+    path('place-cod-order/<oid>/', views.place_cod_order, name='place-cod-order'),
     path('checkout/<oid>/', views.checkout, name='checkout'),
     path('payment-completed/<oid>/', views.payment_completed_view, name='payment-completed'),
     path('payment-failed/', views.payment_failed_view, name='payment-failed'),

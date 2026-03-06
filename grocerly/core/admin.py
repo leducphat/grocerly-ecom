@@ -16,7 +16,12 @@ class VendorAdmin(admin.ModelAdmin):
     list_display = ['name', 'vendor_image']
 
 class CartOrderAdmin(admin.ModelAdmin):
-    list_display = ['user', 'price', 'paid_status', 'order_date', 'product_status', 'oid']
+    list_display = ['customer_type', 'user', 'email', 'payment_method', 'price', 'paid_status', 'order_date', 'product_status', 'oid']
+
+    def customer_type(self, obj):
+        return "Registered" if obj.user else "Guest"
+
+    customer_type.short_description = "Customer Type"
 
 class CartOrderItemsAdmin(admin.ModelAdmin):
     list_display = ['order', 'invoice_no', 'item', 'order_image', 'quantity', 'price', 'total']

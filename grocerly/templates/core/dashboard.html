@@ -1,5 +1,5 @@
 {% extends 'partials/base.html' %}
-{% load static %}
+{% load static currency_filters %}
 {% block content %}
     <main class="main pages">
         <div class="page-header breadcrumb-wrap">
@@ -124,7 +124,7 @@
                                                                 {% else %}
                                                                 <td class="text-danger"><b>X</b></td>
                                                                 {% endif %}
-                                                                <td>${{ o.price }}</td>
+                                                                <td>{{ o.price|vnd }} ₫</td>
                                                                 <td><a href="{% url 'core:order-detail' o.id %}" class="btn-small d-block">View</a></td>
                                                             </tr>
                                                             {% empty %}
@@ -246,3 +246,6 @@
         });
     </script>
 {% endblock content %}
+
+
+

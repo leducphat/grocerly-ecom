@@ -1,5 +1,5 @@
 {% extends 'partials/base.html' %}
-{% load static %}
+{% load static currency_filters %}
 {% block content %}
     <main class="main">
         <div class="container mb-30">
@@ -102,14 +102,15 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$</span><span class="current-product-price-{{ p.id }}">{{ p.price }}</span>
-                                                        <span class="old-price">${{ p.old_price }}</span>
+                                                        <span class="current-product-price-{{ p.id }}">{{ p.price|vnd }}</span><span> ₫</span>
+                                                        <span class="old-price">{{ p.old_price|vnd }} ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <input type="hidden" value="1" class="product-quantity-{{ p.id }}">
                                                         <input type="hidden" class="product-pid-{{ p.id }}" value="{{ p.p_id }}">
                                                         <input type="hidden" class="product-image-{{ p.id }}" value="{{ p.image.url }}">
                                                         <input type="hidden" class="product-id-{{ p.id }}" value="{{ p.id }}">
+                                                        <input type="hidden" class="product-price-{{ p.id }}" value="{{ p.price }}">
                                                         <input type="hidden" class="product-title-{{ p.id }}" value="{{ p.title }}">
                                                         <button class="add add-to-cart-btn" data-index="{{ p.id }}" style="border: none;"><i class="fi-rs-shopping-cart mr-5"></i>Add</button>
                                                     </div>
@@ -159,8 +160,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$28.85</span>
-                                                        <span class="old-price">$32.8</span>
+                                                        <span>28.85 ₫</span>
+                                                        <span class="old-price">32.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -204,8 +205,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$52.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>52.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -249,8 +250,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$48.85</span>
-                                                        <span class="old-price">$52.8</span>
+                                                        <span>48.85 ₫</span>
+                                                        <span class="old-price">52.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -291,8 +292,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$17.85</span>
-                                                        <span class="old-price">$19.8</span>
+                                                        <span>17.85 ₫</span>
+                                                        <span class="old-price">19.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -336,8 +337,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -378,8 +379,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$54.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>54.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -420,8 +421,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$32.85</span>
-                                                        <span class="old-price">$33.8</span>
+                                                        <span>32.85 ₫</span>
+                                                        <span class="old-price">33.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -465,8 +466,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$35.85</span>
-                                                        <span class="old-price">$37.8</span>
+                                                        <span>35.85 ₫</span>
+                                                        <span class="old-price">37.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -510,8 +511,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -552,8 +553,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$22.85</span>
-                                                        <span class="old-price">$24.8</span>
+                                                        <span>22.85 ₫</span>
+                                                        <span class="old-price">24.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -603,8 +604,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$28.85</span>
-                                                        <span class="old-price">$32.8</span>
+                                                        <span>28.85 ₫</span>
+                                                        <span class="old-price">32.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -648,8 +649,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$52.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>52.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -693,8 +694,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$48.85</span>
-                                                        <span class="old-price">$52.8</span>
+                                                        <span>48.85 ₫</span>
+                                                        <span class="old-price">52.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -735,8 +736,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$17.85</span>
-                                                        <span class="old-price">$19.8</span>
+                                                        <span>17.85 ₫</span>
+                                                        <span class="old-price">19.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -780,8 +781,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -822,8 +823,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$54.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>54.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -864,8 +865,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$32.85</span>
-                                                        <span class="old-price">$33.8</span>
+                                                        <span>32.85 ₫</span>
+                                                        <span class="old-price">33.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -909,8 +910,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$35.85</span>
-                                                        <span class="old-price">$37.8</span>
+                                                        <span>35.85 ₫</span>
+                                                        <span class="old-price">37.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -954,8 +955,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -996,8 +997,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$22.85</span>
-                                                        <span class="old-price">$24.8</span>
+                                                        <span>22.85 ₫</span>
+                                                        <span class="old-price">24.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1047,8 +1048,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$28.85</span>
-                                                        <span class="old-price">$32.8</span>
+                                                        <span>28.85 ₫</span>
+                                                        <span class="old-price">32.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1092,8 +1093,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$52.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>52.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1137,8 +1138,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$48.85</span>
-                                                        <span class="old-price">$52.8</span>
+                                                        <span>48.85 ₫</span>
+                                                        <span class="old-price">52.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1179,8 +1180,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$17.85</span>
-                                                        <span class="old-price">$19.8</span>
+                                                        <span>17.85 ₫</span>
+                                                        <span class="old-price">19.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1224,8 +1225,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1266,8 +1267,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$54.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>54.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1308,8 +1309,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$32.85</span>
-                                                        <span class="old-price">$33.8</span>
+                                                        <span>32.85 ₫</span>
+                                                        <span class="old-price">33.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1353,8 +1354,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$35.85</span>
-                                                        <span class="old-price">$37.8</span>
+                                                        <span>35.85 ₫</span>
+                                                        <span class="old-price">37.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1398,8 +1399,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1440,8 +1441,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$22.85</span>
-                                                        <span class="old-price">$24.8</span>
+                                                        <span>22.85 ₫</span>
+                                                        <span class="old-price">24.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1491,8 +1492,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$28.85</span>
-                                                        <span class="old-price">$32.8</span>
+                                                        <span>28.85 ₫</span>
+                                                        <span class="old-price">32.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1536,8 +1537,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$52.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>52.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1581,8 +1582,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$48.85</span>
-                                                        <span class="old-price">$52.8</span>
+                                                        <span>48.85 ₫</span>
+                                                        <span class="old-price">52.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1623,8 +1624,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$17.85</span>
-                                                        <span class="old-price">$19.8</span>
+                                                        <span>17.85 ₫</span>
+                                                        <span class="old-price">19.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1668,8 +1669,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1710,8 +1711,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$54.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>54.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1752,8 +1753,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$32.85</span>
-                                                        <span class="old-price">$33.8</span>
+                                                        <span>32.85 ₫</span>
+                                                        <span class="old-price">33.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1797,8 +1798,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$35.85</span>
-                                                        <span class="old-price">$37.8</span>
+                                                        <span>35.85 ₫</span>
+                                                        <span class="old-price">37.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1842,8 +1843,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1884,8 +1885,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$22.85</span>
-                                                        <span class="old-price">$24.8</span>
+                                                        <span>22.85 ₫</span>
+                                                        <span class="old-price">24.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1935,8 +1936,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$28.85</span>
-                                                        <span class="old-price">$32.8</span>
+                                                        <span>28.85 ₫</span>
+                                                        <span class="old-price">32.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -1980,8 +1981,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$52.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>52.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2025,8 +2026,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$48.85</span>
-                                                        <span class="old-price">$52.8</span>
+                                                        <span>48.85 ₫</span>
+                                                        <span class="old-price">52.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2067,8 +2068,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$17.85</span>
-                                                        <span class="old-price">$19.8</span>
+                                                        <span>17.85 ₫</span>
+                                                        <span class="old-price">19.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2112,8 +2113,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2154,8 +2155,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$54.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>54.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2196,8 +2197,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$32.85</span>
-                                                        <span class="old-price">$33.8</span>
+                                                        <span>32.85 ₫</span>
+                                                        <span class="old-price">33.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2241,8 +2242,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$35.85</span>
-                                                        <span class="old-price">$37.8</span>
+                                                        <span>35.85 ₫</span>
+                                                        <span class="old-price">37.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2286,8 +2287,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2328,8 +2329,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$22.85</span>
-                                                        <span class="old-price">$24.8</span>
+                                                        <span>22.85 ₫</span>
+                                                        <span class="old-price">24.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2379,8 +2380,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$28.85</span>
-                                                        <span class="old-price">$32.8</span>
+                                                        <span>28.85 ₫</span>
+                                                        <span class="old-price">32.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2424,8 +2425,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$52.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>52.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2469,8 +2470,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$48.85</span>
-                                                        <span class="old-price">$52.8</span>
+                                                        <span>48.85 ₫</span>
+                                                        <span class="old-price">52.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2511,8 +2512,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$17.85</span>
-                                                        <span class="old-price">$19.8</span>
+                                                        <span>17.85 ₫</span>
+                                                        <span class="old-price">19.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2556,8 +2557,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2598,8 +2599,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$54.85</span>
-                                                        <span class="old-price">$55.8</span>
+                                                        <span>54.85 ₫</span>
+                                                        <span class="old-price">55.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2640,8 +2641,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$32.85</span>
-                                                        <span class="old-price">$33.8</span>
+                                                        <span>32.85 ₫</span>
+                                                        <span class="old-price">33.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2685,8 +2686,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$35.85</span>
-                                                        <span class="old-price">$37.8</span>
+                                                        <span>35.85 ₫</span>
+                                                        <span class="old-price">37.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2730,8 +2731,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$23.85</span>
-                                                        <span class="old-price">$25.8</span>
+                                                        <span>23.85 ₫</span>
+                                                        <span class="old-price">25.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2772,8 +2773,8 @@
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
-                                                        <span>$22.85</span>
-                                                        <span class="old-price">$24.8</span>
+                                                        <span>22.85 ₫</span>
+                                                        <span class="old-price">24.8 ₫</span>
                                                     </div>
                                                     <div class="add-cart">
                                                         <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2826,8 +2827,8 @@
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
-                                                    <span>$32.85</span>
-                                                    <span class="old-price">$33.8</span>
+                                                    <span>32.85 ₫</span>
+                                                    <span class="old-price">33.8 ₫</span>
                                                 </div>
                                                 <div class="add-cart">
                                                     <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2863,8 +2864,8 @@
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
-                                                    <span>$24.85</span>
-                                                    <span class="old-price">$26.8</span>
+                                                    <span>24.85 ₫</span>
+                                                    <span class="old-price">26.8 ₫</span>
                                                 </div>
                                                 <div class="add-cart">
                                                     <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2900,8 +2901,8 @@
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
-                                                    <span>$12.85</span>
-                                                    <span class="old-price">$13.8</span>
+                                                    <span>12.85 ₫</span>
+                                                    <span class="old-price">13.8 ₫</span>
                                                 </div>
                                                 <div class="add-cart">
                                                     <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -2937,8 +2938,8 @@
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
-                                                    <span>$15.85</span>
-                                                    <span class="old-price">$16.8</span>
+                                                    <span>15.85 ₫</span>
+                                                    <span class="old-price">16.8 ₫</span>
                                                 </div>
                                                 <div class="add-cart">
                                                     <a class="add" href="shop-cart.html"><i class="fi-rs-shopping-cart mr-5"></i>Add </a>
@@ -3058,7 +3059,7 @@
                             </div>
                             <div class="content pt-10">
                                 <h5><a href="shop-product-detail.html">Chen Cardigan</a></h5>
-                                <p class="price mb-0 mt-5">$99.50</p>
+                                <p class="price mb-0 mt-5">99.50 ₫</p>
                                 <div class="product-rate">
                                     <div class="product-rating" style="width: 90%"></div>
                                 </div>
@@ -3070,7 +3071,7 @@
                             </div>
                             <div class="content pt-10">
                                 <h6><a href="shop-product-detail.html">Chen Sweater</a></h6>
-                                <p class="price mb-0 mt-5">$89.50</p>
+                                <p class="price mb-0 mt-5">89.50 ₫</p>
                                 <div class="product-rate">
                                     <div class="product-rating" style="width: 80%"></div>
                                 </div>
@@ -3082,7 +3083,7 @@
                             </div>
                             <div class="content pt-10">
                                 <h6><a href="shop-product-detail.html">Colorful Jacket</a></h6>
-                                <p class="price mb-0 mt-5">$25</p>
+                                <p class="price mb-0 mt-5">25 ₫</p>
                                 <div class="product-rate">
                                     <div class="product-rating" style="width: 60%"></div>
                                 </div>
@@ -3226,8 +3227,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3246,8 +3247,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3266,8 +3267,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3291,8 +3292,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3311,8 +3312,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3331,8 +3332,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3356,8 +3357,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3376,8 +3377,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3396,8 +3397,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3421,8 +3422,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3441,8 +3442,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3461,8 +3462,8 @@
                                         <span class="font-small ml-5 text-muted"> (4.0)</span>
                                     </div>
                                     <div class="product-price">
-                                        <span>$32.85</span>
-                                        <span class="old-price">$33.8</span>
+                                        <span>32.85 ₫</span>
+                                        <span class="old-price">33.8 ₫</span>
                                     </div>
                                 </div>
                             </article>
@@ -3475,3 +3476,5 @@
     </main>
     
     {% endblock content %}
+
+

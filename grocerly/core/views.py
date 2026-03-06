@@ -266,7 +266,6 @@ def cart_view(request):
         return redirect("core:index")
 
 
-@login_required
 def checkout_info_view(request):
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
@@ -278,16 +277,10 @@ def checkout_info_view(request):
             'cart_total_amount': cart_total_amount,
         })
     else:
-        pending_oid = request.session.get('pending_order_oid')
-        if pending_oid:
-            pending_order = CartOrder.objects.filter(
-                oid=pending_oid,
-                user=request.user,
-                paid_status=False,
-            ).first()
-            if pending_order:
-                messages.info(request, "You have a pending checkout. Please complete payment.")
-                return redirect('core:checkout', pending_order.oid)
+        pending_order = _get_pending_order_from_session(request)
+        if pending_order:
+            messages.info(request, "You have a pending checkout. Please complete payment.")
+            return redirect('core:checkout', pending_order.oid)
 
         messages.warning(request, "Your cart is empty")
         return redirect("core:index")
@@ -345,7 +338,44 @@ def update_cart(request):
 
 # ======================== Checkout + Payment ========================
 
-@login_required
+
+def _get_pending_order_from_session(request):
+    pending_oid = request.session.get('pending_order_oid')
+    if not pending_oid:
+        return None
+
+    if request.user.is_authenticated:
+        return CartOrder.objects.filter(
+            oid=pending_oid,
+            user=request.user,
+            paid_status=False,
+        ).first()
+
+    guest_email = request.session.get('guest_checkout_email')
+    order_query = CartOrder.objects.filter(
+        oid=pending_oid,
+        user__isnull=True,
+        paid_status=False,
+    )
+    if guest_email:
+        order_query = order_query.filter(email=guest_email)
+    return order_query.first()
+
+
+def _get_checkout_order_or_none(request, oid):
+    if request.user.is_authenticated:
+        return CartOrder.objects.filter(oid=oid, user=request.user).first()
+
+    pending_oid = request.session.get('pending_order_oid')
+    if str(oid) != str(pending_oid):
+        return None
+
+    guest_email = request.session.get('guest_checkout_email')
+    order_query = CartOrder.objects.filter(oid=oid, user__isnull=True)
+    if guest_email:
+        order_query = order_query.filter(email=guest_email)
+    return order_query.first()
+
 def save_checkout_info(request):
     total_amount = 0
 
@@ -358,19 +388,15 @@ def save_checkout_info(request):
         state = request.POST.get("state")
         country = request.POST.get("country")
 
+        if not full_name or not email or not address:
+            messages.error(request, "Please provide Full Name, Email, and Address to continue.")
+            return redirect("core:checkout-info")
+
         if 'cart_data_obj' in request.session:
             for p_id, item in request.session['cart_data_obj'].items():
                 total_amount += int(item['qty']) * float(item['price'])
 
-            pending_oid = request.session.get('pending_order_oid')
-            order = None
-
-            if pending_oid:
-                order = CartOrder.objects.filter(
-                    oid=pending_oid,
-                    user=request.user,
-                    paid_status=False,
-                ).first()
+            order = _get_pending_order_from_session(request)
 
             if order:
                 order.price = total_amount
@@ -386,8 +412,9 @@ def save_checkout_info(request):
                 order.save()
                 CartOrderItem.objects.filter(order=order).delete()
             else:
+                order_user = request.user if request.user.is_authenticated else None
                 order = CartOrder.objects.create(
-                    user=request.user,
+                    user=order_user,
                     price=total_amount,
                     full_name=full_name,
                     email=email,
@@ -410,16 +437,23 @@ def save_checkout_info(request):
                 )
 
             request.session['pending_order_oid'] = str(order.oid)
+            if not request.user.is_authenticated:
+                request.session['guest_checkout_email'] = email
+                request.session['guest_checkout_phone'] = mobile or ""
 
             return redirect("core:checkout", order.oid)
 
     return redirect("core:index")
 
 
-@login_required
 @csrf_exempt
 def create_checkout_session(request, oid):
-    order = CartOrder.objects.get(oid=oid, user=request.user)
+    order = _get_checkout_order_or_none(request, oid)
+    if not order:
+        return JsonResponse({"error": "Order not found"}, status=404)
+
+    if order.payment_method == 'cod':
+        return JsonResponse({"error": "This order is set to Cash on Delivery"}, status=400)
 
     if order.paid_status:
         return JsonResponse({"error": "Order is already paid"}, status=400)
@@ -432,11 +466,11 @@ def create_checkout_session(request, oid):
         line_items=[
             {
                 'price_data': {
-                    'currency': 'usd',
+                    'currency': 'vnd',
                     'product_data': {
                         'name': order.full_name,
                     },
-                    'unit_amount': int(order.price * 100),
+                    'unit_amount': int(order.price),
                 },
                 'quantity': 1,
             }
@@ -457,9 +491,36 @@ def create_checkout_session(request, oid):
     return JsonResponse({"sessionId": checkout_session.id})
 
 
-@login_required
+def place_cod_order(request, oid):
+    if request.method != "POST":
+        return redirect("core:checkout", oid)
+
+    order = _get_checkout_order_or_none(request, oid)
+    if not order:
+        messages.warning(request, "Order not found. Please start checkout again.")
+        return redirect("core:checkout-info")
+
+    if order.paid_status:
+        messages.info(request, "This order has already been paid.")
+        return redirect("core:payment-completed", order.oid)
+
+    order.payment_method = 'cod'
+    order.product_status = 'processing'
+    order.save(update_fields=['payment_method', 'product_status'])
+
+    if 'cart_data_obj' in request.session:
+        del request.session['cart_data_obj']
+
+    messages.success(request, "Order placed with Cash on Delivery.")
+    return redirect("core:payment-completed", order.oid)
+
+
 def checkout(request, oid):
-    order = CartOrder.objects.get(oid=oid, user=request.user)
+    order = _get_checkout_order_or_none(request, oid)
+    if not order:
+        messages.warning(request, "Checkout session not found. Please continue from checkout info.")
+        return redirect("core:checkout-info")
+
     order_items = CartOrderItem.objects.filter(order=order)
 
     if order.paid_status:
@@ -492,11 +553,13 @@ def checkout(request, oid):
     return render(request, 'core/checkout.html', context)
 
 
-@login_required
 def payment_completed_view(request, oid):
-    order = CartOrder.objects.get(oid=oid, user=request.user)
+    order = _get_checkout_order_or_none(request, oid)
+    if not order:
+        messages.warning(request, "Order not found. Please start checkout again.")
+        return redirect("core:checkout-info")
 
-    if order.paid_status == False:
+    if order.payment_method == 'online' and order.paid_status == False:
         order.paid_status = True
         order.save()
 
@@ -506,6 +569,8 @@ def payment_completed_view(request, oid):
     pending_oid = request.session.get('pending_order_oid')
     if pending_oid and str(order.oid) == str(pending_oid):
         del request.session['pending_order_oid']
+        request.session.pop('guest_checkout_email', None)
+        request.session.pop('guest_checkout_phone', None)
 
     context = {
         'order': order,
@@ -513,16 +578,8 @@ def payment_completed_view(request, oid):
     return render(request, 'core/payment-completed.html', context)
 
 
-@login_required
 def payment_failed_view(request):
-    pending_order = None
-    pending_oid = request.session.get('pending_order_oid')
-    if pending_oid:
-        pending_order = CartOrder.objects.filter(
-            oid=pending_oid,
-            user=request.user,
-            paid_status=False,
-        ).first()
+    pending_order = _get_pending_order_from_session(request)
 
     return render(request, 'core/payment-failed.html', {
         'pending_order': pending_order,

@@ -1,5 +1,5 @@
 {% extends 'partials/base.html' %}
-{% load static %}
+{% load static currency_filters %}
 {% block content %}
     <main class="main" id="wishlist-list">
         <div class="page-header breadcrumb-wrap">
@@ -44,7 +44,7 @@
                                         <h6><a class="product-name mb-10" href="{% url 'core:product-detail' item.product.p_id %}">{{ item.product.title|truncatechars:30 }}</a></h6>
                                     </td>
                                     <td class="price" data-title="Price">
-                                        <span class="text-brand">$</span><span class="text-brand current-product-price-{{ item.product.id }}">{{ item.product.price }}</span>
+                                        <span class="text-brand current-product-price-{{ item.product.id }}">{{ item.product.price|vnd }}</span><span class="text-brand"> ₫</span>
                                     </td>
                                     <td class="text-center detail-info" data-title="Stock">
                                         <span class="stock-status in-stock mb-0">In Stock</span>
@@ -54,6 +54,7 @@
                                         <input type="hidden" class="product-pid-{{ item.product.id }}" value="{{ item.product.p_id }}">
                                         <input type="hidden" class="product-image-{{ item.product.id }}" value="{{ item.product.image.url }}">
                                         <input type="hidden" class="product-id-{{ item.product.id }}" value="{{ item.product.id }}">
+                                        <input type="hidden" class="product-price-{{ item.product.id }}" value="{{ item.product.price }}">
                                         <input type="hidden" class="product-title-{{ item.product.id }}" value="{{ item.product.title }}">
                                         <button class="btn btn-sm add-to-cart-btn" data-index="{{ item.product.id }}">Add to cart</button>
                                     </td>
@@ -92,3 +93,6 @@
         });
     </script>
 {% endblock content %}
+
+
+

@@ -1,5 +1,5 @@
 {% extends 'partials/base.html' %}
-{% load static %}
+{% load static currency_filters %}
 {% block content %}
     <main class="main">
         <div class="page-header mt-30 mb-50">
@@ -63,8 +63,8 @@
                                   </div>
                                   <div class="product-card-bottom">
                                       <div class="product-price">
-                                          <span>${{ p.price }}</span>
-                                          <span class="old-price">${{ p.old_price }}</span>
+                                          <span>{{ p.price|vnd }} ₫</span>
+                                          <span class="old-price">{{ p.old_price|vnd }} ₫</span>
                                       </div>
                                       <div class="add-cart">
                                           <a class="add" href="{% url 'core:product-detail' p.p_id %}"><i class="fi-rs-shopping-cart mr-5"></i>Details</a>
@@ -84,3 +84,6 @@
         </div>
     </main>
 {% endblock content %}
+
+
+
