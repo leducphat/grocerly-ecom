@@ -12,9 +12,23 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from urllib.parse import urlparse
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Manual .env loader (No external library required)
+env_file = BASE_DIR / ".env"
+if env_file.exists():
+    with open(env_file) as f:
+        for line in f:
+            if line.strip() and not line.startswith("#"):
+                try:
+                    key, value = line.strip().split("=", 1)
+                    os.environ[key] = value
+                except ValueError:
+                    continue
 
 
 # Quick-start development settings - unsuitable for production
@@ -84,13 +98,41 @@ WSGI_APPLICATION = 'grocerly.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# Prioritize PostgreSQL if POSTGRES_DB is set, otherwise use DATABASE_URL, else fallback to SQLite.
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.environ.get('DJANGO_DB_PATH', BASE_DIR / 'db.sqlite3'),
+_db_name = os.environ.get('POSTGRES_DB')
+_database_url = os.environ.get('DATABASE_URL')
+
+if _db_name:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _db_name,
+            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        }
     }
-}
+elif _database_url:
+    _parsed = urlparse(_database_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _parsed.path.lstrip('/'),
+            'USER': _parsed.username or '',
+            'PASSWORD': _parsed.password or '',
+            'HOST': _parsed.hostname or 'localhost',
+            'PORT': str(_parsed.port or 5432),
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -161,3 +203,15 @@ AUTH_USER_MODEL = 'userauths.User'
 # Stripe settings (use test keys for development)
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', 'pk_test_your_stripe_public_key')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_your_stripe_secret_key')
+
+
+# Authentication URLs
+LOGIN_URL = 'userauths:sign-in'
+LOGIN_REDIRECT_URL = 'core:index'
+LOGOUT_REDIRECT_URL = 'userauths:sign-in'
+
+
+# Map Django message levels to Bootstrap CSS classes
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+}

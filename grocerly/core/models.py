@@ -38,8 +38,87 @@ def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return 'user_{0}/{1}'.format(instance.user.id, filename)
 
-# Create your models here.
-class Category(models.Model):
+
+################################################# Soft Delete Infrastructure ##########################################
+################################################# Soft Delete Infrastructure ##########################################
+
+class SoftDeleteQuerySet(models.QuerySet):
+    """Custom QuerySet that filters out soft-deleted objects by default."""
+
+    def delete(self):
+        """Soft-delete all objects in this queryset."""
+        return self.update(is_deleted=True, deleted_at=timezone.now())
+
+    def hard_delete(self):
+        """Permanently delete all objects in this queryset."""
+        return super().delete()
+
+    def alive(self):
+        """Return only non-deleted objects."""
+        return self.filter(is_deleted=False)
+
+    def dead(self):
+        """Return only soft-deleted objects."""
+        return self.filter(is_deleted=True)
+
+
+class SoftDeleteManager(models.Manager):
+    """Manager that excludes soft-deleted objects by default."""
+
+    def get_queryset(self):
+        return SoftDeleteQuerySet(self.model, using=self._db).alive()
+
+
+class AllObjectsManager(models.Manager):
+    """Manager that includes ALL objects (even soft-deleted ones)."""
+
+    def get_queryset(self):
+        return SoftDeleteQuerySet(self.model, using=self._db)
+
+
+class SoftDeleteModel(models.Model):
+    """
+    Abstract base model that provides soft-delete functionality.
+
+    Usage:
+     - MyModel.objects.all()             → only non-deleted items
+     - MyModel.all_objects.all()         → everything (including deleted)
+     - MyModel.all_objects.dead()        → only deleted items
+     - instance.soft_delete()            → mark as deleted
+     - instance.restore()               → undo soft delete
+     - instance.hard_delete()            → permanently remove from DB
+    """
+    is_deleted = models.BooleanField(default=False, db_index=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    objects = SoftDeleteManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        abstract = True
+
+    def soft_delete(self):
+        """Mark this object as deleted."""
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save(update_fields=['is_deleted', 'deleted_at'])
+
+    def restore(self):
+        """Undo a soft delete."""
+        self.is_deleted = False
+        self.deleted_at = None
+        self.save(update_fields=['is_deleted', 'deleted_at'])
+
+    def hard_delete(self):
+        """Permanently delete this object from the database."""
+        super().delete()
+
+
+################################################# Core Models ##########################################
+################################################# Core Models ##########################################
+
+
+class Category(SoftDeleteModel):
     c_id = ShortUUIDField(unique=True, length=10, max_length=20, prefix="cat", alphabet="abcdefgh12345")
     title = models.CharField(max_length=100, default="Category Title")
     image = models.ImageField(upload_to="category", default="category.jpg")
@@ -60,7 +139,7 @@ class Category(models.Model):
 class Tag(models.Model):
     pass
 
-class Vendor(models.Model):
+class Vendor(SoftDeleteModel):
     v_id = ShortUUIDField(unique=True, length=10, max_length=20, prefix="ven", alphabet="abcdefgh12345")
 
     name = models.CharField(max_length=100, default="Vendor Name")
@@ -80,14 +159,35 @@ class Vendor(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
+    class Meta:
+        verbose_name_plural = "Vendors"
+
     def vendor_image(self):
         return mark_safe(f'<img src="{self.image.url}" width="50" height="50" />')
     
     def __str__(self):
         return self.name
-        
 
-class Product(models.Model):
+    def soft_delete(self):
+        """Soft-delete this vendor and all their products."""
+        super().soft_delete()
+        # Cascade soft-delete to all products belonging to this vendor
+        Product.all_objects.filter(vendor=self, is_deleted=False).update(
+            is_deleted=True, deleted_at=timezone.now()
+        )
+
+    def restore(self):
+        """Restore this vendor and all their products that were deleted at the same time."""
+        deleted_at = self.deleted_at
+        super().restore()
+        # Restore products that were soft-deleted at the same time as this vendor
+        if deleted_at:
+            Product.all_objects.filter(vendor=self, deleted_at=deleted_at).update(
+                is_deleted=False, deleted_at=None
+            )
+
+
+class Product(SoftDeleteModel):
     p_id = ShortUUIDField(unique=True, length=10, max_length=20, alphabet="abcdefgh12345")
 
     title = models.CharField(max_length=100, default="Product Title")
@@ -99,8 +199,8 @@ class Product(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, related_name='products')
 
 
-    price = models.DecimalField(max_digits=999999999999, decimal_places=3, default=0.000)
-    old_price = models.DecimalField(max_digits=999999999999, decimal_places=3, default=1.000)
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
+    old_price = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 
     specification = models.TextField(null=True, blank=True, default="No product's specification available")
     type = models.CharField(max_length=100, null=True, blank=True, default="General")
@@ -121,10 +221,8 @@ class Product(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(null=True, blank=True)
 
-
-    # quantity = models.IntegerField(default=1)
-    # category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    # vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    class Meta:
+        verbose_name_plural = "Products"
 
     def product_image(self):
         return mark_safe(f'<img src="{self.image.url}" width="50" height="50" />')
@@ -164,8 +262,8 @@ class CartOrder(models.Model):
     state = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True)
 
-    price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    saved = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
+    saved = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
     coupons = models.ManyToManyField('Coupon', blank=True)
 
     shipping_method = models.CharField(max_length=100, null=True, blank=True)
@@ -191,8 +289,8 @@ class CartOrderItem(models.Model):
     item = models.CharField(max_length=200)
     image = models.CharField(max_length=200)
     quantity = models.IntegerField(default=0)
-    price = models.DecimalField(max_digits=999999999999, decimal_places=3, default=0.000)
-    total = models.DecimalField(max_digits=999999999999, decimal_places=3, default=0.000)
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
+    total = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 
     class Meta:
         verbose_name_plural = "Cart Order Items"
@@ -219,7 +317,9 @@ class ProductReview(models.Model):
         verbose_name_plural = "Product Reviews"
 
     def __str__(self):
-        return self.product.title
+        if self.product:
+            return self.product.title
+        return f"Review #{self.pk}"
     
     def get_rating(self):
         return self.rating
@@ -234,7 +334,9 @@ class Wishlist(models.Model):
         verbose_name_plural = "Wishlists"
 
     def __str__(self):
-        return self.product.title
+        if self.product:
+            return self.product.title
+        return f"Wishlist #{self.pk}"
 
 
 class Address(models.Model):
@@ -247,7 +349,7 @@ class Address(models.Model):
         verbose_name_plural = "Addresses"
 
 
-class Coupon(models.Model):
+class Coupon(SoftDeleteModel):
     code = models.CharField(max_length=1000)
     discount = models.IntegerField(default=1)
     active = models.BooleanField(default=True)

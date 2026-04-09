@@ -1,18 +1,32 @@
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: grocerly-db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-grocerly}
+      - POSTGRES_USER=${POSTGRES_USER:-grocerly}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-grocerly_secret}
+    expose:
+      - "5432"
+    restart: unless-stopped
+
   web:
     image: ${WEB_IMAGE:-grocerly-web:latest}
     container_name: grocerly-web
     volumes:
-      - sqlite-data:/data
       - static-data:/app/staticfiles
       - media-data:/app/media
     environment:
       - DJANGO_DEBUG=${DJANGO_DEBUG:-0}
       - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-change-me-in-production}
-      - DJANGO_DB_PATH=/data/db.sqlite3
+      - DATABASE_URL=postgres://${POSTGRES_USER:-grocerly}:${POSTGRES_PASSWORD:-grocerly_secret}@db:5432/${POSTGRES_DB:-grocerly}
     expose:
       - "8000"
+    depends_on:
+      - db
     restart: unless-stopped
 
   nginx:
@@ -29,6 +43,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  sqlite-data:
+  postgres-data:
   static-data:
   media-data:

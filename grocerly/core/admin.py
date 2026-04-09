@@ -5,19 +5,59 @@ from urllib.parse import urlencode
 
 from core.models import Category, Tag, Vendor, Product, ProductReview, ProductImage, CartOrder, CartOrderItem, Wishlist, Address, Coupon
 
-# Register your models here.
+
+# ======================== Soft Delete Admin Mixin ========================
+
+class SoftDeleteAdminMixin:
+    """
+    Mixin for admin classes of SoftDeleteModel subclasses.
+    - Shows all objects (including deleted) via all_objects manager.
+    - Adds 'is_deleted' to list_display and list_filter.
+    - Provides bulk actions to soft-delete and restore.
+    """
+
+    def get_queryset(self, request):
+        """Show ALL objects in admin, including soft-deleted ones."""
+        return self.model.all_objects.get_queryset()
+
+    def soft_delete_selected(self, request, queryset):
+        count = queryset.filter(is_deleted=False).update(
+            is_deleted=True,
+            deleted_at=__import__('django.utils.timezone', fromlist=['now']).now()
+        )
+        self.message_user(request, f"{count} item(s) soft-deleted.")
+
+    soft_delete_selected.short_description = "Soft delete selected items"
+
+    def restore_selected(self, request, queryset):
+        count = queryset.filter(is_deleted=True).update(
+            is_deleted=False,
+            deleted_at=None
+        )
+        self.message_user(request, f"{count} item(s) restored.")
+
+    restore_selected.short_description = "Restore selected items"
+
+    actions = ['soft_delete_selected', 'restore_selected']
+
+
+# ======================== Core Model Admins ========================
+
 class ProductImagesAdmin(admin.TabularInline):
     model = ProductImage
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(SoftDeleteAdminMixin, admin.ModelAdmin):
     inlines = [ProductImagesAdmin]
-    list_display = ['user', 'title', 'product_image', 'category', 'vendor', 'price', 'old_price', 'get_percentage', 'featured', 'product_status', 'p_id']
+    list_display = ['user', 'title', 'product_image', 'category', 'vendor', 'price', 'old_price', 'get_percentage', 'featured', 'product_status', 'is_deleted', 'p_id']
+    list_filter = ['is_deleted', 'product_status', 'featured', 'category', 'vendor']
 
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['title', 'category_image']
+class CategoryAdmin(SoftDeleteAdminMixin, admin.ModelAdmin):
+    list_display = ['title', 'category_image', 'is_deleted']
+    list_filter = ['is_deleted']
 
-class VendorAdmin(admin.ModelAdmin):
-    list_display = ['name', 'vendor_image']
+class VendorAdmin(SoftDeleteAdminMixin, admin.ModelAdmin):
+    list_display = ['name', 'vendor_image', 'is_deleted']
+    list_filter = ['is_deleted']
 
 
 class CartOrderItemInline(admin.TabularInline):
@@ -68,8 +108,9 @@ class WishlistAdmin(admin.ModelAdmin):
 class AddressAdmin(admin.ModelAdmin):
     list_display = ['user', 'address', 'mobile', 'status']
 
-class CouponAdmin(admin.ModelAdmin):
-    list_display = ['code', 'discount', 'active']
+class CouponAdmin(SoftDeleteAdminMixin, admin.ModelAdmin):
+    list_display = ['code', 'discount', 'active', 'is_deleted']
+    list_filter = ['is_deleted', 'active']
 
 
 admin.site.register(Product, ProductAdmin)
