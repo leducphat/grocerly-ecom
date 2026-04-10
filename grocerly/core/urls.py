@@ -53,4 +53,12 @@ urlpatterns = [
     path('wishlist/', views.wishlist_view, name='wishlist'),
     path('add-to-wishlist/', views.add_to_wishlist, name='add-to-wishlist'),
     path('remove-from-wishlist/', views.remove_wishlist, name='remove-from-wishlist'),
+
+    # Static Pages & Contact
+    path('contact/', views.contact, name='contact'),
+    path('ajax-contact-form/', views.ajax_contact_form, name='ajax-contact-form'),
+    path('about_us/', views.about_us, name='about_us'),
+    path('purchase_guide/', views.purchase_guide, name='purchase_guide'),
+    path('privacy_policy/', views.privacy_policy, name='privacy_policy'),
+    path('terms_of_service/', views.terms_of_service, name='terms_of_service'),
 ]

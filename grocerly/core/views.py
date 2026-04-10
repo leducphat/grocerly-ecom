@@ -694,3 +694,42 @@ def remove_wishlist(request):
     wishlist_json = serializers.serialize('json', wishlist)
     t = render_to_string('core/async/wishlist-list.html', context)
     return JsonResponse({'data': t, 'w': wishlist_json})
+
+# ======================== Static Pages & Contact ========================
+from userauths.models import ContactUs
+
+def contact(request):
+    return render(request, "core/contact.html")
+
+def ajax_contact_form(request):
+    full_name = request.GET.get('full_name')
+    email = request.GET.get('email')
+    phone = request.GET.get('phone')
+    subject = request.GET.get('subject')
+    message = request.GET.get('message')
+
+    ContactUs.objects.create(
+        full_name=full_name,
+        email=email,
+        phone=phone,
+        subject=subject,
+        message=message,
+    )
+
+    data = {
+        "bool": True,
+        "message": "Message Sent Successfully"
+    }
+    return JsonResponse({"data": data})
+
+def about_us(request):
+    return render(request, "core/about_us.html")
+
+def purchase_guide(request):
+    return render(request, "core/purchase_guide.html")
+
+def privacy_policy(request):
+    return render(request, "core/privacy_policy.html")
+
+def terms_of_service(request):
+    return render(request, "core/terms_of_service.html")
