@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     # Third Party
     'taggit',
@@ -60,6 +61,7 @@ INSTALLED_APPS = [
     # Custom apps
     'core',
     'userauths',
+    'useradmin',
 ]
 
 MIDDLEWARE = [

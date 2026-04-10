@@ -1,4 +1,4 @@
-﻿{% load static currency_filters %}
+{% load static currency_filters %}
 
 <!DOCTYPE html>
 <html class="no-js" lang="en">
@@ -285,6 +285,7 @@
                                             <li><a href="{% url 'core:dashboard' %}"><i class="fi fi-rs-label mr-10"></i>My Voucher</a></li>
                                             <li><a href="{% url 'core:wishlist' %}"><i class="fi fi-rs-heart mr-10"></i>My Wishlist</a></li>
                                             <li><a href="{% url 'userauths:profile-update' %}"><i class="fi fi-rs-settings-sliders mr-10"></i>Setting</a></li>
+                                            <li><a href="{% url 'useradmin:dashboard' %}"><i class="fi fi-rs-settings mr-10"></i>Vendor Dashboard</a></li>
                                             {% if user.is_authenticated %}
                                             <li><a href="{% url 'userauths:sign-out' %}"><i class="fi fi-rs-sign-out mr-10"></i>Sign out</a></li>
                                             {% else %}
@@ -384,7 +385,7 @@
                                             <li><a href="vendors-list.html">Vendors List</a></li>
                                             <li><a href="vendor-details-1.html">Vendor Details 01</a></li>
                                             <li><a href="vendor-details-2.html">Vendor Details 02</a></li>
-                                            <li><a href="vendor-dashboard.html">Vendor Dashboard</a></li>
+                                            <li><a href="{% url 'useradmin:dashboard' %}">Vendor Dashboard</a></li>
                                             <li><a href="vendor-guide.html">Vendor Guide</a></li>
                                         </ul>
                                     </li>
