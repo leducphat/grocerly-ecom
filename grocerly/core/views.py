@@ -191,6 +191,7 @@ def search_view(request):
 
 
 def filter_product(request):
+    category_ids = request.GET.getlist("category[]")
     vendor_ids = request.GET.getlist("vendor[]")
     min_price = request.GET.get("min_price")
     max_price = request.GET.get("max_price")
@@ -208,6 +209,9 @@ def filter_product(request):
             products = products.filter(price__lte=float(max_price))
         except (TypeError, ValueError):
             pass
+
+    if category_ids:
+        products = products.filter(category__id__in=category_ids).distinct()
 
     if vendor_ids:
         products = products.filter(vendor__id__in=vendor_ids).distinct()

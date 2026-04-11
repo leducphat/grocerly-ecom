@@ -30,7 +30,10 @@
                                             {% for c in categories|slice:":8" %}
                                             <li class="{% if forloop.last %}mb-0{% endif %}">
                                                 {% cycle 'assets/imgs/theme/icons/category-1.svg' 'assets/imgs/theme/icons/category-2.svg' 'assets/imgs/theme/icons/category-3.svg' 'assets/imgs/theme/icons/category-4.svg' as category_icon silent %}
-                                                <a href="{% url 'core:category-product-list' c.c_id %}"> <img src="{% static category_icon %}" alt="{{ c.title }}" />{{ c.title }}</a>
+                                                <input class="form-check-input" type="checkbox" name="category_filter" id="categoryCheckbox{{ forloop.counter }}" value="{{ c.id }}" />
+                                                <label class="form-check-label ml-10" for="categoryCheckbox{{ forloop.counter }}">
+                                                    <span><img src="{% static category_icon %}" alt="{{ c.title }}" width="20" height="20" class="mr-5"/>{{ c.title }}</span>
+                                                </label>
                                             </li>
                                             {% empty %}
                                             <li class="mb-0"><a href="#">No categories yet</a></li>
@@ -285,6 +288,11 @@
     }
 
     function runProductFilters(){
+        const selectedCategories = [];
+        $("input[name='category_filter']:checked").each(function(){
+            selectedCategories.push($(this).val());
+        });
+
         const selectedVendors = [];
         $("input[name='vendor_filter']:checked").each(function(){
             selectedVendors.push($(this).val());
@@ -296,6 +304,7 @@
         $.ajax({
             url: "{% url 'core:filter-product' %}",
             data: {
+                "category[]": selectedCategories,
                 "vendor[]": selectedVendors,
                 "min_price": minPrice,
                 "max_price": maxPrice
@@ -308,7 +317,7 @@
         });
     }
 
-    $(document).on("change", "input[name='vendor_filter']", function(){
+    $(document).on("change", "input[name='vendor_filter'], input[name='category_filter']", function(){
         runProductFilters();
     });
 
