@@ -1,5 +1,5 @@
 {% extends 'useradmin/base.html' %}
-{% load static %}
+{% load static currency_filters %}
 {% load humanize %}
 {% block content %}  
 
@@ -108,9 +108,9 @@
                                                 <div class="info">{{o.item}}</div>
                                             </a>
                                         </td>
-                                        <td>${{ o.price }}</td>
+                                        <td>{{ o.price|vnd }} ₫</td>
                                         <td>{{ o.qty }}</td>
-                                        <td class="text-end">${{o.total}}</td>
+                                        <td class="text-end">{{o.total|vnd}} ₫</td>
                                     </tr>
                                 {% endfor %}
                                     
@@ -128,11 +128,11 @@
                                             </dl>
                                             <dl class="dlist">
                                                 <dt>Discount:</dt>
-                                                <dd>${{ order.saved }}</dd>
+                                                <dd>{{ order.saved|vnd }} ₫</dd>
                                             </dl>
                                             <dl class="dlist">
                                                 <dt>Grand total:</dt>
-                                                <dd><b class="h5">${{order.price}}</b></dd>
+                                                <dd><b class="h5">{{order.price|vnd}} ₫</b></dd>
                                             </dl>
                                             <dl class="dlist">
                                                 <dt class="text-muted">Status:</dt>

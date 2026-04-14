@@ -1,6 +1,6 @@
 {% extends 'useradmin/base.html' %}
 {% load static %}
-{% load humanize %}
+{% load humanize currency_filters %}
 {% block content %}
   
 <section class="content-main">
@@ -20,7 +20,7 @@
                     <span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
                     <div class="text">
                         <h6 class="mb-1 card-title">Revenue</h6>
-                        <span>${{ revenue.price|floatformat:2|intcomma }}</span>
+                        <span>{{ revenue.price|vnd }} ₫</span>
                     </div>
                 </article>
             </div>
@@ -53,7 +53,7 @@
                     <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
                     <div class="text">
                         <h6 class="mb-1 card-title">Monthly Earning</h6>
-                        <span>{{ monthly_revenue.price|floatformat:2|intcomma }}</span>
+                        <span>{{ monthly_revenue.price|vnd }} ₫</span>
                     </div>
                 </article>
             </div>
@@ -89,7 +89,7 @@
                                 <td>{{l.email}}</td>
                                 <td>{{l.phone}}</td>
                                 <td>{{l.order_date}}</td>
-                                <td>${{l.price}}</td>
+                                <td>{{l.price|vnd}} ₫</td>
                                 <td>
                                     {% if l.paid_status == True %}
                                     <span class="badge badge-pill badge-soft-success">Paid</span>

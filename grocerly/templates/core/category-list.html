@@ -1,4 +1,4 @@
-﻿{% extends 'partials/base.html' %}
+{% extends 'partials/base.html' %}
 {% load static %}
 {% block content %}
 
@@ -44,7 +44,7 @@
                         <div class="shop-product-fillter mb-50 pr-30">
                             <div class="totall-product">
                                 <h2>
-                                    <img class="w-36px mr-10" src="assets/imgs/theme/icons/category-1.svg" alt="" />
+                                    <img class="w-36px mr-10" src="{% static 'assets/imgs/theme/icons/category-1.svg' %}" alt="" />
                                     {{ categories.count }} Categories
                                 </h2>
                             </div>
@@ -107,7 +107,7 @@
                                         </h4>
                                         <div class="entry-meta font-xs color-grey mt-10 pb-10">
                                             <div>
-                                                <span class="hit-count mr-10">{{c.category.count}} Product{{c.category.count|pluralize}}</span>
+                                                <span class="hit-count mr-10">{{ c.products.count }} Product{{ c.products.count|pluralize }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -148,7 +148,7 @@
                                 <ul>
                                     {% for c in categories %}
                                     <li>
-                                        <a href="shop-grid-right.html"> <img src="{{c.image.url}}" alt="" />{{c.title}}</a><span class="count">{{c.category.count}}</span>
+                                        <a href="{% url 'core:category-product-list' c.c_id %}"> <img src="{{ c.image.url }}" alt="" />{{ c.title }}</a><span class="count">{{ c.products.count }}</span>
                                     </li>    
                                     {% endfor %}                      
                                 </ul>

@@ -24,12 +24,16 @@ from userauths.models import Profile
 
 # Create your views here.
 def index(request):
-    # products = Product.objects.all().order_by('-id')
-
     products = Product.objects.filter(featured=True, product_status='published').order_by('-id')
+    categories = Category.objects.all()
+    deals_products = Product.objects.filter(product_status='published', featured=True).order_by('-id')[:4]
+    new_products_sidebar = Product.objects.filter(product_status='published').order_by('-date')[:3]
 
     context = {
-        'products': products
+        'products': products,
+        'categories': categories,
+        'deals_products': deals_products,
+        'new_products_sidebar': new_products_sidebar,
     }
 
     return render(request, 'core/index.html', context)

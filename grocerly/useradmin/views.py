@@ -64,7 +64,7 @@ def add_product(request):
 
 @admin_required
 def edit_product(request, pid):
-    product = Product.objects.get(pid=pid)
+    product = Product.objects.get(p_id=pid)
 
     if request.method == "POST":
         form = AddProductForm(request.POST, request.FILES, instance=product)
@@ -83,7 +83,7 @@ def edit_product(request, pid):
 
 @admin_required
 def delete_product(request, pid):
-    product = Product.objects.get(pid=pid)
+    product = Product.objects.get(p_id=pid)
     product.delete()
     return redirect("useradmin:dashboard-products")
 
