@@ -14,9 +14,13 @@ from pathlib import Path
 import os
 from urllib.parse import urlparse
 from django.contrib.messages import constants as messages
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Manual .env loader (No external library required)
 env_file = BASE_DIR / ".env"
@@ -57,11 +61,13 @@ INSTALLED_APPS = [
 
     # Third Party
     'taggit',
+    'rest_framework',
 
     # Custom apps
     'core',
     'userauths',
     'useradmin',
+    'store_api',
 ]
 
 MIDDLEWARE = [

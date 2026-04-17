@@ -14,7 +14,7 @@
     <meta property="og:url" content="" />
     <meta property="og:image" content="" />
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/theme/favicon.svg' %}" />
     <!-- Template CSS -->
     <link rel="stylesheet" href="{% static 'assets/css/plugins/slider-range.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}" />
@@ -1197,6 +1197,145 @@
                 }
             });
         });
+    </script>
+
+    <!-- Chatbot Widget -->
+    <div id="chatbot-widget" class="chatbot-container">
+        <div class="chatbot-header" onclick="toggleChatbot()">
+            <div class="d-flex align-items-center">
+                <i class="fi-rs-headset mr-10" style="font-size: 24px; color: white;"></i>
+                <h6 class="mb-0 text-white">Grocerly Assistant</h6>
+            </div>
+            <i class="fi-rs-angle-up text-white" id="chatbot-toggle-icon"></i>
+        </div>
+        <div class="chatbot-body" id="chatbot-body" style="display: none;">
+            <div class="chat-messages" id="chat-messages">
+                <div class="chat-message bot-message">
+                    Hi! I'm your Grocerly Assistant. I can help you find products, check prices, and more!
+                </div>
+            </div>
+            <div id="typing-indicator" class="typing-indicator">Assistant is thinking...</div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Type your message..." onkeypress="handleChatEnter(event)">
+                <button onclick="sendChatMessage()"><i class="fi-rs-paper-plane" style="color: white;"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .chatbot-container { position: fixed; bottom: 20px; right: 20px; width: 350px; background: #fff; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 9999; overflow: hidden; border: 1px solid #e2e9e1; transition: all 0.3s ease; }
+        .chatbot-header { background: #3BB77E; padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .chatbot-body { height: 380px; display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; }
+        .chat-message { margin-bottom: 12px; padding: 10px 15px; border-radius: 15px; max-width: 85%; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .user-message { background: #3BB77E; color: white; align-self: flex-end; margin-left: auto; border-bottom-right-radius: 5px; }
+        .bot-message { background: #fff; border: 1px solid #e2e9e1; color: #253D4E; margin-right: auto; border-bottom-left-radius: 5px; }
+        .chat-input-area { display: flex; padding: 12px; border-top: 1px solid #e2e9e1; background: #fff; }
+        .chat-input-area input { flex: 1; border: 1px solid #ececec; border-radius: 20px; padding: 10px 15px; outline: none; height: 40px; font-size: 14px; }
+        .chat-input-area button { background: #3BB77E; border: none; width: 40px; height: 40px; border-radius: 50%; margin-left: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
+        .chat-input-area button:hover { background: #29A56C; }
+        .typing-indicator { display: none; padding: 5px 15px; font-style: italic; color: #777; font-size: 12px; background: #f8f9fa; }
+    </style>
+
+    <script>
+        let chatHistory = JSON.parse(sessionStorage.getItem('grocerlyChatHistory')) || [];
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (chatHistory.length > 0) {
+                // Clear default greeting if we have history
+                document.getElementById('chat-messages').innerHTML = '';
+                // Loop through history and render messages
+                chatHistory.forEach(msg => {
+                    appendMessage(msg.role === 'user' ? 'user' : 'bot', msg.content);
+                });
+            }
+        });
+
+        function toggleChatbot() {
+            const body = document.getElementById('chatbot-body');
+            const icon = document.getElementById('chatbot-toggle-icon');
+            if (body.style.display === 'none') {
+                body.style.display = 'flex';
+                icon.className = 'fi-rs-angle-down text-white';
+            } else {
+                body.style.display = 'none';
+                icon.className = 'fi-rs-angle-up text-white';
+            }
+        }
+
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        function appendMessage(sender, text) {
+            const msgs = document.getElementById('chat-messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = sender === 'user' ? 'chat-message user-message' : 'chat-message bot-message';
+            // Simple markdown handling for bold text
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            msgDiv.innerHTML = text;
+            msgs.appendChild(msgDiv);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Display user msg
+            appendMessage('user', text);
+            chatHistory.push({role: 'user', content: text});
+            sessionStorage.setItem('grocerlyChatHistory', JSON.stringify(chatHistory));
+            
+            input.value = '';
+            document.getElementById('typing-indicator').style.display = 'block';
+
+            // Send to backend
+            fetch('/api/v1/chat/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // Needs csrf token
+                },
+                body: JSON.stringify({
+                    message: text,
+                    history: chatHistory
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('typing-indicator').style.display = 'none';
+                if(data.reply) {
+                    appendMessage('bot', data.reply);
+                    // Add to local history
+                    chatHistory.push({role: 'assistant', content: data.reply});
+                    sessionStorage.setItem('grocerlyChatHistory', JSON.stringify(chatHistory));
+                } else if(data.error) {
+                    appendMessage('bot', "Error: " + data.error);
+                }
+            })
+            .catch(err => {
+                document.getElementById('typing-indicator').style.display = 'none';
+                appendMessage('bot', "Sorry, network error occurred.");
+                console.error(err);
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
     </script>
 
     {% block extra_js %}{% endblock %}
