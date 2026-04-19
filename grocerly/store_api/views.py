@@ -37,6 +37,17 @@ def search_products(query: str) -> list[dict]:
         })
     return results
 
+def request_add_to_cart(product_url_id: str, qty: int = 1):
+    """Call this function when the user asks to add an item to their cart or wants to buy an item.
+    Do not just tell them it's added; you MUST call this function so the system can confirm it.
+    Provide the exact product_url_id from the search results, and how many they want (qty).
+    """
+    pass
+
+def request_checkout():
+    """Call this function when the user asks to checkout, pay, or place their order."""
+    pass
+
 def get_bestsellers() -> list[dict]:
     """Get the bestselling and featured products of the store.
     Call this when the user asks what is popular or what to buy.
@@ -57,13 +68,14 @@ try:
     # Initialize the model with tools and system instruction
     model = genai.GenerativeModel(
         model_name='gemini-2.5-flash',
-        tools=[search_products, get_bestsellers],
+        tools=[search_products, get_bestsellers, request_add_to_cart, request_checkout],
         system_instruction=(
             "You are Grocerly Assistant, the AI shopping assistant for Grocerly E-commerce. "
             "You are polite, helpful, and concise. "
             "Always use the provided tools to search for products when the user asks about them. "
             "If quoting a price, mention the VND currency clearly. "
-            "If a user wants to buy something, provide them the product title and its price based on the search_products tool output."
+            "If a user wants to buy something, or add to cart, YOU MUST use the request_add_to_cart tool! "
+            "If they ask to checkout, use the request_checkout tool."
         )
     )
     # create a global conversation history placeholder or start chat
@@ -93,13 +105,97 @@ def ai_chat(request):
             role = 'model' if msg.get('role') == 'assistant' else 'user'
             formatted_history.append({"role": role, "parts": [msg.get('content', '')]})
 
-        # Initialize chat with history and enable auto-calling
-        chat = model.start_chat(
-            history=formatted_history, 
-            enable_automatic_function_calling=True
-        )
+        # Initialize chat with history (disabling automatic function calling)
+        chat = model.start_chat(history=formatted_history)
         
         response = chat.send_message(user_message)
+        
+        # Manual loop to process function calls (max 3 loops to prevent recursion)
+        for _ in range(3):
+            if not response.parts:
+                break
+                
+            # Collect all function calls from the response
+            function_calls_to_execute = []
+            for part in response.parts:
+                if part.function_call:
+                    function_calls_to_execute.append(part.function_call)
+                    
+            if not function_calls_to_execute:
+                break
+                
+            # We process the first function call for simplicity
+            fc = function_calls_to_execute[0]
+            name = fc.name
+            args = {k: v for k, v in fc.args.items()} if hasattr(fc.args, 'items') else dict(fc.args)
+            
+            if name == "request_add_to_cart":
+                p_id = args.get('product_url_id')
+                # Handle possible float representation from JSON
+                try:
+                    qty = int(float(args.get('qty', 1)))
+                except Exception:
+                    qty = 1
+
+                p = Product.objects.filter(p_id=p_id).first()
+                if p:
+                    # Interrupt conversation to ask for UI confirmation
+                    return Response({
+                        "reply": f"Would you like to add **{qty}x {p.title}** to your cart?",
+                        "action": "confirm_add_cart",
+                        "product": {
+                            "id": str(p.id),
+                            "pid": p.p_id,
+                            "title": p.title,
+                            "qty": qty,
+                            "price": str(p.price),
+                            "image": p.image.url if p.image else ""
+                        }
+                    })
+                else:
+                    response = chat.send_message([{
+                        "function_response": {
+                            "name": name,
+                            "response": {"error": "Product not found"}
+                        }
+                    }])
+                    continue
+
+            elif name == "request_checkout":
+                return Response({
+                    "reply": "You can review your items and complete your order at the checkout page.",
+                    "action": "confirm_checkout"
+                })
+
+            elif name == "search_products":
+                query_val = args.get('query', '')
+                results = search_products(query_val)
+                response = chat.send_message([{
+                    "function_response": {
+                        "name": name,
+                        "response": {"result": results}
+                    }
+                }])
+                return Response({
+                    "reply": response.text,
+                    "hidden_context": f"(SYSTEM CONTEXT - DO NOT MENTION: Latest Search Results: {results})"
+                })
+                
+            elif name == "get_bestsellers":
+                results = get_bestsellers()
+                response = chat.send_message([{
+                    "function_response": {
+                        "name": name,
+                        "response": {"result": results}
+                    }
+                }])
+                return Response({
+                    "reply": response.text,
+                    "hidden_context": f"(SYSTEM CONTEXT - DO NOT MENTION: Latest Bestsellers: {results})"
+                })
+                
+            else:
+                break
         
         return Response({
             "reply": response.text

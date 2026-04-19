@@ -1310,7 +1310,20 @@
                     appendMessage('bot', data.reply);
                     // Add to local history
                     chatHistory.push({role: 'assistant', content: data.reply});
+                    if (data.hidden_context) {
+                        chatHistory.push({role: 'user', content: data.hidden_context});
+                    }
                     sessionStorage.setItem('grocerlyChatHistory', JSON.stringify(chatHistory));
+
+                    if (data.action === "confirm_add_cart") {
+                        const p = data.product;
+                        const btnHtml = `<button style="margin-top:10px; width:100%; border-radius:5px;" class="btn btn-sm btn-success" onclick="aiConfirmCartAdd('${p.id}', '${p.title.replace(/'/g, "\\'")}', '${p.qty}', '${p.price}', '${p.image}', '${p.pid}')">Yes, Add to Cart</button>`;
+                        appendMessage('bot', btnHtml);
+                    } else if (data.action === "confirm_checkout") {
+                        const btnHtml = `<button style="margin-top:10px; width:100%; border-radius:5px;" class="btn btn-sm btn-success" onclick="window.location.href='/cart/'">Proceed to Checkout</button>`;
+                        appendMessage('bot', btnHtml);
+                    }
+
                 } else if(data.error) {
                     appendMessage('bot', "Error: " + data.error);
                 }
@@ -1335,6 +1348,31 @@
                 }
             }
             return cookieValue;
+        }
+
+        function aiConfirmCartAdd(id, title, qty, price, image, pid) {
+            appendMessage('user', "Yes, please add it.");
+            chatHistory.push({role: 'user', content: "Yes, please add it."});
+            
+            $.ajax({
+                url: '/add-to-cart/',
+                data: {
+                    'id': id,
+                    'pid': pid,
+                    'image': image,
+                    'qty': qty,
+                    'title': title,
+                    'price': price,
+                },
+                dataType: 'json',
+                success: function(response){
+                    $(".cart-items-count").text(response.totalcartitems);
+                    appendMessage('bot', "✅ Item successfully added to your cart!");
+                    // Give silent context back to AI so it knows it was successful
+                    chatHistory.push({role: 'user', content: "(SYSTEM: Item added successfully. Acknowledge briefly.)"});
+                    sessionStorage.setItem('grocerlyChatHistory', JSON.stringify(chatHistory));
+                }
+            });
         }
     </script>
 
