@@ -1367,9 +1367,11 @@
                 dataType: 'json',
                 success: function(response){
                     $(".cart-items-count").text(response.totalcartitems);
-                    appendMessage('bot', "✅ Item successfully added to your cart!");
-                    // Give silent context back to AI so it knows it was successful
-                    chatHistory.push({role: 'user', content: "(SYSTEM: Item added successfully. Acknowledge briefly.)"});
+                    
+                    const botReply = `✅ Đã thêm **${qty}x ${title}** vào giỏ hàng thành công! Bạn có muốn tiến hành **Thanh toán (Checkout)** luôn không, hay muốn tìm thêm đồ gì khác?`;
+                    appendMessage('bot', botReply);
+                    
+                    chatHistory.push({role: 'assistant', content: botReply});
                     sessionStorage.setItem('grocerlyChatHistory', JSON.stringify(chatHistory));
                 }
             });
