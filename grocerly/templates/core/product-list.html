@@ -74,9 +74,11 @@
                                     <div class="sidebar-widget widget-tags">
                                         <ul class="tags-list">
                                             {% for t in tags %}
+                                            {% if t.slug %}
                                             <li class="hover-up">
                                                 <a href="{% url 'core:tags' t.slug %}"><i class="fi-rs-cross mr-10"></i>{{ t.name }}</a>
                                             </li>
+                                            {% endif %}
                                             {% empty %}
                                             <li class="hover-up">
                                                 <a href="#"><i class="fi-rs-cross mr-10"></i>No tags yet</a>

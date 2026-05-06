@@ -1,17 +1,4 @@
 services:
-  db:
-    image: postgres:16-alpine
-    container_name: grocerly-db
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB:-grocerly}
-      - POSTGRES_USER=${POSTGRES_USER:-grocerly}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-grocerly_secret}
-    expose:
-      - "5432"
-    restart: unless-stopped
-
   web:
     image: ${WEB_IMAGE:-grocerly-web:latest}
     container_name: grocerly-web
@@ -22,11 +9,14 @@ services:
       - DJANGO_DEBUG=${DJANGO_DEBUG:-0}
       - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-change-me-in-production}
-      - DATABASE_URL=postgres://${POSTGRES_USER:-grocerly}:${POSTGRES_PASSWORD:-grocerly_secret}@db:5432/${POSTGRES_DB:-grocerly}
+      - DATABASE_URL=${DATABASE_URL}
+      - USE_S3=${USE_S3:-False}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME}
+      - AWS_S3_REGION_NAME=${AWS_S3_REGION_NAME}
     expose:
       - "8000"
-    depends_on:
-      - db
     restart: unless-stopped
 
   nginx:
@@ -43,6 +33,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres-data:
   static-data:
   media-data:

@@ -11,3 +11,6 @@ stripe==12.1.0
 tzdata==2025.2
 gunicorn==23.0.0
 psycopg2-binary==2.9.10
+django-cleanup==9.0.0
+boto3==1.36.0
+django-storages==1.14.5

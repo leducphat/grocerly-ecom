@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 
-from core.models import CartOrder, CartOrderItem, Product, Category, ProductReview
+from core.models import CartOrder, CartOrderItem, Product, Category, ProductReview, ProductImage
 from userauths.models import Profile, User
 from useradmin.forms import AddProductForm
 from useradmin.decorators import admin_required
@@ -54,6 +54,12 @@ def add_product(request):
             new_form.user = request.user
             new_form.save()
             form.save_m2m()
+            
+            # Handle additional images
+            additional_images = request.FILES.getlist('additional_images')
+            for img in additional_images:
+                ProductImage.objects.create(product=new_form, image=img)
+                
             return redirect("useradmin:dashboard-products")
     else:
         form = AddProductForm()
@@ -72,6 +78,17 @@ def edit_product(request, pid):
             new_form = form.save(commit=False)
             new_form.save()
             form.save_m2m()
+            
+            # Handle additional images
+            additional_images = request.FILES.getlist('additional_images')
+            for img in additional_images:
+                ProductImage.objects.create(product=new_form, image=img)
+                
+            # Handle deletion of existing images
+            delete_images = request.POST.getlist('delete_images')
+            if delete_images:
+                ProductImage.objects.filter(id__in=delete_images, product=new_form).delete()
+                
             return redirect("useradmin:dashboard-products")
     else:
         form = AddProductForm(instance=product)

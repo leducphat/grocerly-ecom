@@ -16,5 +16,5 @@ export SSH_KEY="$HOME/.ssh/grocerly-key.pem"   # Replace with path to your EC2 S
 export REMOTE_DIR="/home/ubuntu/grocerly"      # Adjust if EC2_USER is different
 
 # Optional data sync toggle
-# 0 = normal deploy, 1 = also upload local db.sqlite3 and media/ to EC2 container
-export SYNC_LOCAL_DB="0"
+# 0 = normal deploy, 1 = also upload local media/ to EC2 container
+export SYNC_LOCAL_MEDIA="0"

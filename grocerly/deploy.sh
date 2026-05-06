@@ -15,7 +15,6 @@ EC2_HOST=""                      # e.g. ec2-xx-xx-xx-xx.compute-1.amazonaws.com 
 EC2_USER="ubuntu"                # ubuntu (Ubuntu AMI) / ec2-user (Amazon Linux)
 SSH_KEY=""                       # e.g. ~/.ssh/grocerly-key.pem
 REMOTE_DIR="/home/$EC2_USER/grocerly"
-SYNC_LOCAL_DB="${SYNC_LOCAL_DB:-0}"  # set to 1 to sync local db.sqlite3 and media/
 
 # ---------- Load local secrets from deploy.sh.local (if exists) ----------
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -104,17 +103,6 @@ else
     warn "No .env found locally; EC2 will use existing .env or defaults"
 fi
 
-if [ "$SYNC_LOCAL_DB" = "1" ]; then
-    info "SYNC_LOCAL_DB=1 detected: preparing local db/media sync files..."
-    [ -f db.sqlite3 ] || error "SYNC_LOCAL_DB=1 but local db.sqlite3 not found"
-    $SCP_CMD db.sqlite3 "$EC2_USER@$EC2_HOST:$REMOTE_DIR/db.sqlite3"
-    if [ -d media ]; then
-        $SCP_CMD -r media "$EC2_USER@$EC2_HOST:$REMOTE_DIR/"
-    else
-        warn "SYNC_LOCAL_DB=1 but local media/ folder not found; skipping media sync"
-    fi
-fi
-
 # ---------- Step 6: Pull latest image and restart ----------
 info "Deploying on EC2..."
 $SSH_CMD << EOF
@@ -126,17 +114,6 @@ aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --
 WEB_IMAGE=$ECR_URI:$IMAGE_TAG docker compose pull web
 WEB_IMAGE=$ECR_URI:$IMAGE_TAG docker compose up -d --remove-orphans
 
-if [ "$SYNC_LOCAL_DB" = "1" ]; then
-    echo "Applying local db/media to running containers..."
-    docker compose stop web
-    docker cp "$REMOTE_DIR/db.sqlite3" grocerly-web:/data/db.sqlite3
-    if [ -d "$REMOTE_DIR/media" ]; then
-        docker cp "$REMOTE_DIR/media/." grocerly-web:/app/media/
-        docker exec grocerly-web sh -lc 'chmod -R a+rX /app/media'
-    fi
-    docker compose start web
-fi
-
 docker image prune -f
 docker compose ps
 EOF
@@ -146,7 +123,4 @@ info "=========================================="
 info " Deployment successful!"
 info " Image: $ECR_URI:$IMAGE_TAG"
 info " Site: http://$EC2_HOST"
-if [ "$SYNC_LOCAL_DB" = "1" ]; then
-    info " Local data sync: enabled (db.sqlite3/media copied)"
-fi
 info "=========================================="

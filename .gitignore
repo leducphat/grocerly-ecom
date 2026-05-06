@@ -202,7 +202,8 @@ ecr-login.log
 *.key
 !*.pub
 
-# Docker volumes
+# Docker volumes & Local storage
+media/
 sqlite-data/
 media-data/
 static-data/
