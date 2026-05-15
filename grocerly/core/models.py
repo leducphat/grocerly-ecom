@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
 from shortuuid.django_fields import ShortUUIDField
 from django.utils.html import mark_safe
 from userauths.models import User
@@ -121,7 +122,11 @@ class SoftDeleteModel(models.Model):
 class Category(SoftDeleteModel):
     c_id = ShortUUIDField(unique=True, length=10, max_length=20, prefix="cat", alphabet="abcdefgh12345")
     title = models.CharField(max_length=100, default="Category Title")
-    image = models.ImageField(upload_to="category", default="category.jpg")
+    image = models.FileField(
+        upload_to="category", 
+        default="category.jpg",
+        validators=[FileExtensionValidator(allowed_extensions=['svg', 'png', 'jpg', 'jpeg', 'gif', 'webp'])]
+    )
 
     class Meta:
         verbose_name_plural = "Categories"
