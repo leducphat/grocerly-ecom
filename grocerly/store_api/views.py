@@ -201,9 +201,24 @@ def ai_chat(request):
             "reply": response.text
         })
     except Exception as e:
-        import traceback
+        import traceback, re
         traceback.print_exc()
         error_msg = str(e)
-        if "429" in error_msg or "Quota" in error_msg:
-            return Response({"reply": "Hệ thống AI đang quá tải do giới hạn miễn phí (Rate Limit). Vui lòng đợi khoảng 15-30 giây rồi thử lại nhé!"}, status=200)
-        return Response({"reply": "I am having trouble connecting to my brain right now. Try again later!"}, status=200)
+        if "429" in error_msg or "Quota" in error_msg or "ResourceExhausted" in error_msg:
+            # Try to extract the retry delay from Google's error response
+            retry_match = re.search(r'retry in (\d+\.?\d*)', error_msg, re.IGNORECASE)
+            if not retry_match:
+                retry_match = re.search(r'retry_delay\s*\{\s*seconds:\s*(\d+)', error_msg)
+            
+            if retry_match:
+                wait_seconds = int(float(retry_match.group(1)))
+                return Response({
+                    "reply": f"⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi **{wait_seconds} giây** rồi thử lại nhé!",
+                    "retry_after": wait_seconds
+                }, status=200)
+            else:
+                return Response({
+                    "reply": "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 giây rồi thử lại nhé!",
+                    "retry_after": 30
+                }, status=200)
+        return Response({"reply": "Mình đang gặp trục trặc kết nối. Bạn thử lại sau nhé!"}, status=200)
