@@ -67,7 +67,7 @@ genai.configure(api_key=api_key)
 try:
     # Initialize the model with tools and system instruction
     model = genai.GenerativeModel(
-        model_name='gemini-2.5-flash',
+        model_name='gemini-1.5-flash',
         tools=[search_products, get_bestsellers, request_add_to_cart, request_checkout],
         system_instruction=(
             "You are Grocerly Assistant, the AI shopping assistant for Grocerly E-commerce. "
@@ -203,4 +203,7 @@ def ai_chat(request):
     except Exception as e:
         import traceback
         traceback.print_exc()
+        error_msg = str(e)
+        if "429" in error_msg or "Quota" in error_msg:
+            return Response({"reply": "Hệ thống AI đang quá tải do giới hạn miễn phí (Rate Limit). Vui lòng đợi khoảng 15-30 giây rồi thử lại nhé!"}, status=200)
         return Response({"reply": "I am having trouble connecting to my brain right now. Try again later!"}, status=200)
