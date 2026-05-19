@@ -67,7 +67,7 @@ genai.configure(api_key=api_key)
 try:
     # Initialize the model with tools and system instruction
     model = genai.GenerativeModel(
-        model_name='gemini-1.5-flash-latest',
+        model_name='gemini-2.0-flash',
         tools=[search_products, get_bestsellers, request_add_to_cart, request_checkout],
         system_instruction=(
             "You are Grocerly Assistant, the AI shopping assistant for Grocerly E-commerce. "
