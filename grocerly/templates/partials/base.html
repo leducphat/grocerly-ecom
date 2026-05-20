@@ -1067,7 +1067,7 @@
 
                     if (data.action === "confirm_add_cart") {
                         const p = data.product;
-                        const btnHtml = `<button style="margin-top:10px; width:100%; border-radius:5px;" class="btn btn-sm btn-success" onclick="aiConfirmCartAdd('${p.id}', '${p.title.replace(/'/g, "\\'")}', '${p.qty}', '${p.price}', '${p.image}', '${p.pid}')">Yes, Add to Cart</button>`;
+                        const btnHtml = `<button style="margin-top:10px; width:100%; border-radius:5px;" class="btn btn-sm btn-success" onclick="aiConfirmCartAdd('${p.id}', '${p.title.replace(/'/g, "\\'")}', '${p.qty}', '${p.price}', '${p.image}', '${p.p_id}')">Yes, Add to Cart</button>`;
                         appendMessage('bot', btnHtml);
                     } else if (data.action === "confirm_checkout") {
                         const btnHtml = `<button style="margin-top:10px; width:100%; border-radius:5px;" class="btn btn-sm btn-success" onclick="window.location.href='/cart/'">Proceed to Checkout</button>`;

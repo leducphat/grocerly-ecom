@@ -1,4 +1,4 @@
-from core.models import Product
+from core.models import Product, Vendor
 from django import forms
 
 class AddProductForm(forms.ModelForm):
@@ -15,6 +15,7 @@ class AddProductForm(forms.ModelForm):
     weight_volume = forms.CharField(widget=forms.TextInput(attrs={'placeholder': "Volume/Weight (e.g. 1kg, 500ml)", "class":"form-control"}), required=False)
     ingredients = forms.CharField(widget=forms.Textarea(attrs={'placeholder': "Ingredients list", "class":"form-control"}), required=False)
     storage_instructions = forms.CharField(widget=forms.TextInput(attrs={'placeholder': "e.g. Store in a cool dry place", "class":"form-control"}), required=False)
+    vendor = forms.ModelChoiceField(queryset=Vendor.objects.all(), widget=forms.Select(attrs={"class":"form-select"}), required=False)
 
     class Meta:
         model = Product
@@ -34,4 +35,5 @@ class AddProductForm(forms.ModelForm):
             'weight_volume',
             'ingredients',
             'storage_instructions',
+            'vendor',
         ]

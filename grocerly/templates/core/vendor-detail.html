@@ -20,7 +20,7 @@
                         <div class="product-category">
                             <span class="text-muted">Since {{vendor.date|date:"Y"}}</span>
                         </div>
-                        <h3 class="mb-5 text-white"><a href="vendor-details-1.html" class="text-white">{{vendor.name}}</a></h3>
+                        <h3 class="mb-5 text-white"><a href="{% url 'core:coming-soon' %}" class="text-white">{{vendor.name}}</a></h3>
                         <div class="product-rate-cover mb-15">
                             <div class="product-rate d-inline-block">
                                 <div class="product-rating" style="width: 90%"></div>
@@ -125,7 +125,7 @@
                             <div class="product-img-action-wrap">
                                 <div class="product-img product-img-zoom">
                                     <div class="product-img-inner">
-                                        <a href="shop-product-right.html">
+                                        <a href="{% url \'core:product-detail\' p.p_id %}">
                                             <img class="default-img" src="{{ p.image.url }}" alt="" />
                                             <img class="hover-img" src="{{ p.image.url }}" alt="" />
                                         </a>
@@ -144,7 +144,7 @@
                                 <div class="product-category">
                                     <a href="shop-grid-right.html">{{p.category.title}}</a>
                                 </div>
-                                <h2><a href="shop-product-right.html">{{p.title|truncatechars:50}}</a></h2>
+                                <h2><a href="{% url 'core:coming-soon' %}">{{p.title|truncatechars:50}}</a></h2>
                                 <div class="product-rate-cover">
                                     {% comment %} <div class="product-rate d-inline-block">
                                         <div class="product-rating" style="width: 90%"></div>
@@ -198,7 +198,7 @@
                                 <div class="product-cart-wrap style-2">
                                     <div class="product-img-action-wrap">
                                         <div class="product-img">
-                                            <a href="shop-product-right.html">
+                                            <a href="{% url 'core:coming-soon' %}">
                                                 <img src="{% static 'assets/imgs/banner/banner-5.png' %}" alt="" />
                                             </a>
                                         </div>
@@ -208,7 +208,7 @@
                                             <div class="deals-countdown" data-countdown="2025/03/25 00:00:00"></div>
                                         </div>
                                         <div class="deals-content">
-                                            <h2><a href="shop-product-right.html">Seeds of Change Organic Quinoa, Brown</a></h2>
+                                            <h2><a href="{% url 'core:coming-soon' %}">Seeds of Change Organic Quinoa, Brown</a></h2>
                                             <div class="product-rate-cover">
                                                 <div class="product-rate d-inline-block">
                                                     <div class="product-rating" style="width: 90%"></div>
@@ -216,7 +216,7 @@
                                                 <span class="font-small ml-5 text-muted"> (4.0)</span>
                                             </div>
                                             <div>
-                                                <span class="font-small text-muted">By <a href="vendor-details-1.html">NestFood</a></span>
+                                                <span class="font-small text-muted">By <a href="{% url 'core:coming-soon' %}">NestFood</a></span>
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
@@ -235,7 +235,7 @@
                                 <div class="product-cart-wrap style-2">
                                     <div class="product-img-action-wrap">
                                         <div class="product-img">
-                                            <a href="shop-product-right.html">
+                                            <a href="{% url 'core:coming-soon' %}">
                                                 <img src="{% static 'assets/imgs/banner/banner-6.png' %}" alt="" />
                                             </a>
                                         </div>
@@ -245,7 +245,7 @@
                                             <div class="deals-countdown" data-countdown="2026/04/25 00:00:00"></div>
                                         </div>
                                         <div class="deals-content">
-                                            <h2><a href="shop-product-right.html">Perdue Simply Smart Organics Gluten</a></h2>
+                                            <h2><a href="{% url 'core:coming-soon' %}">Perdue Simply Smart Organics Gluten</a></h2>
                                             <div class="product-rate-cover">
                                                 <div class="product-rate d-inline-block">
                                                     <div class="product-rating" style="width: 90%"></div>
@@ -253,7 +253,7 @@
                                                 <span class="font-small ml-5 text-muted"> (4.0)</span>
                                             </div>
                                             <div>
-                                                <span class="font-small text-muted">By <a href="vendor-details-1.html">Old El Paso</a></span>
+                                                <span class="font-small text-muted">By <a href="{% url 'core:coming-soon' %}">Old El Paso</a></span>
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
@@ -272,7 +272,7 @@
                                 <div class="product-cart-wrap style-2">
                                     <div class="product-img-action-wrap">
                                         <div class="product-img">
-                                            <a href="shop-product-right.html">
+                                            <a href="{% url 'core:coming-soon' %}">
                                                 <img src="{% static 'assets/imgs/banner/banner-7.png' %}" alt="" />
                                             </a>
                                         </div>
@@ -282,7 +282,7 @@
                                             <div class="deals-countdown" data-countdown="2027/03/25 00:00:00"></div>
                                         </div>
                                         <div class="deals-content">
-                                            <h2><a href="shop-product-right.html">Signature Wood-Fired Mushroom</a></h2>
+                                            <h2><a href="{% url 'core:coming-soon' %}">Signature Wood-Fired Mushroom</a></h2>
                                             <div class="product-rate-cover">
                                                 <div class="product-rate d-inline-block">
                                                     <div class="product-rating" style="width: 80%"></div>
@@ -290,7 +290,7 @@
                                                 <span class="font-small ml-5 text-muted"> (3.0)</span>
                                             </div>
                                             <div>
-                                                <span class="font-small text-muted">By <a href="vendor-details-1.html">Progresso</a></span>
+                                                <span class="font-small text-muted">By <a href="{% url 'core:coming-soon' %}">Progresso</a></span>
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
@@ -309,7 +309,7 @@
                                 <div class="product-cart-wrap style-2">
                                     <div class="product-img-action-wrap">
                                         <div class="product-img">
-                                            <a href="shop-product-right.html">
+                                            <a href="{% url 'core:coming-soon' %}">
                                                 <img src="{% static 'assets/imgs/banner/banner-8.png' %}" alt="" />
                                             </a>
                                         </div>
@@ -319,7 +319,7 @@
                                             <div class="deals-countdown" data-countdown="2025/02/25 00:00:00"></div>
                                         </div>
                                         <div class="deals-content">
-                                            <h2><a href="shop-product-right.html">Simply Lemonade with Raspberry Juice</a></h2>
+                                            <h2><a href="{% url 'core:coming-soon' %}">Simply Lemonade with Raspberry Juice</a></h2>
                                             <div class="product-rate-cover">
                                                 <div class="product-rate d-inline-block">
                                                     <div class="product-rating" style="width: 80%"></div>
@@ -327,7 +327,7 @@
                                                 <span class="font-small ml-5 text-muted"> (3.0)</span>
                                             </div>
                                             <div>
-                                                <span class="font-small text-muted">By <a href="vendor-details-1.html">Yoplait</a></span>
+                                                <span class="font-small text-muted">By <a href="{% url 'core:coming-soon' %}">Yoplait</a></span>
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
