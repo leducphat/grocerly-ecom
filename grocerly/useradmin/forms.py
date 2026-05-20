@@ -9,7 +9,7 @@ class AddProductForm(forms.ModelForm):
     type = forms.CharField(widget=forms.TextInput(attrs={'placeholder': "Type of product e.g organic cream", "class":"form-control"}))
     stock_count = forms.CharField(widget=forms.NumberInput(attrs={'placeholder': "How many are in stock?", "class":"form-control"}))
     expiry_period = forms.CharField(widget=forms.TextInput(attrs={'placeholder': "Expiry period e.g 100 Days", "class":"form-control"}), required=False)
-    mfd = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'placeholder': "e.g: 22-11-02", "class":"form-control"}), required=False)
+    mfd = forms.DateTimeField(widget=forms.DateInput(attrs={'type': 'date', 'class':'form-control'}), required=False)
     tags = forms.CharField(widget=forms.TextInput(attrs={'placeholder': "Tags", "class":"form-control"}), required=False)
     image = forms.ImageField(widget=forms.FileInput(attrs={"class":"form-control"}), required=False)
     weight_volume = forms.CharField(widget=forms.TextInput(attrs={'placeholder': "Volume/Weight (e.g. 1kg, 500ml)", "class":"form-control"}), required=False)
