@@ -741,3 +741,6 @@ def privacy_policy(request):
 
 def terms_of_service(request):
     return render(request, "core/terms_of_service.html")
+
+def coming_soon(request):
+    return render(request, "core/coming-soon.html")

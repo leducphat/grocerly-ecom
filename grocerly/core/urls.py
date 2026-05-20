@@ -61,4 +61,5 @@ urlpatterns = [
     path('purchase_guide/', views.purchase_guide, name='purchase_guide'),
     path('privacy_policy/', views.privacy_policy, name='privacy_policy'),
     path('terms_of_service/', views.terms_of_service, name='terms_of_service'),
+    path('coming-soon/', views.coming_soon, name='coming-soon'),
 ]
