@@ -1,0 +1,466 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-20 10:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "404 - Không tìm thấy trang | Grocerly"
+msgstr ""
+
+msgid "About"
+msgstr ""
+
+msgid "About Us"
+msgstr ""
+
+msgid "Account"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Add Address"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "All Categories"
+msgstr ""
+
+msgid "All Deals"
+msgstr ""
+
+msgid "All Vendors"
+msgstr ""
+
+msgid "Apply Price"
+msgstr ""
+
+msgid "Avg. Rating"
+msgstr ""
+
+msgid "Browse"
+msgstr ""
+
+msgid "Butter and Margarine"
+msgstr ""
+
+msgid "By"
+msgstr ""
+
+msgid "By Categories"
+msgstr ""
+
+msgid "By Price"
+msgstr ""
+
+msgid "By Tags"
+msgstr ""
+
+msgid "By Vendors"
+msgstr ""
+
+msgid "Careers"
+msgstr ""
+
+msgid "Cart"
+msgstr ""
+
+msgid "Categories"
+msgstr ""
+
+msgid "Category"
+msgstr ""
+
+msgid "Checkout"
+msgstr ""
+
+msgid "Cheese"
+msgstr ""
+
+msgid "Company"
+msgstr ""
+
+msgid "Compare products"
+msgstr ""
+
+msgid "Contact"
+msgstr ""
+
+msgid "Contact Us"
+msgstr ""
+
+msgid "Cảm ơn bạn đã kiên nhẫn chờ đợi!"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Deals"
+msgstr ""
+
+msgid "Deals Of The Day"
+msgstr ""
+
+msgid "Delivery Information"
+msgstr ""
+
+msgid "Discount"
+msgstr ""
+
+msgid "Don’t miss amazing<br /> grocery deals"
+msgstr ""
+
+msgid "Edit Profile"
+msgstr ""
+
+msgid "Eggs Substitutes"
+msgstr ""
+
+msgid "Featured"
+msgstr ""
+
+msgid "Filter"
+msgstr ""
+
+msgid "Filters"
+msgstr ""
+
+msgid "Fresh Vegetables<br /> Big discount"
+msgstr ""
+
+msgid "From your account dashboard you can easily check &amp; view your"
+msgstr ""
+
+msgid "From:"
+msgstr ""
+
+msgid "Hello"
+msgstr ""
+
+msgid "Help Ticket"
+msgstr ""
+
+msgid "Home"
+msgstr ""
+
+msgid "Items"
+msgstr ""
+
+msgid "Log In / Sign Up"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Make Default"
+msgstr ""
+
+msgid "Marmalades"
+msgstr ""
+
+msgid "Max Price"
+msgstr ""
+
+msgid "Milk & Flavoured Milk"
+msgstr ""
+
+msgid "Min Price"
+msgstr ""
+
+msgid "My Account"
+msgstr ""
+
+msgid "My Address"
+msgstr ""
+
+msgid "My Profile"
+msgstr ""
+
+msgid "My Voucher"
+msgstr ""
+
+msgid "My Wishlist"
+msgstr ""
+
+msgid "Mình đang gặp trục trặc kết nối. Bạn thử lại sau nhé!"
+msgstr ""
+
+msgid "Need help? Call Us:"
+msgstr ""
+
+msgid "No categories yet"
+msgstr ""
+
+msgid "No deals available right now."
+msgstr ""
+
+msgid "No orders yet."
+msgstr ""
+
+msgid "No tags yet"
+msgstr ""
+
+msgid "No vendors yet"
+msgstr ""
+
+msgid "Not verified"
+msgstr ""
+
+msgid "Oops! Trang này không tồn tại"
+msgstr ""
+
+msgid "Order"
+msgstr ""
+
+msgid "Order Tracking"
+msgstr ""
+
+msgid "Orders"
+msgstr ""
+
+msgid "Our location"
+msgstr ""
+
+msgid "Pages"
+msgstr ""
+
+msgid "Paid Status"
+msgstr ""
+
+msgid "Popular"
+msgstr ""
+
+msgid "Popular Products"
+msgstr ""
+
+msgid "Price: High to Low"
+msgstr ""
+
+msgid "Price: Low to High"
+msgstr ""
+
+msgid "Privacy Policy"
+msgstr ""
+
+msgid "Proceed To CheckOut"
+msgstr ""
+
+msgid "Product"
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "Purchase Guide"
+msgstr ""
+
+msgid "Quantity"
+msgstr ""
+
+msgid "Register"
+msgstr ""
+
+msgid "Release Date"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Save Address"
+msgstr ""
+
+msgid "Save up to 50% off on your first order"
+msgstr ""
+
+msgid "Search for items..."
+msgstr ""
+
+msgid "Search for items…"
+msgstr ""
+
+msgid "Setting"
+msgstr ""
+
+msgid "Shipping"
+msgstr ""
+
+msgid "Shipping Details"
+msgstr ""
+
+msgid "Shop"
+msgstr ""
+
+msgid "Show more..."
+msgstr ""
+
+msgid "Show:"
+msgstr ""
+
+msgid "Sign In"
+msgstr ""
+
+msgid "Sign in"
+msgstr ""
+
+msgid "Sign out"
+msgstr ""
+
+msgid "Sign up for the daily newsletter"
+msgstr ""
+
+msgid "Sort by:"
+msgstr ""
+
+msgid "Sour Cream and Dips"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Subscribe"
+msgstr ""
+
+msgid "Subtotal"
+msgstr ""
+
+msgid "Support Center"
+msgstr ""
+
+msgid "Tax"
+msgstr ""
+
+msgid "Tea & Kombucha"
+msgstr ""
+
+msgid "Terms & Conditions"
+msgstr ""
+
+msgid "Terms of Service"
+msgstr ""
+
+msgid "There are"
+msgstr ""
+
+msgid "This feature is currently under development and will be available soon."
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Tiếp Tục Mua Sắm"
+msgstr ""
+
+msgid "To:"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Track My Order"
+msgstr ""
+
+msgid "Tính năng này đang được đội ngũ Grocerly xây dựng và sẽ sớm ra mắt trong thời gian tới."
+msgstr ""
+
+msgid "Unit Price"
+msgstr ""
+
+msgid "Vendor Dashboard"
+msgstr ""
+
+msgid "Vendors"
+msgstr ""
+
+msgid "Verified"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "View Cart"
+msgstr ""
+
+msgid "View cart"
+msgstr ""
+
+msgid "Về Trang Chủ"
+msgstr ""
+
+msgid "We found"
+msgstr ""
+
+msgid "Wishlist"
+msgstr ""
+
+msgid "Your Cart"
+msgstr ""
+
+msgid "Your Location"
+msgstr ""
+
+msgid "Your Orders"
+msgstr ""
+
+msgid "Your cart is empty"
+msgstr ""
+
+msgid "Your emaill address"
+msgstr ""
+
+msgid "and"
+msgstr ""
+
+msgid "edit your password and account details."
+msgstr ""
+
+msgid "items for you!"
+msgstr ""
+
+msgid "manage your"
+msgstr ""
+
+msgid "products in your cart"
+msgstr ""
+
+msgid "recent orders"
+msgstr ""
+
+msgid "shipping and billing addresses"
+msgstr ""
+
+msgid "Đang Phát Triển"
+msgstr ""
+
+msgid "Đường link bạn truy cập có thể đã bị xóa, đổi tên, hoặc tạm thời không khả dụng."
+msgstr ""
+
+msgid "← Quay về Trang Chủ"
+msgstr ""
+
+msgid "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi **%(wait_seconds)s giây** rồi thử lại nhé!"
+msgstr ""
+
+msgid "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 giây rồi thử lại nhé!"
+msgstr ""
+

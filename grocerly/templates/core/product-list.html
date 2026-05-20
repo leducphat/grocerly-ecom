@@ -1,13 +1,13 @@
 {% extends 'partials/base.html' %}
-{% load static currency_filters %}
+{% load static currency_filters i18n %}
 {% block content %}
 
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
-                    <span></span> Shop <span></span> Filter
+                    <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>{% trans "Home" %}</a>
+                    <span></span> {% trans "Shop" %} <span></span> {% trans "Filter" %}
                 </div>
             </div>
         </div>
@@ -16,7 +16,7 @@
                 <div class="col-lg-12">
                     <a class="shop-filter-toogle" href="#">
                         <span class="fi-rs-filter mr-5"></span>
-                        Filters
+                        {% trans "Filters" %}
                         <i class="fi-rs-angle-small-down angle-down"></i>
                         <i class="fi-rs-angle-small-up angle-up"></i>
                     </a>
@@ -24,7 +24,7 @@
                         <div class="row">
                             <div class="col-xl-3 col-lg-6 col-md-6 mb-lg-0 mb-md-2 mb-sm-2">
                                 <div class="card">
-                                    <h5 class="mb-30">By Categories</h5>
+                                    <h5 class="mb-30">{% trans "By Categories" %}</h5>
                                     <div class="categories-dropdown-wrap font-heading">
                                         <ul>
                                             {% for c in categories|slice:":8" %}
@@ -35,7 +35,7 @@
                                                 </label>
                                             </li>
                                             {% empty %}
-                                            <li class="mb-0"><a href="#">No categories yet</a></li>
+                                            <li class="mb-0"><a href="#">{% trans "No categories yet" %}</a></li>
                                             {% endfor %}
                                         </ul>
                                     </div>
@@ -43,7 +43,7 @@
                             </div>
                             <div class="col-xl-3 col-lg-6 col-md-6 mb-lg-0 mb-md-2 mb-sm-2">
                                 <div class="card">
-                                    <h5 class="mb-30">By Vendors</h5>
+                                    <h5 class="mb-30">{% trans "By Vendors" %}</h5>
                                     <div class="d-flex">
                                         <div class="custome-checkbox mr-80">
                                             {% for v in vendors|slice:":12" %}
@@ -53,7 +53,7 @@
                                                 <br />
                                                 {% endif %}
                                             {% empty %}
-                                                <span>No vendors yet</span>
+                                                <span>{% trans "No vendors yet" %}</span>
                                             {% endfor %}
                                         </div>
                                         <div class="custome-checkbox">
@@ -70,7 +70,7 @@
                             </div>
                             <div class="col-xl-3 col-lg-6 col-md-6 mb-lg-0 mb-md-2 mb-sm-2">
                                 <div class="card">
-                                    <h5 class="mb-30">By Tags</h5>
+                                    <h5 class="mb-30">{% trans "By Tags" %}</h5>
                                     <div class="sidebar-widget widget-tags">
                                         <ul class="tags-list">
                                             {% for t in tags %}
@@ -81,7 +81,7 @@
                                             {% endif %}
                                             {% empty %}
                                             <li class="hover-up">
-                                                <a href="#"><i class="fi-rs-cross mr-10"></i>No tags yet</a>
+                                                <a href="#"><i class="fi-rs-cross mr-10"></i>{% trans "No tags yet" %}</a>
                                             </li>
                                             {% endfor %}
                                         </ul>
@@ -90,27 +90,27 @@
                             </div>
                             <div class="col-xl-3 col-lg-6 col-md-6 mb-lg-0 mb-md-5 mb-sm-5">
                                 <div class="card">
-                                    <h5 class="mb-10">By Price</h5>
+                                    <h5 class="mb-10">{% trans "By Price" %}</h5>
                                     <div class="sidebar-widget price_range range">
                                         <div class="price-filter mb-20">
                                             <div class="price-filter-inner">
                                                 <div id="slider-range" class="mb-20"></div>
                                                 <div class="d-flex justify-content-between">
-                                                    <div class="caption">From: <strong id="slider-range-value1" class="text-brand">{{ min_price|vnd }} ₫</strong></div>
-                                                    <div class="caption">To: <strong id="slider-range-value2" class="text-brand">{{ max_price|vnd }} ₫</strong></div>
+                                                    <div class="caption">{% trans "From:" %} <strong id="slider-range-value1" class="text-brand">{{ min_price|vnd }} ₫</strong></div>
+                                                    <div class="caption">{% trans "To:" %} <strong id="slider-range-value2" class="text-brand">{{ max_price|vnd }} ₫</strong></div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="custome-checkbox">
                                             <div class="mb-2">
-                                                <label class="mb-1">Min Price</label>
+                                                <label class="mb-1">{% trans "Min Price" %}</label>
                                                 <input type="number" step="0.01" id="min-price-filter" class="form-control" value="{{ min_price }}" min="0">
                                             </div>
                                             <div class="mb-2">
-                                                <label class="mb-1">Max Price</label>
+                                                <label class="mb-1">{% trans "Max Price" %}</label>
                                                 <input type="number" step="0.01" id="max-price-filter" class="form-control" value="{{ max_price }}" min="0">
                                             </div>
-                                            <button type="button" id="apply-price-filter" class="btn btn-sm">Apply Price</button>
+                                            <button type="button" id="apply-price-filter" class="btn btn-sm">{% trans "Apply Price" %}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -121,13 +121,13 @@
                 <div class="col-12">
                     <div class="shop-product-fillter">
                         <div class="totall-product">
-                            <p>We found <strong class="text-brand">{{ product_count }}</strong> items for you!</p>
+                            <p>{% trans "We found" %} <strong class="text-brand">{{ product_count }}</strong> {% trans "items for you!" %}</p>
                         </div>
                         <div class="sort-by-product-area">
                             <div class="sort-by-cover mr-10">
                                 <div class="sort-by-product-wrap">
                                     <div class="sort-by">
-                                        <span><i class="fi-rs-apps"></i>Show:</span>
+                                        <span><i class="fi-rs-apps"></i>{% trans "Show:" %}</span>
                                     </div>
                                     <div class="sort-by-dropdown-wrap">
                                         <span> 50 <i class="fi-rs-angle-small-down"></i></span>
@@ -139,26 +139,26 @@
                                         <li><a href="#">100</a></li>
                                         <li><a href="#">150</a></li>
                                         <li><a href="#">200</a></li>
-                                        <li><a href="#">All</a></li>
+                                        <li><a href="#">{% trans "All" %}</a></li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="sort-by-cover">
                                 <div class="sort-by-product-wrap">
                                     <div class="sort-by">
-                                        <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
+                                        <span><i class="fi-rs-apps-sort"></i>{% trans "Sort by:" %}</span>
                                     </div>
                                     <div class="sort-by-dropdown-wrap">
-                                        <span> Featured <i class="fi-rs-angle-small-down"></i></span>
+                                        <span> {% trans "Featured" %} <i class="fi-rs-angle-small-down"></i></span>
                                     </div>
                                 </div>
                                 <div class="sort-by-dropdown">
                                     <ul>
-                                        <li><a class="active" href="#">Featured</a></li>
-                                        <li><a href="#">Price: Low to High</a></li>
-                                        <li><a href="#">Price: High to Low</a></li>
-                                        <li><a href="#">Release Date</a></li>
-                                        <li><a href="#">Avg. Rating</a></li>
+                                        <li><a class="active" href="#">{% trans "Featured" %}</a></li>
+                                        <li><a href="#">{% trans "Price: Low to High" %}</a></li>
+                                        <li><a href="#">{% trans "Price: High to Low" %}</a></li>
+                                        <li><a href="#">{% trans "Release Date" %}</a></li>
+                                        <li><a href="#">{% trans "Avg. Rating" %}</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -188,9 +188,9 @@
                     </div> {% endcomment %}
                     <section class="section-padding pb-5">
                         <div class="section-title">
-                            <h3 class="">Deals Of The Day</h3>
+                            <h3 class="">{% trans "Deals Of The Day" %}</h3>
                             <a class="show-all" href="{% url 'core:product-list' %}">
-                                All Deals
+                                {% trans "All Deals" %}
                                 <i class="fi-rs-angle-right"></i>
                             </a>
                         </div>
@@ -209,7 +209,7 @@
                                         <div class="deals-content">
                                             <h2><a href="{% url 'core:product-detail' deal.p_id %}">{{ deal.title|truncatechars:40 }}</a></h2>
                                             <div>
-                                                <span class="font-small text-muted">By <a href="{% url 'core:vendor-detail' deal.vendor.v_id %}">{{ deal.vendor.name }}</a></span>
+                                                <span class="font-small text-muted">{% trans "By" %} <a href="{% url 'core:vendor-detail' deal.vendor.v_id %}">{{ deal.vendor.name }}</a></span>
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
@@ -223,7 +223,7 @@
                             </div>
                             {% empty %}
                             <div class="col-12">
-                                <p>No deals available right now.</p>
+                                <p>{% trans "No deals available right now." %}</p>
                             </div>
                             {% endfor %}
                         </div>

@@ -1,9 +1,9 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>404 - Không tìm thấy trang | Grocerly</title>
+    <title>{% trans "404 - Không tìm thấy trang | Grocerly" %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/theme/favicon.svg' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}" />
@@ -67,11 +67,11 @@
                 <img src="{% static 'assets/imgs/theme/logo.svg' %}" alt="Grocerly" style="max-width: 180px; margin-bottom: 40px;" />
             </a>
             <div class="error-code">404</div>
-            <h1 class="error-title">Oops! Trang này không tồn tại</h1>
+            <h1 class="error-title">{% trans "Oops! Trang này không tồn tại" %}</h1>
             <p class="error-desc">
-                Đường link bạn truy cập có thể đã bị xóa, đổi tên, hoặc tạm thời không khả dụng.
+                {% trans "Đường link bạn truy cập có thể đã bị xóa, đổi tên, hoặc tạm thời không khả dụng." %}
             </p>
-            <a href="/" class="btn-back">← Quay về Trang Chủ</a>
+            <a href="/" class="btn-back">{% trans "← Quay về Trang Chủ" %}</a>
         </div>
     </div>
 </body>

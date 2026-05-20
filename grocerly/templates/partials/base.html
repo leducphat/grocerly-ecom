@@ -1,4 +1,4 @@
-{% load static currency_filters %}
+{% load static currency_filters i18n %}
 
 <!DOCTYPE html>
 <html class="no-js" lang="en">
@@ -124,10 +124,10 @@
                     <div class="col-xl-3 col-lg-4">
                         <div class="header-info">
                             <ul>
-                                <li><a href="{% url 'core:about_us' %}">About Us</a></li>
-                                <li><a href="{% url 'core:dashboard' %}">My Account</a></li>
-                                <li><a href="{% url 'core:wishlist' %}">Wishlist</a></li>
-                                <li><a href="{% url 'core:dashboard' %}">Order Tracking</a></li>
+                                <li><a href="{% url 'core:about_us' %}">{% trans "About Us" %}</a></li>
+                                <li><a href="{% url 'core:dashboard' %}">{% trans "My Account" %}</a></li>
+                                <li><a href="{% url 'core:wishlist' %}">{% trans "Wishlist" %}</a></li>
+                                <li><a href="{% url 'core:dashboard' %}">{% trans "Order Tracking" %}</a></li>
                             </ul>
                         </div>
                     </div>
@@ -145,34 +145,21 @@
                     <div class="col-xl-3 col-lg-4">
                         <div class="header-info header-info-right">
                             <ul>
-                                <li>Need help? Call Us: <strong class="text-brand"> + 1800 900</strong></li>
+                                <li>{% trans "Need help? Call Us:" %} <strong class="text-brand"> + 1800 900</strong></li>
                                 <li>
-                                    <a class="language-dropdown-active" href="#">English <i class="fi-rs-angle-small-down"></i></a>
-                                    <ul class="language-dropdown">
-                                        <li>
-                                            <a href="#"><img src="{% static 'assets/imgs/theme/flag-fr.png' %}" alt="" />Français</a>
-                                        </li>
-                                        <li>
-                                            <a href="#"><img src="{% static 'assets/imgs/theme/flag-dt.png' %}" alt="" />Deutsch</a>
-                                        </li>
-                                        <li>
-                                            <a href="#"><img src="{% static 'assets/imgs/theme/flag-ru.png' %}" alt="" />Pусский</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <a class="language-dropdown-active" href="#">₫ <i class="fi-rs-angle-small-down"></i></a>
-                                    <ul class="language-dropdown">
-                                        <li>
-                                            <a href="#"><img src="{% static 'assets/imgs/theme/flag-fr.png' %}" alt="" />INR</a>
-                                        </li>
-                                        <li>
-                                            <a href="#"><img src="{% static 'assets/imgs/theme/flag-dt.png' %}" alt="" />MBP</a>
-                                        </li>
-                                        <li>
-                                            <a href="#"><img src="{% static 'assets/imgs/theme/flag-ru.png' %}" alt="" />EU</a>
-                                        </li>
-                                    </ul>
+                                    <form action="{% url 'set_language' %}" method="post" id="lang-form" style="margin:0;">
+                                        {% csrf_token %}
+                                        <input name="next" type="hidden" value="{{ request.path }}" />
+                                        <select name="language" onchange="document.getElementById('lang-form').submit()" style="border:none; background:transparent; font-weight:600; font-size:13px; color:#253D4E; cursor:pointer; padding-right:15px;">
+                                            {% get_current_language as LANGUAGE_CODE %}
+                                            {% get_available_languages as LANGUAGES %}
+                                            {% for lang_code, lang_name in LANGUAGES %}
+                                                <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                                                    {{ lang_name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </form>
                                 </li>
                             </ul>
                         </div>
@@ -190,12 +177,12 @@
                         <div class="search-style-2">
                             <form action="{% url 'core:search' %}" method="GET">
                                 <select class="select-active">
-                                    <option>All Categories</option>
+                                    <option>{% trans "All Categories" %}</option>
                                     {% for c in categories %}
                                     <option>{{ c.title }}</option>
                                     {% endfor %}
                                 </select>
-                                <input type="text" name="q" placeholder="Search for items..." />
+                                <input type="text" name="q" placeholder="{% trans 'Search for items...' %}" />
                             </form>
                         </div>
                         <div class="header-action-right">
@@ -203,7 +190,7 @@
                                 <div class="search-location">
                                     <form action="#">
                                         <select class="select-active">
-                                            <option>Your Location</option>
+                                            <option>{% trans "Your Location" %}</option>
                                             <option>Alabama</option>
                                             <option>Alaska</option>
                                             <option>Arizona</option>
@@ -226,14 +213,14 @@
                                         <img class="svgInject" alt="Nest" src="{% static 'assets/imgs/theme/icons/icon-heart.svg' %}" />
                                         <span class="pro-count blue">{{ wishlist_count }}</span>
                                     </a>
-                                    <a href="{% url 'core:wishlist' %}"><span class="lable">Wishlist</span></a>
+                                    <a href="{% url 'core:wishlist' %}"><span class="lable">{% trans "Wishlist" %}</span></a>
                                 </div>
                                 <div class="header-action-icon-2">
                                     <a class="mini-cart-icon" href="{% url 'core:cart' %}">
                                         <img alt="Nest" src="{% static 'assets/imgs/theme/icons/icon-cart.svg' %}" />
                                         <span class="pro-count blue mini-cart-count" id="cart-count">{{ cart_total_items }}</span>
                                     </a>
-                                    <a href="{% url 'core:cart' %}"><span class="lable">Cart</span></a>
+                                    <a href="{% url 'core:cart' %}"><span class="lable">{% trans "Cart" %}</span></a>
                                     <div class="cart-dropdown-wrap cart-dropdown-hm2">
                                         <ul class="mini-cart-items">
                                             {% if request.session.cart_data_obj %}
@@ -251,18 +238,18 @@
                                             {% else %}
                                                 <li>
                                                     <div class="shopping-cart-title">
-                                                        <h4>Your cart is empty</h4>
+                                                        <h4>{% trans "Your cart is empty" %}</h4>
                                                     </div>
                                                 </li>
                                             {% endif %}
                                         </ul>
                                         <div class="shopping-cart-footer">
                                             <div class="shopping-cart-total">
-                                                <h4>Items <span>{{ cart_total_items }}</span></h4>
+                                                <h4>{% trans "Items" %} <span>{{ cart_total_items }}</span></h4>
                                             </div>
                                             <div class="shopping-cart-button">
-                                                <a href="{% url 'core:cart' %}" class="outline">View cart</a>
-                                                <a href="{% url 'core:checkout-info' %}">Checkout</a>
+                                                <a href="{% url 'core:cart' %}" class="outline">{% trans "View cart" %}</a>
+                                                <a href="{% url 'core:checkout-info' %}">{% trans "Checkout" %}</a>
                                             </div>
                                         </div>
                                     </div>
@@ -271,19 +258,19 @@
                                     <a href="{% url 'core:dashboard' %}">
                                         <img class="svgInject" alt="Nest" src="{% static 'assets/imgs/theme/icons/icon-user.svg' %}" />
                                     </a>
-                                    <a href="{% url 'core:dashboard' %}"><span class="lable ml-0">Account</span></a>
+                                    <a href="{% url 'core:dashboard' %}"><span class="lable ml-0">{% trans "Account" %}</span></a>
                                     <div class="cart-dropdown-wrap cart-dropdown-hm2 account-dropdown">
                                         <ul>
-                                            <li><a href="{% url 'core:dashboard' %}"><i class="fi fi-rs-user mr-10"></i>My Account</a></li>
-                                            <li><a href="{% url 'core:dashboard' %}"><i class="fi fi-rs-location-alt mr-10"></i>Order Tracking</a></li>
-                                            <li><a href="{% url 'core:dashboard' %}"><i class="fi fi-rs-label mr-10"></i>My Voucher</a></li>
-                                            <li><a href="{% url 'core:wishlist' %}"><i class="fi fi-rs-heart mr-10"></i>My Wishlist</a></li>
-                                            <li><a href="{% url 'userauths:profile-update' %}"><i class="fi fi-rs-settings-sliders mr-10"></i>Setting</a></li>
-                                            <li><a href="{% url 'useradmin:dashboard' %}"><i class="fi fi-rs-settings mr-10"></i>Vendor Dashboard</a></li>
+                                            <li><a href="{% url 'core:dashboard' %}"><i class="fi fi-rs-user mr-10"></i>{% trans "My Account" %}</a></li>
+                                            <li><a href="{% url 'core:dashboard' %}"><i class="fi fi-rs-location-alt mr-10"></i>{% trans "Order Tracking" %}</a></li>
+                                            <li><a href="{% url 'core:dashboard' %}"><i class="fi fi-rs-label mr-10"></i>{% trans "My Voucher" %}</a></li>
+                                            <li><a href="{% url 'core:wishlist' %}"><i class="fi fi-rs-heart mr-10"></i>{% trans "My Wishlist" %}</a></li>
+                                            <li><a href="{% url 'userauths:profile-update' %}"><i class="fi fi-rs-settings-sliders mr-10"></i>{% trans "Setting" %}</a></li>
+                                            <li><a href="{% url 'useradmin:dashboard' %}"><i class="fi fi-rs-settings mr-10"></i>{% trans "Vendor Dashboard" %}</a></li>
                                             {% if user.is_authenticated %}
-                                            <li><a href="{% url 'userauths:sign-out' %}"><i class="fi fi-rs-sign-out mr-10"></i>Sign out</a></li>
+                                            <li><a href="{% url 'userauths:sign-out' %}"><i class="fi fi-rs-sign-out mr-10"></i>{% trans "Sign out" %}</a></li>
                                             {% else %}
-                                            <li><a href="{% url 'userauths:sign-in' %}"><i class="fi fi-rs-sign-in mr-10"></i>Sign in</a></li>
+                                            <li><a href="{% url 'userauths:sign-in' %}"><i class="fi fi-rs-sign-in mr-10"></i>{% trans "Sign in" %}</a></li>
                                             {% endif %}
                                             
                                         </ul>
@@ -304,7 +291,7 @@
                     <div class="header-nav d-none d-lg-flex">
                         <div class="main-categori-wrap d-none d-lg-block">
                             <a class="categories-button-active" href="#">
-                                <span class="fi-rs-apps"></span> <span class="et">Browse</span> All Categories
+                                <span class="fi-rs-apps"></span> <span class="et">{% trans "Browse" %}</span> {% trans "All Categories" %}
                                 <i class="fi-rs-angle-down"></i>
                             </a>
                             <div class="categories-dropdown-wrap categories-dropdown-active-large font-heading">
@@ -318,54 +305,54 @@
                                     </ul>
                                 </div>
 
-                                <div class="more_categories"><span class="icon"></span> <span class="heading-sm-1">Show more...</span></div>
+                                <div class="more_categories"><span class="icon"></span> <span class="heading-sm-1">{% trans "Show more..." %}</span></div>
                             </div>
                         </div>
                         <div class="main-menu main-menu-padding-1 main-menu-lh-2 d-none d-lg-block font-heading">
                             <nav>
                                 <ul>
-                                    <li class="hot-deals"><img src="{% static 'assets/imgs/theme/icons/icon-hot.svg' %}" alt="hot deals" /><a href="{% url 'core:product-list' %}">Deals</a></li>
+                                    <li class="hot-deals"><img src="{% static 'assets/imgs/theme/icons/icon-hot.svg' %}" alt="hot deals" /><a href="{% url 'core:product-list' %}">{% trans "Deals" %}</a></li>
                                     <li>
-                                        <a href="{% url 'core:index' %}">Home</a>
+                                        <a href="{% url 'core:index' %}">{% trans "Home" %}</a>
                                     </li>
                                     <li>
-                                        <a href="{% url 'core:about_us' %}">About</a>
+                                        <a href="{% url 'core:about_us' %}">{% trans "About" %}</a>
                                     </li>
                                     <li>
-                                        <a href="#">Category <i class="fi-rs-angle-down"></i></a>
+                                        <a href="#">{% trans "Category" %} <i class="fi-rs-angle-down"></i></a>
                                         <ul class="sub-menu">
                                             {% for c in categories %}
                                             <li><a href="{% url 'core:category-product-list' c.c_id %}">{{c.title}}</a></li>
                                             {% endfor %}
                                             <hr>
-                                            <li><a href="{% url 'core:category-list' %}">All Categories</a></li>
+                                            <li><a href="{% url 'core:category-list' %}">{% trans "All Categories" %}</a></li>
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="{% url 'core:product-list' %}">Shop</a>
+                                        <a href="{% url 'core:product-list' %}">{% trans "Shop" %}</a>
                                     </li>
                                     <li>
-                                        <a href="#">Vendors <i class="fi-rs-angle-down"></i></a>
+                                        <a href="#">{% trans "Vendors" %} <i class="fi-rs-angle-down"></i></a>
                                         <ul class="sub-menu">
-                                            <li><a href="{% url 'core:vendor-list' %}">All Vendors</a></li>
-                                            <li><a href="{% url 'useradmin:dashboard' %}">Vendor Dashboard</a></li>
+                                            <li><a href="{% url 'core:vendor-list' %}">{% trans "All Vendors" %}</a></li>
+                                            <li><a href="{% url 'useradmin:dashboard' %}">{% trans "Vendor Dashboard" %}</a></li>
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="#">Pages <i class="fi-rs-angle-down"></i></a>
+                                        <a href="#">{% trans "Pages" %} <i class="fi-rs-angle-down"></i></a>
                                         <ul class="sub-menu">
-                                            <li><a href="{% url 'core:about_us' %}">About Us</a></li>
-                                            <li><a href="{% url 'core:contact' %}">Contact</a></li>
-                                            <li><a href="{% url 'core:dashboard' %}">My Account</a></li>
-                                            <li><a href="{% url 'userauths:sign-in' %}">Login</a></li>
-                                            <li><a href="{% url 'userauths:sign-up' %}">Register</a></li>
-                                            <li><a href="{% url 'core:purchase_guide' %}">Purchase Guide</a></li>
-                                            <li><a href="{% url 'core:privacy_policy' %}">Privacy Policy</a></li>
-                                            <li><a href="{% url 'core:terms_of_service' %}">Terms of Service</a></li>
+                                            <li><a href="{% url 'core:about_us' %}">{% trans "About Us" %}</a></li>
+                                            <li><a href="{% url 'core:contact' %}">{% trans "Contact" %}</a></li>
+                                            <li><a href="{% url 'core:dashboard' %}">{% trans "My Account" %}</a></li>
+                                            <li><a href="{% url 'userauths:sign-in' %}">{% trans "Login" %}</a></li>
+                                            <li><a href="{% url 'userauths:sign-up' %}">{% trans "Register" %}</a></li>
+                                            <li><a href="{% url 'core:purchase_guide' %}">{% trans "Purchase Guide" %}</a></li>
+                                            <li><a href="{% url 'core:privacy_policy' %}">{% trans "Privacy Policy" %}</a></li>
+                                            <li><a href="{% url 'core:terms_of_service' %}">{% trans "Terms of Service" %}</a></li>
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="{% url 'core:contact' %}">Contact</a>
+                                        <a href="{% url 'core:contact' %}">{% trans "Contact" %}</a>
                                     </li>
                                 </ul>
                             </nav>
@@ -412,18 +399,18 @@
                                         {% else %}
                                             <li>
                                                 <div class="shopping-cart-title">
-                                                    <h4>Your cart is empty</h4>
+                                                    <h4>{% trans "Your cart is empty" %}</h4>
                                                 </div>
                                             </li>
                                         {% endif %}
                                     </ul>
                                     <div class="shopping-cart-footer">
                                         <div class="shopping-cart-total">
-                                            <h4>Items <span>{{ cart_total_items }}</span></h4>
+                                            <h4>{% trans "Items" %} <span>{{ cart_total_items }}</span></h4>
                                         </div>
                                         <div class="shopping-cart-button">
-                                            <a href="{% url 'core:cart' %}">View cart</a>
-                                            <a href="{% url 'core:checkout-info' %}">Checkout</a>
+                                            <a href="{% url 'core:cart' %}">{% trans "View cart" %}</a>
+                                            <a href="{% url 'core:checkout-info' %}">{% trans "Checkout" %}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -465,7 +452,7 @@
             <div class="mobile-header-content-area">
                 <div class="mobile-search search-style-3 mobile-header-border">
                     <form action="{% url 'core:search' %}" method="GET">
-                        <input type="text" name="q" placeholder="Search for items…" />
+                        <input type="text" name="q" placeholder="{% trans 'Search for items…' %}" />
                         <button type="submit"><i class="fi-rs-search"></i></button>
                     </form>
                 </div>
@@ -474,13 +461,13 @@
                     <nav>
                         <ul class="mobile-menu font-heading">
                             <li>
-                                <a href="{% url 'core:index' %}">Home</a>
+                                <a href="{% url 'core:index' %}">{% trans "Home" %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'core:product-list' %}">Shop</a>
+                                <a href="{% url 'core:product-list' %}">{% trans "Shop" %}</a>
                             </li>
                             <li class="menu-item-has-children">
-                                <a href="#">Categories</a>
+                                <a href="#">{% trans "Categories" %}</a>
                                 <ul class="dropdown">
                                     {% for c in categories %}
                                     <li><a href="{% url 'core:category-product-list' c.c_id %}">{{c.title}}</a></li>
@@ -488,21 +475,21 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="{% url 'core:vendor-list' %}">Vendors</a>
+                                <a href="{% url 'core:vendor-list' %}">{% trans "Vendors" %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'core:about_us' %}">About</a>
+                                <a href="{% url 'core:about_us' %}">{% trans "About" %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'core:contact' %}">Contact</a>
+                                <a href="{% url 'core:contact' %}">{% trans "Contact" %}</a>
                             </li>
                             <li class="menu-item-has-children">
-                                <a href="#">Pages</a>
+                                <a href="#">{% trans "Pages" %}</a>
                                 <ul class="dropdown">
-                                    <li><a href="{% url 'core:about_us' %}">About Us</a></li>
-                                    <li><a href="{% url 'core:purchase_guide' %}">Purchase Guide</a></li>
-                                    <li><a href="{% url 'core:privacy_policy' %}">Privacy Policy</a></li>
-                                    <li><a href="{% url 'core:terms_of_service' %}">Terms of Service</a></li>
+                                    <li><a href="{% url 'core:about_us' %}">{% trans "About Us" %}</a></li>
+                                    <li><a href="{% url 'core:purchase_guide' %}">{% trans "Purchase Guide" %}</a></li>
+                                    <li><a href="{% url 'core:privacy_policy' %}">{% trans "Privacy Policy" %}</a></li>
+                                    <li><a href="{% url 'core:terms_of_service' %}">{% trans "Terms of Service" %}</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -511,10 +498,10 @@
                 </div>
                 <div class="mobile-header-info-wrap">
                     <div class="single-mobile-header-info">
-                        <a href="{% url 'core:contact' %}"><i class="fi-rs-marker"></i> Our location </a>
+                        <a href="{% url 'core:contact' %}"><i class="fi-rs-marker"></i> {% trans "Our location" %} </a>
                     </div>
                     <div class="single-mobile-header-info">
-                        <a href="{% url 'userauths:sign-in' %}"><i class="fi-rs-user"></i>Log In / Sign Up </a>
+                        <a href="{% url 'userauths:sign-in' %}"><i class="fi-rs-user"></i>{% trans "Log In / Sign Up" %} </a>
                     </div>
                     <div class="single-mobile-header-info">
                         <a href="#"><i class="fi-rs-headphones"></i>(+01) - 2345 - 6789 </a>
@@ -651,40 +638,40 @@
                         </div>
                     </div>
                     <div class="footer-link-widget col">
-                        <h4 class="widget-title">Company</h4>
+                        <h4 class="widget-title">{% trans "Company" %}</h4>
                         <ul class="footer-list mb-sm-5 mb-md-0">
-                            <li><a href="{% url 'core:about_us' %}">About Us</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Delivery Information</a></li>
-                            <li><a href="{% url 'core:privacy_policy' %}">Privacy Policy</a></li>
-                            <li><a href="{% url 'core:terms_of_service' %}">Terms & Conditions</a></li>
-                            <li><a href="{% url 'core:contact' %}">Contact Us</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Support Center</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Careers</a></li>
+                            <li><a href="{% url 'core:about_us' %}">{% trans "About Us" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Delivery Information" %}</a></li>
+                            <li><a href="{% url 'core:privacy_policy' %}">{% trans "Privacy Policy" %}</a></li>
+                            <li><a href="{% url 'core:terms_of_service' %}">{% trans "Terms & Conditions" %}</a></li>
+                            <li><a href="{% url 'core:contact' %}">{% trans "Contact Us" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Support Center" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Careers" %}</a></li>
                         </ul>
                     </div>
                     <div class="footer-link-widget col">
-                        <h4 class="widget-title">Account</h4>
+                        <h4 class="widget-title">{% trans "Account" %}</h4>
                         <ul class="footer-list mb-sm-5 mb-md-0">
-                            <li><a href="{% url 'userauths:sign-in' %}">Sign In</a></li>
-                            <li><a href="{% url 'core:cart' %}">View Cart</a></li>
-                            <li><a href="{% url 'core:wishlist' %}">My Wishlist</a></li>
-                            <li><a href="{% url 'core:dashboard' %}">Track My Order</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Help Ticket</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Shipping Details</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Compare products</a></li>
+                            <li><a href="{% url 'userauths:sign-in' %}">{% trans "Sign In" %}</a></li>
+                            <li><a href="{% url 'core:cart' %}">{% trans "View Cart" %}</a></li>
+                            <li><a href="{% url 'core:wishlist' %}">{% trans "My Wishlist" %}</a></li>
+                            <li><a href="{% url 'core:dashboard' %}">{% trans "Track My Order" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Help Ticket" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Shipping Details" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Compare products" %}</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-link-widget col">
-                        <h4 class="widget-title">Popular</h4>
+                        <h4 class="widget-title">{% trans "Popular" %}</h4>
                         <ul class="footer-list mb-sm-5 mb-md-0">
-                            <li><a href="{% url 'core:coming-soon' %}">Milk & Flavoured Milk</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Butter and Margarine</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Eggs Substitutes</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Marmalades</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Sour Cream and Dips</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Tea & Kombucha</a></li>
-                            <li><a href="{% url 'core:coming-soon' %}">Cheese</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Milk & Flavoured Milk" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Butter and Margarine" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Eggs Substitutes" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Marmalades" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Sour Cream and Dips" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Tea & Kombucha" %}</a></li>
+                            <li><a href="{% url 'core:coming-soon' %}">{% trans "Cheese" %}</a></li>
                         </ul>
                     </div>
 

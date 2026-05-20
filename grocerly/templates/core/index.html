@@ -1,5 +1,5 @@
 {% extends 'partials/base.html' %}
-{% load static currency_filters %}
+{% load static currency_filters i18n %}
 {% block content %}
     <main class="main">
         <div class="container mb-30">
@@ -11,24 +11,24 @@
                                 <div class="single-hero-slider single-animation-wrap" style="background-image: url({% static 'assets/imgs/slider/slider-1.png' %})">
                                     <div class="slider-content">
                                         <h1 class="display-2 mb-40">
-                                            Don’t miss amazing<br /> grocery deals
+                                            {% trans "Don’t miss amazing<br /> grocery deals" %}
                                         </h1>
-                                        <p class="mb-65">Sign up for the daily newsletter</p>
+                                        <p class="mb-65">{% trans "Sign up for the daily newsletter" %}</p>
                                         <form class="form-subcriber d-flex">
-                                            <input type="email" placeholder="Your emaill address" />
-                                            <button class="btn" type="submit">Subscribe</button>
+                                            <input type="email" placeholder="{% trans 'Your emaill address' %}" />
+                                            <button class="btn" type="submit">{% trans "Subscribe" %}</button>
                                         </form>
                                     </div>
                                 </div>
                                 <div class="single-hero-slider single-animation-wrap" style="background-image: url({% static 'assets/imgs/slider/slider-2.png' %})">
                                     <div class="slider-content">
                                         <h1 class="display-2 mb-40">
-                                            Fresh Vegetables<br /> Big discount
+                                            {% trans "Fresh Vegetables<br /> Big discount" %}
                                         </h1>
-                                        <p class="mb-65">Save up to 50% off on your first order</p>
+                                        <p class="mb-65">{% trans "Save up to 50% off on your first order" %}</p>
                                         <form class="form-subcriber d-flex">
-                                            <input type="email" placeholder="Your emaill address" />
-                                            <button class="btn" type="submit">Subscribe</button>
+                                            <input type="email" placeholder="{% trans 'Your emaill address' %}" />
+                                            <button class="btn" type="submit">{% trans "Subscribe" %}</button>
                                         </form>
                                     </div>
                                 </div>
@@ -39,10 +39,10 @@
                     <!--End hero-->
                     <section class="product-tabs section-padding position-relative">
                         <div class="section-title style-2">
-                            <h3>Popular Products</h3>
+                            <h3>{% trans "Popular Products" %}</h3>
                             <ul class="nav nav-tabs links" id="myTab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="nav-tab-all" data-bs-toggle="tab" data-bs-target="#tab-all" type="button" role="tab" aria-controls="tab-all" aria-selected="true">All</button>
+                                    <button class="nav-link active" id="nav-tab-all" data-bs-toggle="tab" data-bs-target="#tab-all" type="button" role="tab" aria-controls="tab-all" aria-selected="true">{% trans "All" %}</button>
                                 </li>
                                 {% for c in categories %}
                                 <li class="nav-item" role="presentation">
@@ -99,7 +99,7 @@
                                                         <input type="hidden" class="product-id-{{ p.id }}" value="{{ p.id }}">
                                                         <input type="hidden" class="product-price-{{ p.id }}" value="{{ p.price }}">
                                                         <input type="hidden" class="product-title-{{ p.id }}" value="{{ p.title }}">
-                                                        <button class="add add-to-cart-btn" data-index="{{ p.id }}" style="border: none;"><i class="fi-rs-shopping-cart mr-5"></i>Add</button>
+                                                        <button class="add add-to-cart-btn" data-index="{{ p.id }}" style="border: none;"><i class="fi-rs-shopping-cart mr-5"></i>{% trans "Add" %}</button>
                                                     </div>
                                                 </div>
                                             </div>

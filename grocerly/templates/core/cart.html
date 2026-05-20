@@ -1,21 +1,21 @@
 {% extends 'partials/base.html' %}
-{% load static currency_filters %}
+{% load static currency_filters i18n %}
 {% block content %}
     <main class="main" id="cart-list">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
-                    <span></span> Cart
+                    <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>{% trans "Home" %}</a>
+                    <span></span> {% trans "Cart" %}
                 </div>
             </div>
         </div>
         <div class="container mb-80 mt-50">
             <div class="row">
                 <div class="col-lg-8 mb-40">
-                    <h1 class="heading-2 mb-10">Your Cart</h1>
+                    <h1 class="heading-2 mb-10">{% trans "Your Cart" %}</h1>
                     <div class="d-flex justify-content-between">
-                        <h6 class="text-body">There are <span class="text-brand">{{ totalcartitems }}</span> products in your cart</h6>
+                        <h6 class="text-body">{% trans "There are" %} <span class="text-brand">{{ totalcartitems }}</span> {% trans "products in your cart" %}</h6>
                     </div>
                 </div>
             </div>
@@ -25,12 +25,12 @@
                         <table class="table table-wishlist">
                             <thead>
                                 <tr class="main-heading">
-                                        <th scope="col" class="start pl-30">Product</th>
-                                    <th scope="col">Title</th>
-                                    <th scope="col">Unit Price</th>
-                                    <th scope="col" class="text-center">Quantity</th>
-                                    <th scope="col">Subtotal</th>
-                                    <th scope="col" class="end">Remove</th>
+                                        <th scope="col" class="start pl-30">{% trans "Product" %}</th>
+                                    <th scope="col">{% trans "Title" %}</th>
+                                    <th scope="col">{% trans "Unit Price" %}</th>
+                                    <th scope="col" class="text-center">{% trans "Quantity" %}</th>
+                                    <th scope="col">{% trans "Subtotal" %}</th>
+                                    <th scope="col" class="end">{% trans "Remove" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -65,25 +65,25 @@
                         <div class="table-responsive">
                             <div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <p class="fw-bold">Tax</p>
+                                    <p class="fw-bold">{% trans "Tax" %}</p>
                                     <p>0 ₫</p>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <p class="fw-bold">Shipping</p>
+                                    <p class="fw-bold">{% trans "Shipping" %}</p>
                                     <p>0 ₫</p>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <p class="fw-bold">Discount</p>
+                                    <p class="fw-bold">{% trans "Discount" %}</p>
                                     <p>0 ₫</p>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <p class="fw-bold">Total</p>
+                                    <p class="fw-bold">{% trans "Total" %}</p>
                                     <p>{{ cart_total_amount|vnd }} ₫</p>
                                 </div>
                             </div>
                         </div>
                         {% if totalcartitems %}
-                            <a href="{% url 'core:checkout-info' %}" class="btn mb-20 w-100">Proceed To CheckOut<i class="fi-rs-sign-out ml-15"></i></a>
+                            <a href="{% url 'core:checkout-info' %}" class="btn mb-20 w-100">{% trans "Proceed To CheckOut" %}<i class="fi-rs-sign-out ml-15"></i></a>
                         {% endif %}
                     </div>
                 </div>

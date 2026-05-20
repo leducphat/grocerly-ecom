@@ -1,12 +1,12 @@
 {% extends 'partials/base.html' %}
-{% load static currency_filters %}
+{% load static currency_filters i18n %}
 {% block content %}
     <main class="main pages">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
-                    <span></span> Pages <span></span> My Account
+                    <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>{% trans "Home" %}</a>
+                    <span></span> {% trans "Pages" %} <span></span> {% trans "My Account" %}
                 </div>
             </div>
         </div>
@@ -19,22 +19,22 @@
                                 <div class="dashboard-menu">
                                     <ul class="nav flex-column" role="tablist">
                                         <li class="nav-item">
-                                            <a class="nav-link active" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false"><i class="fi-rs-user mr-10"></i>Profile</a>
+                                            <a class="nav-link active" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false"><i class="fi-rs-user mr-10"></i>{% trans "Profile" %}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                            <a class="nav-link" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>{% trans "Dashboard" %}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>{% trans "Orders" %}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>{% trans "My Address" %}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="{% url 'core:wishlist' %}"><i class="fi-rs-heart mr-10"></i>Wishlist</a>
+                                            <a class="nav-link" href="{% url 'core:wishlist' %}"><i class="fi-rs-heart mr-10"></i>{% trans "Wishlist" %}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="{% url 'userauths:sign-out' %}"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                            <a class="nav-link" href="{% url 'userauths:sign-out' %}"><i class="fi-rs-sign-out mr-10"></i>{% trans "Logout" %}</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -45,7 +45,7 @@
                                     <div class="tab-pane fade active show" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                                         <div class="card">
                                             <div class="card-header border-bottom">
-                                                <h3 class="mb-0">My Profile</h3>
+                                                <h3 class="mb-0">{% trans "My Profile" %}</h3>
                                             </div>
                                             <div class="card-body mb-2" style="display: flex; align-items: center; gap: 10px;">
                                                 <div>
@@ -61,15 +61,15 @@
                                                     <span><input class="mb-2" type="text" value="Phone - {{ user_profile.phone }}" readonly></span>
                                                     {% if user_profile.verified %}
                                                     <div class="p-4 border rounded">
-                                                        <span>Verified</span> <span><i class="fas fa-check-circle"></i></span>
+                                                        <span>{% trans "Verified" %}</span> <span><i class="fas fa-check-circle"></i></span>
                                                     </div>
                                                     {% else %}
                                                     <div class="p-4 border rounded">
-                                                        <span>Not verified</span> <span><i class="fas fa-x"></i></span>
+                                                        <span>{% trans "Not verified" %}</span> <span><i class="fas fa-x"></i></span>
                                                     </div>
                                                     {% endif %}
                                                     <div class="p-4 border rounded">
-                                                       <a href="{% url 'userauths:profile-update' %}" class="btn btn-success">Edit Profile</a>
+                                                       <a href="{% url 'userauths:profile-update' %}" class="btn btn-success">{% trans "Edit Profile" %}</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -80,12 +80,12 @@
                                     <div class="tab-pane fade" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
                                         <div class="card">
                                             <div class="card-header">
-                                                <h3 class="mb-0">Hello {{ request.user|title }}!</h3>
+                                                <h3 class="mb-0">{% trans "Hello" %} {{ request.user|title }}!</h3>
                                             </div>
                                             <div class="card-body">
                                                 <p>
-                                                    From your account dashboard you can easily check &amp; view your <a href="#">recent orders</a>,<br />
-                                                    manage your <a href="#">shipping and billing addresses</a> and <a href="#">edit your password and account details.</a>
+                                                    {% trans "From your account dashboard you can easily check &amp; view your" %} <a href="#">{% trans "recent orders" %}</a>,<br />
+                                                    {% trans "manage your" %} <a href="#">{% trans "shipping and billing addresses" %}</a> {% trans "and" %} <a href="#">{% trans "edit your password and account details." %}</a>
                                                 </p>
                                             </div>
                                             <div style="height: 500px; width: 100%; max-width: 800px; margin: 0 auto;">
@@ -98,19 +98,19 @@
                                     <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                                         <div class="card">
                                             <div class="card-header">
-                                                <h3 class="mb-0">Your Orders</h3>
+                                                <h3 class="mb-0">{% trans "Your Orders" %}</h3>
                                             </div>
                                             <div class="card-body">
                                                 <div class="table-responsive">
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
-                                                                <th>Order</th>
-                                                                <th>Date</th>
-                                                                <th>Status</th>
-                                                                <th>Paid Status</th>
-                                                                <th>Total</th>
-                                                                <th>Actions</th>
+                                                                <th>{% trans "Order" %}</th>
+                                                                <th>{% trans "Date" %}</th>
+                                                                <th>{% trans "Status" %}</th>
+                                                                <th>{% trans "Paid Status" %}</th>
+                                                                <th>{% trans "Total" %}</th>
+                                                                <th>{% trans "Actions" %}</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -125,11 +125,11 @@
                                                                 <td class="text-danger"><b>X</b></td>
                                                                 {% endif %}
                                                                 <td>{{ o.price|vnd }} ₫</td>
-                                                                <td><a href="{% url 'core:order-detail' o.id %}" class="btn-small d-block">View</a></td>
+                                                                <td><a href="{% url 'core:order-detail' o.id %}" class="btn-small d-block">{% trans "View" %}</a></td>
                                                             </tr>
                                                             {% empty %}
                                                             <tr>
-                                                                <td colspan="6">No orders yet.</td>
+                                                                <td colspan="6">{% trans "No orders yet." %}</td>
                                                             </tr>
                                                             {% endfor %}
                                                         </tbody>
@@ -145,7 +145,7 @@
                                             <div>
                                                 <form class="mb-4" method="POST"> {% csrf_token %}
                                                     <div class="card-header">
-                                                        <h5>Add Address</h5>
+                                                        <h5>{% trans "Add Address" %}</h5>
                                                     </div>
                                                     <div class="row">
                                                         <div class="form-group col-md-6">
@@ -155,7 +155,7 @@
                                                             <input placeholder="Phone" required class="form-control" name="mobile" />
                                                         </div>
                                                         <div class="col-md-12">
-                                                            <button type="submit" class="btn btn-fill-out submit font-weight-bold" name="submit" value="Submit">Save Address</button>
+                                                            <button type="submit" class="btn btn-fill-out submit font-weight-bold" name="submit" value="Submit">{% trans "Save Address" %}</button>
                                                         </div>
                                                     </div>
                                                 </form>
@@ -166,7 +166,7 @@
                                             <div class="col-lg-6">
                                                 <div class="card mb-3 mb-lg-0">
                                                     <div class="card-header">
-                                                        <h4 class="mb-0">Address {{ forloop.counter }}</h4>
+                                                        <h4 class="mb-0">{% trans "Address" %} {{ forloop.counter }}</h4>
                                                     </div>
                                                     <div class="card-body border rounded">
                                                         <address>
@@ -176,10 +176,10 @@
                                                         <br>
                                                         {% if a.status %}
                                                             <i data-address-id="{{ a.id }}" class="fa fa-check-circle text-success check{{ a.id }} check"></i>
-                                                            <button data-address-id="{{ a.id }}" style="display: none;" class="btn make-default-address button{{ a.id }} action_btn">Make Default</button>
+                                                            <button data-address-id="{{ a.id }}" style="display: none;" class="btn make-default-address button{{ a.id }} action_btn">{% trans "Make Default" %}</button>
                                                         {% else %}
                                                             <i data-address-id="{{ a.id }}" style="display: none;" class="fa fa-check-circle text-success check check{{ a.id }}"></i>
-                                                            <button data-address-id="{{ a.id }}" class="btn make-default-address button{{ a.id }} action_btn">Make Default</button>
+                                                            <button data-address-id="{{ a.id }}" class="btn make-default-address button{{ a.id }} action_btn">{% trans "Make Default" %}</button>
                                                         {% endif %}
                                                     </div>
                                                 </div>

@@ -3,6 +3,7 @@ import google.generativeai as genai
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.utils.translation import gettext_lazy as _
 
 from core.models import Product, Category
 from store_api.serializers import ProductSerializer, CategorySerializer
@@ -213,12 +214,12 @@ def ai_chat(request):
             if retry_match:
                 wait_seconds = int(float(retry_match.group(1)))
                 return Response({
-                    "reply": f"⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi **{wait_seconds} giây** rồi thử lại nhé!",
+                    "reply": str(_("⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi **%(wait_seconds)s giây** rồi thử lại nhé!")) % {'wait_seconds': wait_seconds},
                     "retry_after": wait_seconds
                 }, status=200)
             else:
                 return Response({
-                    "reply": "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 giây rồi thử lại nhé!",
+                    "reply": str(_("⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 giây rồi thử lại nhé!")),
                     "retry_after": 30
                 }, status=200)
-        return Response({"reply": "Mình đang gặp trục trặc kết nối. Bạn thử lại sau nhé!"}, status=200)
+        return Response({"reply": str(_("Mình đang gặp trục trặc kết nối. Bạn thử lại sau nhé!"))}, status=200)

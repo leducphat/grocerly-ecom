@@ -1,0 +1,466 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-20 10:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "404 - Không tìm thấy trang | Grocerly"
+msgstr "404 - Không tìm thấy trang | Grocerly"
+
+msgid "About"
+msgstr "Giới thiệu"
+
+msgid "About Us"
+msgstr "Về chúng tôi"
+
+msgid "Account"
+msgstr "Tài khoản"
+
+msgid "Actions"
+msgstr "Hành động"
+
+msgid "Add"
+msgstr "Thêm"
+
+msgid "Add Address"
+msgstr "Thêm địa chỉ"
+
+msgid "Address"
+msgstr "Địa chỉ"
+
+msgid "All"
+msgstr "Tất cả"
+
+msgid "All Categories"
+msgstr "Tất cả danh mục"
+
+msgid "All Deals"
+msgstr "Tất cả khuyến mãi"
+
+msgid "All Vendors"
+msgstr "Tất cả nhà bán"
+
+msgid "Apply Price"
+msgstr "Áp dụng giá"
+
+msgid "Avg. Rating"
+msgstr "Đánh giá TB"
+
+msgid "Browse"
+msgstr "Duyệt"
+
+msgid "Butter and Margarine"
+msgstr "Bơ và Bơ thực vật"
+
+msgid "By"
+msgstr "Bởi"
+
+msgid "By Categories"
+msgstr "Theo danh mục"
+
+msgid "By Price"
+msgstr "Theo giá"
+
+msgid "By Tags"
+msgstr "Theo thẻ"
+
+msgid "By Vendors"
+msgstr "Theo nhà bán"
+
+msgid "Careers"
+msgstr "Tuyển dụng"
+
+msgid "Cart"
+msgstr "Giỏ hàng"
+
+msgid "Categories"
+msgstr "Danh mục"
+
+msgid "Category"
+msgstr "Danh mục"
+
+msgid "Checkout"
+msgstr "Thanh toán"
+
+msgid "Cheese"
+msgstr "Phô mai"
+
+msgid "Company"
+msgstr "Công ty"
+
+msgid "Compare products"
+msgstr "So sánh sản phẩm"
+
+msgid "Contact"
+msgstr "Liên hệ"
+
+msgid "Contact Us"
+msgstr "Liên hệ với chúng tôi"
+
+msgid "Cảm ơn bạn đã kiên nhẫn chờ đợi!"
+msgstr "Cảm ơn bạn đã kiên nhẫn chờ đợi!"
+
+msgid "Dashboard"
+msgstr "Bảng điều khiển"
+
+msgid "Date"
+msgstr "Ngày"
+
+msgid "Deals"
+msgstr "Khuyến mãi"
+
+msgid "Deals Of The Day"
+msgstr "Khuyến mãi trong ngày"
+
+msgid "Delivery Information"
+msgstr "Thông tin giao hàng"
+
+msgid "Discount"
+msgstr "Giảm giá"
+
+msgid "Don’t miss amazing<br /> grocery deals"
+msgstr "Đừng bỏ lỡ<br /> siêu khuyến mãi"
+
+msgid "Edit Profile"
+msgstr "Chỉnh sửa hồ sơ"
+
+msgid "Eggs Substitutes"
+msgstr "Trứng và sản phẩm thay thế"
+
+msgid "Featured"
+msgstr "Nổi bật"
+
+msgid "Filter"
+msgstr "Lọc"
+
+msgid "Filters"
+msgstr "Bộ lọc"
+
+msgid "Fresh Vegetables<br /> Big discount"
+msgstr "Rau củ tươi<br /> Giảm giá sốc"
+
+msgid "From your account dashboard you can easily check &amp; view your"
+msgstr "Từ bảng điều khiển, bạn có thể dễ dàng kiểm tra &amp; xem"
+
+msgid "From:"
+msgstr "Từ:"
+
+msgid "Hello"
+msgstr "Xin chào"
+
+msgid "Help Ticket"
+msgstr "Gửi hỗ trợ"
+
+msgid "Home"
+msgstr "Trang chủ"
+
+msgid "Items"
+msgstr "Sản phẩm"
+
+msgid "Log In / Sign Up"
+msgstr "Đăng nhập / Đăng ký"
+
+msgid "Login"
+msgstr "Đăng nhập"
+
+msgid "Logout"
+msgstr "Đăng xuất"
+
+msgid "Make Default"
+msgstr "Đặt làm mặc định"
+
+msgid "Marmalades"
+msgstr "Mứt"
+
+msgid "Max Price"
+msgstr "Giá cao nhất"
+
+msgid "Milk & Flavoured Milk"
+msgstr "Sữa & Sữa tươi"
+
+msgid "Min Price"
+msgstr "Giá thấp nhất"
+
+msgid "My Account"
+msgstr "Tài khoản của tôi"
+
+msgid "My Address"
+msgstr "Địa chỉ của tôi"
+
+msgid "My Profile"
+msgstr "Hồ sơ của tôi"
+
+msgid "My Voucher"
+msgstr "Voucher của tôi"
+
+msgid "My Wishlist"
+msgstr "Danh sách yêu thích"
+
+msgid "Mình đang gặp trục trặc kết nối. Bạn thử lại sau nhé!"
+msgstr "Mình đang gặp trục trặc kết nối. Bạn thử lại sau nhé!"
+
+msgid "Need help? Call Us:"
+msgstr "Cần hỗ trợ? Gọi ngay:"
+
+msgid "No categories yet"
+msgstr "Chưa có danh mục"
+
+msgid "No deals available right now."
+msgstr "Hiện tại không có khuyến mãi nào."
+
+msgid "No orders yet."
+msgstr "Chưa có đơn hàng nào."
+
+msgid "No tags yet"
+msgstr "Chưa có thẻ"
+
+msgid "No vendors yet"
+msgstr "Chưa có nhà bán"
+
+msgid "Not verified"
+msgstr "Chưa xác minh"
+
+msgid "Oops! Trang này không tồn tại"
+msgstr "Oops! Trang này không tồn tại"
+
+msgid "Order"
+msgstr "Đơn hàng"
+
+msgid "Order Tracking"
+msgstr "Theo dõi đơn hàng"
+
+msgid "Orders"
+msgstr "Đơn đặt hàng"
+
+msgid "Our location"
+msgstr "Vị trí của chúng tôi"
+
+msgid "Pages"
+msgstr "Trang"
+
+msgid "Paid Status"
+msgstr "Trạng thái thanh toán"
+
+msgid "Popular"
+msgstr "Phổ biến"
+
+msgid "Popular Products"
+msgstr "Sản phẩm phổ biến"
+
+msgid "Price: High to Low"
+msgstr "Giá: Cao đến Thấp"
+
+msgid "Price: Low to High"
+msgstr "Giá: Thấp đến Cao"
+
+msgid "Privacy Policy"
+msgstr "Chính sách bảo mật"
+
+msgid "Proceed To CheckOut"
+msgstr "Tiến hành Thanh toán"
+
+msgid "Product"
+msgstr "Sản phẩm"
+
+msgid "Profile"
+msgstr "Hồ sơ"
+
+msgid "Purchase Guide"
+msgstr "Hướng dẫn mua hàng"
+
+msgid "Quantity"
+msgstr "Số lượng"
+
+msgid "Register"
+msgstr "Đăng ký"
+
+msgid "Release Date"
+msgstr "Ngày phát hành"
+
+msgid "Remove"
+msgstr "Xóa"
+
+msgid "Save Address"
+msgstr "Lưu địa chỉ"
+
+msgid "Save up to 50% off on your first order"
+msgstr "Giảm giá lên đến 50% cho đơn hàng đầu tiên"
+
+msgid "Search for items..."
+msgstr "Tìm kiếm sản phẩm..."
+
+msgid "Search for items…"
+msgstr "Tìm kiếm sản phẩm…"
+
+msgid "Setting"
+msgstr "Cài đặt"
+
+msgid "Shipping"
+msgstr "Vận chuyển"
+
+msgid "Shipping Details"
+msgstr "Chi tiết vận chuyển"
+
+msgid "Shop"
+msgstr "Cửa hàng"
+
+msgid "Show more..."
+msgstr "Xem thêm..."
+
+msgid "Show:"
+msgstr "Hiển thị:"
+
+msgid "Sign In"
+msgstr "Đăng nhập"
+
+msgid "Sign in"
+msgstr "Đăng nhập"
+
+msgid "Sign out"
+msgstr "Đăng xuất"
+
+msgid "Sign up for the daily newsletter"
+msgstr "Đăng ký nhận bản tin hàng ngày"
+
+msgid "Sort by:"
+msgstr "Sắp xếp theo:"
+
+msgid "Sour Cream and Dips"
+msgstr "Kem chua và Sốt chấm"
+
+msgid "Status"
+msgstr "Trạng thái"
+
+msgid "Subscribe"
+msgstr "Đăng ký"
+
+msgid "Subtotal"
+msgstr "Tạm tính"
+
+msgid "Support Center"
+msgstr "Trung tâm hỗ trợ"
+
+msgid "Tax"
+msgstr "Thuế"
+
+msgid "Tea & Kombucha"
+msgstr "Trà & Kombucha"
+
+msgid "Terms & Conditions"
+msgstr "Điều khoản & Điều kiện"
+
+msgid "Terms of Service"
+msgstr "Điều khoản Dịch vụ"
+
+msgid "There are"
+msgstr "Có"
+
+msgid "This feature is currently under development and will be available soon."
+msgstr "Tính năng này hiện đang được phát triển và sẽ sớm ra mắt."
+
+msgid "Title"
+msgstr "Tiêu đề"
+
+msgid "Tiếp Tục Mua Sắm"
+msgstr "Tiếp Tục Mua Sắm"
+
+msgid "To:"
+msgstr "Đến:"
+
+msgid "Total"
+msgstr "Tổng cộng"
+
+msgid "Track My Order"
+msgstr "Theo dõi đơn hàng của tôi"
+
+msgid "Tính năng này đang được đội ngũ Grocerly xây dựng và sẽ sớm ra mắt trong thời gian tới."
+msgstr "Tính năng này đang được đội ngũ Grocerly xây dựng và sẽ sớm ra mắt trong thời gian tới."
+
+msgid "Unit Price"
+msgstr "Đơn giá"
+
+msgid "Vendor Dashboard"
+msgstr "Trang quản trị Nhà bán"
+
+msgid "Vendors"
+msgstr "Nhà bán"
+
+msgid "Verified"
+msgstr "Đã xác minh"
+
+msgid "View"
+msgstr "Xem"
+
+msgid "View Cart"
+msgstr "Xem giỏ hàng"
+
+msgid "View cart"
+msgstr "Xem giỏ hàng"
+
+msgid "Về Trang Chủ"
+msgstr "Về Trang Chủ"
+
+msgid "We found"
+msgstr "Chúng tôi tìm thấy"
+
+msgid "Wishlist"
+msgstr "Danh sách yêu thích"
+
+msgid "Your Cart"
+msgstr "Giỏ hàng của bạn"
+
+msgid "Your Location"
+msgstr "Vị trí của bạn"
+
+msgid "Your Orders"
+msgstr "Đơn hàng của bạn"
+
+msgid "Your cart is empty"
+msgstr "Giỏ hàng của bạn đang trống"
+
+msgid "Your emaill address"
+msgstr "Địa chỉ email của bạn"
+
+msgid "and"
+msgstr "và"
+
+msgid "edit your password and account details."
+msgstr "chỉnh sửa mật khẩu và thông tin tài khoản."
+
+msgid "items for you!"
+msgstr "sản phẩm cho bạn!"
+
+msgid "manage your"
+msgstr "quản lý"
+
+msgid "products in your cart"
+msgstr "sản phẩm trong giỏ hàng"
+
+msgid "recent orders"
+msgstr "các đơn hàng gần đây"
+
+msgid "shipping and billing addresses"
+msgstr "địa chỉ giao hàng và thanh toán"
+
+msgid "Đang Phát Triển"
+msgstr "Đang Phát Triển"
+
+msgid "Đường link bạn truy cập có thể đã bị xóa, đổi tên, hoặc tạm thời không khả dụng."
+msgstr "Đường link bạn truy cập có thể đã bị xóa, đổi tên, hoặc tạm thời không khả dụng."
+
+msgid "← Quay về Trang Chủ"
+msgstr "← Quay về Trang Chủ"
+
+msgid "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi **%(wait_seconds)s giây** rồi thử lại nhé!"
+msgstr "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi **%(wait_seconds)s giây** rồi thử lại nhé!"
+
+msgid "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 giây rồi thử lại nhé!"
+msgstr "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 giây rồi thử lại nhé!"
+

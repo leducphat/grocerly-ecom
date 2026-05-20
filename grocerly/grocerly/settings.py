@@ -15,6 +15,7 @@ import os
 from urllib.parse import urlparse
 from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,6 +78,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -169,7 +171,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGES = [
+    ('vi', _('Vietnamese')),
+    ('en', _('English')),
+]
+
+LANGUAGE_CODE = 'vi'
 
 # Set the timezone to Asia/Ho_Chi_Minh
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
@@ -177,6 +184,10 @@ TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
 
 USE_TZ = True
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
 
 
 # Static files (CSS, JavaScript, Images)

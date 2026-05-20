@@ -1,5 +1,5 @@
 {% extends 'partials/base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block content %}
 <main class="main">
@@ -10,21 +10,21 @@
                     <div class="coming-soon-content">
                         <img src="{% static 'assets/imgs/theme/logo.svg' %}" alt="Grocerly" class="mb-30" style="max-width: 200px;" />
                         <h1 class="display-2 mb-30" style="color: #253D4E; font-weight: 700;">
-                            🚧 Đang Phát Triển
+                            🚧 {% trans "Đang Phát Triển" %}
                         </h1>
                         <p class="font-lg text-muted mb-30">
-                            Tính năng này đang được đội ngũ Grocerly xây dựng và sẽ sớm ra mắt trong thời gian tới.
-                            <br/>Cảm ơn bạn đã kiên nhẫn chờ đợi!
+                            {% trans "Tính năng này đang được đội ngũ Grocerly xây dựng và sẽ sớm ra mắt trong thời gian tới." %}
+                            <br/>{% trans "Cảm ơn bạn đã kiên nhẫn chờ đợi!" %}
                         </p>
                         <p class="font-md text-muted mb-40" style="color: #838383;">
-                            <em>This feature is currently under development and will be available soon.</em>
+                            <em>{% trans "This feature is currently under development and will be available soon." %}</em>
                         </p>
                         <div class="d-flex justify-content-center gap-3">
                             <a href="{% url 'core:index' %}" class="btn btn-lg" style="background-color: #3BB77E; color: white; border-radius: 10px; padding: 12px 30px;">
-                                <i class="fi-rs-home mr-5"></i> Về Trang Chủ
+                                <i class="fi-rs-home mr-5"></i> {% trans "Về Trang Chủ" %}
                             </a>
                             <a href="{% url 'core:product-list' %}" class="btn btn-lg btn-outline-secondary" style="border-radius: 10px; padding: 12px 30px;">
-                                <i class="fi-rs-shopping-bag mr-5"></i> Tiếp Tục Mua Sắm
+                                <i class="fi-rs-shopping-bag mr-5"></i> {% trans "Tiếp Tục Mua Sắm" %}
                             </a>
                         </div>
                     </div>
