@@ -664,3 +664,42 @@ msgstr "Đăng ký ngay"
 
 msgid "Filter by price"
 msgstr "Lọc theo giá"
+
+msgid "Stay home & get your daily"
+msgstr "Ở nhà & nhận nhu yếu phẩm hàng ngày"
+
+msgid "needs from our shop"
+msgstr "từ cửa hàng của chúng tôi"
+
+msgid "Start Your Daily Shopping with"
+msgstr "Bắt đầu mua sắm hàng ngày cùng"
+
+msgid "Best prices & offers"
+msgstr "Giá & ưu đãi tốt nhất"
+
+msgid "Orders 50 ₫ or more"
+msgstr "Đơn hàng từ 50 ₫ trở lên"
+
+msgid "Free delivery"
+msgstr "Giao hàng miễn phí"
+
+msgid "24/7 amazing services"
+msgstr "Dịch vụ tuyệt vời 24/7"
+
+msgid "Great daily deal"
+msgstr "Ưu đãi tuyệt vời mỗi ngày"
+
+msgid "When you sign up"
+msgstr "Khi bạn đăng ký"
+
+msgid "Wide assortment"
+msgstr "Đa dạng sản phẩm"
+
+msgid "Mega Discounts"
+msgstr "Siêu giảm giá"
+
+msgid "Easy returns"
+msgstr "Đổi trả dễ dàng"
+
+msgid "Within 30 days"
+msgstr "Trong vòng 30 ngày"
