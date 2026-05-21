@@ -711,32 +711,40 @@ def wishlist_view(request):
     }
     return render(request, "core/wishlist.html", context)
 
-
-@login_required
 def add_to_wishlist(request):
-    product_id = request.GET['id']
+    if not request.user.is_authenticated:
+        return JsonResponse({"bool": False, "error": "Vui lòng đăng nhập để thêm vào Wishlist!"})
+
+    product_id = request.GET.get('id')
     product = Product.objects.get(id=product_id)
 
     wishlist_count = Wishlist.objects.filter(product=product, user=request.user).count()
 
-    if wishlist_count > 0:
-        context = {"bool": True}
-    else:
+    if wishlist_count == 0:
         Wishlist.objects.create(
             user=request.user,
             product=product,
         )
-        context = {"bool": True}
+        
+    total_wishlist = Wishlist.objects.filter(user=request.user).count()
+    context = {"bool": True, "total_wishlist_items": total_wishlist}
 
     return JsonResponse(context)
 
 
-@login_required
 def remove_wishlist(request):
-    pid = request.GET['id']
+    if not request.user.is_authenticated:
+        return JsonResponse({"bool": False, "error": "Vui lòng đăng nhập để sử dụng Wishlist!"})
+
+    pid = request.GET.get('id')
+    try:
+        wishlist_d = Wishlist.objects.get(id=pid, user=request.user)
+        wishlist_d.delete()
+    except Wishlist.DoesNotExist:
+        pass
+
     wishlist = Wishlist.objects.filter(user=request.user)
-    wishlist_d = Wishlist.objects.get(id=pid)
-    wishlist_d.delete()
+    total_wishlist = wishlist.count()
 
     context = {
         "bool": True,
@@ -744,7 +752,7 @@ def remove_wishlist(request):
     }
     wishlist_json = serializers.serialize('json', wishlist)
     t = render_to_string('core/async/wishlist-list.html', context)
-    return JsonResponse({'data': t, 'w': wishlist_json})
+    return JsonResponse({'data': t, 'w': wishlist_json, 'total_wishlist_items': total_wishlist})
 
 # ======================== Static Pages & Contact ========================
 from userauths.models import ContactUs

@@ -85,9 +85,16 @@
                 data: { "id": wishlist_id },
                 dataType: "json",
                 success: function(response){
-                    this_val.closest("tr").remove();
-                    let count = $("#wishlist-body tr").length;
-                    $("#wishlist-item-count").text(count);
+                    if (response.bool === true) {
+                        $("#wishlist-body").html(response.data);
+                        $("#wishlist-item-count").text(response.total_wishlist_items);
+                        $(".wishlist-count").text(response.total_wishlist_items);
+                    } else if (response.error) {
+                        alert(response.error);
+                    }
+                },
+                error: function() {
+                    alert("Có lỗi xảy ra, vui lòng thử lại!");
                 }
             });
         });
