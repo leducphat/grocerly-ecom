@@ -60,8 +60,11 @@ def add_product(request):
             
             # Handle additional images
             additional_images = request.FILES.getlist('additional_images')
+            import uuid
             for img in additional_images:
                 if img.size > 0:
+                    ext = img.name.split('.')[-1] if '.' in img.name else 'jpg'
+                    img.name = f"{uuid.uuid4().hex[:10]}.{ext}"
                     ProductImage.objects.create(product=new_form, image=img)
                 
             return redirect("useradmin:dashboard-products")
@@ -85,8 +88,11 @@ def edit_product(request, pid):
             
             # Handle additional images
             additional_images = request.FILES.getlist('additional_images')
+            import uuid
             for img in additional_images:
                 if img.size > 0:
+                    ext = img.name.split('.')[-1] if '.' in img.name else 'jpg'
+                    img.name = f"{uuid.uuid4().hex[:10]}.{ext}"
                     ProductImage.objects.create(product=new_form, image=img)
                 
             # Handle deletion of existing images
