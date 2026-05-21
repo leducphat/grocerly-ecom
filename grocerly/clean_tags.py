@@ -1,8 +1,10 @@
 import os
+import sys
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "grocerly.settings")
 django.setup()
+sys.stdout.reconfigure(encoding='utf-8')
 
 from taggit.models import Tag, TaggedItem
 
