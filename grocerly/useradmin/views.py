@@ -53,10 +53,8 @@ def add_product(request):
             new_form = form.save(commit=False)
             new_form.user = request.user
             new_form.product_status = 'published'
-            try:
-                new_form.vendor = Vendor.objects.get(user=request.user)
-            except Vendor.DoesNotExist:
-                new_form.vendor = Vendor.objects.first()
+            if not new_form.vendor:
+                new_form.vendor = Vendor.objects.filter(user=request.user).first() or Vendor.objects.first()
             new_form.save()
             form.save_m2m()
             
