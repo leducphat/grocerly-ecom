@@ -22,15 +22,32 @@ from core.forms import ProductReviewForm
 from userauths.models import Profile
 
 
+import re
+
 def safe_float(val, default=0.0):
     try:
-        return float(str(val).replace(',', ''))
+        if val is None:
+            return default
+        val_str = str(val).replace('₫', '').replace('VND', '').replace('$', '').strip()
+        
+        if re.match(r'^\d{1,3}(\.\d{3})+$', val_str):
+            val_str = val_str.replace('.', '')
+            
+        if re.match(r'^\d{1,3}(,\d{3})+$', val_str):
+            val_str = val_str.replace(',', '')
+            
+        val_str = re.sub(r'[^\d.,]', '', val_str)
+        if not val_str:
+            return default
+            
+        val_str = val_str.replace(',', '.')
+        return float(val_str)
     except (ValueError, TypeError):
         return default
 
 def safe_int(val, default=1):
     try:
-        return int(float(str(val).replace(',', '')))
+        return int(safe_float(val, default))
     except (ValueError, TypeError):
         return default
 
