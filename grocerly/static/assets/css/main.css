@@ -7114,7 +7114,7 @@ h6.post-title {
 }
 
 .header-info>ul>li {
-    margin-right: 20px;
+    margin-right: 12px;
     position: relative;
     display: -webkit-box;
     display: -ms-flexbox;
@@ -7122,6 +7122,7 @@ h6.post-title {
     -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
+    white-space: nowrap;
 }
 
 .header-info>ul>li:before {
@@ -7147,6 +7148,7 @@ h6.post-title {
 .header-info>ul>li a {
     color: #7E7E7E;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .header-info>ul>li a i {
