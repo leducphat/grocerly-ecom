@@ -89,6 +89,8 @@ def edit_product(request, pid):
                 
             # Handle deletion of existing images
             delete_images = request.POST.getlist('delete_images')
+            # Lọc bỏ các giá trị rỗng/không hợp lệ để tránh ValueError (ví dụ: 'id' expected a number but got '')
+            delete_images = [img_id for img_id in delete_images if str(img_id).strip().isdigit()]
             if delete_images:
                 ProductImage.objects.filter(id__in=delete_images, product=new_form).delete()
                 
