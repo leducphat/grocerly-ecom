@@ -22,6 +22,20 @@ from core.forms import ProductReviewForm
 from userauths.models import Profile
 
 
+def safe_float(val, default=0.0):
+    try:
+        return float(str(val).replace(',', ''))
+    except (ValueError, TypeError):
+        return default
+
+def safe_int(val, default=1):
+    try:
+        return int(float(str(val).replace(',', '')))
+    except (ValueError, TypeError):
+        return default
+
+
+
 # Create your views here.
 def index(request):
     products = Product.objects.filter(featured=True, product_status='published').order_by('-id')
@@ -263,7 +277,7 @@ def cart_view(request):
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
         for p_id, item in request.session['cart_data_obj'].items():
-            cart_total_amount += int(item['qty']) * float(item['price'])
+            cart_total_amount += safe_int(item.get('qty')) * safe_float(item.get('price'))
         return render(request, 'core/cart.html', {
             'cart_data': request.session['cart_data_obj'],
             'totalcartitems': len(request.session['cart_data_obj']),
@@ -278,7 +292,7 @@ def checkout_info_view(request):
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
         for p_id, item in request.session['cart_data_obj'].items():
-            cart_total_amount += int(item['qty']) * float(item['price'])
+            cart_total_amount += safe_int(item.get('qty')) * safe_float(item.get('price'))
         return render(request, 'core/checkout-info.html', {
             'cart_data': request.session['cart_data_obj'],
             'totalcartitems': len(request.session['cart_data_obj']),
@@ -305,7 +319,7 @@ def delete_item_from_cart(request):
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
         for p_id, item in request.session['cart_data_obj'].items():
-            cart_total_amount += int(item['qty']) * float(item['price'])
+            cart_total_amount += safe_int(item.get('qty')) * safe_float(item.get('price'))
 
     context = render_to_string("core/async/cart-list.html", {
         'cart_data': request.session['cart_data_obj'],
@@ -331,7 +345,7 @@ def update_cart(request):
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
         for p_id, item in request.session['cart_data_obj'].items():
-            cart_total_amount += int(item['qty']) * float(item['price'])
+            cart_total_amount += safe_int(item.get('qty')) * safe_float(item.get('price'))
 
     context = render_to_string("core/async/cart-list.html", {
         'cart_data': request.session['cart_data_obj'],
@@ -402,7 +416,7 @@ def save_checkout_info(request):
 
         if 'cart_data_obj' in request.session:
             for p_id, item in request.session['cart_data_obj'].items():
-                total_amount += int(item['qty']) * float(item['price'])
+                total_amount += safe_int(item.get('qty')) * safe_float(item.get('price'))
 
             order = _get_pending_order_from_session(request)
 
@@ -439,9 +453,9 @@ def save_checkout_info(request):
                     invoice_no="INVOICE_NO-" + str(order.id),
                     item=item['title'],
                     image=item['image'],
-                    quantity=int(item['qty']),
-                    price=item['price'],
-                    total=float(item['qty']) * float(item['price']),
+                    quantity=safe_int(item.get('qty')),
+                    price=safe_float(item.get('price')),
+                    total=float(safe_int(item.get('qty'))) * safe_float(item.get('price')),
                 )
 
             request.session['pending_order_oid'] = str(order.oid)
