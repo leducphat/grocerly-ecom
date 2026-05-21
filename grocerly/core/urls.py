@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 app_name = 'core'
@@ -18,7 +18,7 @@ urlpatterns = [
     path('vendors/<v_id>/', views.vendor_detail_view, name='vendor-detail'),
 
     # Tags
-    path('products/tag/<slug:tag_slug>/', views.tag_list, name='tags'),
+    re_path(r'products/tag/(?P<tag_slug>[\w\-]+)/', views.tag_list, name='tags'),
 
     # Add Review (AJAX)
     path('ajax-add-review/<int:p_id>/', views.ajax_add_review, name='ajax-add-review'),
