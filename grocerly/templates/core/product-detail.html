@@ -1,13 +1,13 @@
 {% extends 'partials/base.html' %}
-{% load static currency_filters %}
+{% load static currency_filters i18n %}
 {% block content %}
 
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="index.html" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
-                    <span></span> <a href="shop-grid-right.html">Vegetables & tubers</a> <span></span> Seeds of Change Organic
+                    <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>{% trans "Home" %}</a>
+                    <span></span> <a href="{% url 'core:coming-soon' %}">{{ p.category.title }}</a> <span></span> {{ p.title|truncatechars:30 }}
                 </div>
             </div>
         </div>
@@ -58,7 +58,7 @@
                                                 <div class="product-price primary-color float-left">
                                                     <span class="current-price text-brand"><span class="current-product-price-{{ p.id }}">{{ p.price|vnd }}</span> ₫</span>
                                                     <span>
-                                                        <span class="save-price font-md color3 ml-15">-{{p.get_percentage|floatformat:0}}% Off</span>
+                                                        <span class="save-price font-md color3 ml-15">-{{p.get_percentage|floatformat:0}}% {% trans "Off" %}</span>
                                                     <span class="old-price font-md ml-15">{{ p.old_price|vnd }} ₫</span>
                                                     </span>
                                                 </div>
@@ -88,20 +88,20 @@
                                                 <input type="hidden" class="product-price-{{ p.id }}" value="{{ p.price }}">
                                                 <input type="hidden" class="product-title-{{ p.id }}" value="{{ p.title }}">
                                                 <div class="product-extra-link2">
-                                                    <button type="button" class="button button-add-to-cart add-to-cart-btn" data-index="{{ p.id }}"><i class="fi-rs-shopping-cart"></i>Add to cart</button>
+                                                    <button type="button" class="button button-add-to-cart add-to-cart-btn" data-index="{{ p.id }}"><i class="fi-rs-shopping-cart"></i>{% trans "Add to cart" %}</button>
                                                     <a aria-label="Add To Wishlist" class="action-btn hover-up add-to-wishlist" href="#" data-product-id="{{ p.id }}"><i class="fi-rs-heart"></i></a>
                                                 </div>
                                             </div>
                                             <div class="font-xs">
                                                 <ul class="mr-50 float-start">
-                                                    <li class="mb-5">Type: <span class="text-brand"> {{p.type}}</span></li>
-                                                    <li class="mb-5">MFG:<span class="text-brand"> {{p.mfd|date:"d M, Y"}}</span></li>
-                                                    <li>Expiry period: <span class="text-brand"> {{p.expiry_period}}</span></li>
+                                                    <li class="mb-5">{% trans "Type:" %} <span class="text-brand"> {{p.type}}</span></li>
+                                                    <li class="mb-5">{% trans "MFG:" %}<span class="text-brand"> {{p.mfd|date:"d M, Y"}}</span></li>
+                                                    <li>{% trans "Expiry period:" %} <span class="text-brand"> {{p.expiry_period}}</span></li>
                                                 </ul>
                                                 <ul class="float-start">
-                                                    <li class="mb-5">SKU: <a href="#"> {{p.sku}}</a></li>
-                                                    <li class="mb-5">Tags: {% for tag in p.tags.all %}{% if tag.slug %}<a href="{% url 'core:tags' tag.slug %}" rel="tag">#{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %} </li>
-                                                    <li>Stock:<span class="in-stock text-brand ml-5"> {{p.stock_count}} Item(s) In Stock</span></li>
+                                                    <li class="mb-5">{% trans "SKU:" %} <a href="#"> {{p.sku}}</a></li>
+                                                    <li class="mb-5">{% trans "Tags:" %} {% for tag in p.tags.all %}{% if tag.slug %}<a href="{% url 'core:tags' tag.slug %}" rel="tag">#{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %} </li>
+                                                    <li>Stock:<span class="in-stock text-brand ml-5"> {{p.stock_count}} {% trans "Item(s) In Stock" %}</span></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -112,16 +112,16 @@
                                     <div class="tab-style3">
                                         <ul class="nav nav-tabs text-uppercase">
                                             <li class="nav-item">
-                                                <a class="nav-link active" id="Description-tab" data-bs-toggle="tab" href="#Description">Description</a>
+                                                <a class="nav-link active" id="Description-tab" data-bs-toggle="tab" href="#Description">{% trans "Description" %}</a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link" id="Additional-info-tab" data-bs-toggle="tab" href="#Additional-info">Additional info</a>
+                                                <a class="nav-link" id="Additional-info-tab" data-bs-toggle="tab" href="#Additional-info">{% trans "Additional info" %}</a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link" id="Vendor-info-tab" data-bs-toggle="tab" href="#Vendor-info">Vendor</a>
+                                                <a class="nav-link" id="Vendor-info-tab" data-bs-toggle="tab" href="#Vendor-info">{% trans "Vendor" %}</a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link" id="Reviews-tab" data-bs-toggle="tab" href="#Reviews">Reviews ({{ reviews.count }})</a>
+                                                <a class="nav-link" id="Reviews-tab" data-bs-toggle="tab" href="#Reviews">{% trans "Reviews" %} ({{ reviews.count }})</a>
                                             </li>
                                         </ul>
                                         <div class="tab-content shop_info_tab entry-main-content">
@@ -236,20 +236,20 @@
                                                     </div>
                                                 </div>
                                                 <ul class="contact-infor mb-50">
-                                                    <li><img src="{% static 'assets/imgs/theme/icons/icon-location.svg' %}" alt="" /><strong>Address: </strong> <span>{{ p.vendor.address }}</span></li>
-                                                    <li><img src="{% static 'assets/imgs/theme/icons/icon-contact.svg' %}" alt="" /><strong>Contact Seller:</strong><span>{{ p.vendor.contact }}</span></li>
+                                                    <li><img src="{% static 'assets/imgs/theme/icons/icon-location.svg' %}" alt="" /><strong>{% trans "Address:" %} </strong> <span>{{ p.vendor.address }}</span></li>
+                                                    <li><img src="{% static 'assets/imgs/theme/icons/icon-contact.svg' %}" alt="" /><strong>{% trans "Contact Seller:" %}</strong><span>{{ p.vendor.contact }}</span></li>
                                                 </ul>
                                                 <div class="d-flex mb-55">
                                                     <div class="mr-30">
-                                                        <p class="text-brand font-xs">Rating</p>
+                                                        <p class="text-brand font-xs">{% trans "Rating" %}</p>
                                                         <h4 class="mb-0">{{ p.vendor.authentic_rating }}%</h4>
                                                     </div>
                                                     <div class="mr-30">
-                                                        <p class="text-brand font-xs">Ship on time</p>
+                                                        <p class="text-brand font-xs">{% trans "Ship on time" %}</p>
                                                         <h4 class="mb-0">{{ p.vendor.shipping_on_time }}%</h4>
                                                     </div>
                                                     <div>
-                                                        <p class="text-brand font-xs">Chat response</p>
+                                                        <p class="text-brand font-xs">{% trans "Chat response" %}</p>
                                                         <h4 class="mb-0">{{ p.vendor.chat_resp_time }}%</h4>
                                                     </div>
                                                 </div>
@@ -260,7 +260,7 @@
                                                 <div class="comments-area">
                                                     <div class="row">
                                                         <div class="col-lg-8">
-                                                            <h4 class="mb-30">Customer questions & answers</h4>
+                                                            <h4 class="mb-30">{% trans "Customer questions & answers" %}</h4>
                                                             <div class="comment-list">
                                                                 {% for r in reviews %}
                                                                 <div class="single-comment justify-content-between d-flex mb-30">
@@ -289,36 +289,36 @@
                                                                     </div>
                                                                 </div>
                                                                 {% empty %}
-                                                                <p>No reviews yet. Be the first to review this product!</p>
+                                                                <p>{% trans "No reviews yet. Be the first to review this product!" %}</p>
                                                                 {% endfor %}
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-4">
-                                                            <h4 class="mb-30">Customer reviews</h4>
+                                                            <h4 class="mb-30">{% trans "Customer reviews" %}</h4>
                                                             <div class="d-flex mb-30">
-                                                                <h6>{{ average_rating.rating|floatformat:1|default:"0.0" }} out of 5.0</h6>
+                                                                <h6>{{ average_rating.rating|floatformat:1|default:"0.0" }} {% trans "out of 5.0" %}</h6>
                                                             </div>
                                                             <div class="progress">
-                                                                <span>5 star</span>
+                                                                <span>5 {% trans "star" %}</span>
                                                                 <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
                                                             </div>
                                                             <div class="progress">
-                                                                <span>4 star</span>
+                                                                <span>4 {% trans "star" %}</span>
                                                                 <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
                                                             </div>
                                                             <div class="progress">
-                                                                <span>3 star</span>
+                                                                <span>3 {% trans "star" %}</span>
                                                                 <div class="progress-bar" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">45%</div>
                                                             </div>
                                                             <div class="progress">
-                                                                <span>2 star</span>
+                                                                <span>2 {% trans "star" %}</span>
                                                                 <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
                                                             </div>
                                                             <div class="progress mb-30">
-                                                                <span>1 star</span>
+                                                                <span>1 {% trans "star" %}</span>
                                                                 <div class="progress-bar" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">85%</div>
                                                             </div>
-                                                            <a href="#" class="font-xs text-muted">How are ratings calculated?</a>
+                                                            <a href="#" class="font-xs text-muted">{% trans "How are ratings calculated?" %}</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -326,7 +326,7 @@
                                                 {% if request.user.is_authenticated %}
                                                 {% if make_review %}
                                                 <div class="comment-form">
-                                                    <h4 class="mb-15">Add a review</h4>
+                                                    <h4 class="mb-15">{% trans "Add a review" %}</h4>
                                                     <strong class="text-success" id="review-res"></strong>
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-12">
@@ -345,7 +345,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <button type="submit" class="button button-contactForm">Submit Review</button>
+                                                                    <button type="submit" class="button button-contactForm">{% trans "Submit Review" %}</button>
                                                                 </div>
                                                             </form>
                                                         </div>
@@ -360,7 +360,7 @@
                                 <div class="row mt-60">
                                     {% if related_products %}
                                     <div class="col-12">
-                                        <h2 class="section-title style-1 mb-30">Related products</h2>
+                                        <h2 class="section-title style-1 mb-30">{% trans "Related products" %}</h2>
                                     </div>
                                     {% endif %}
                                     <div class="col-12">
@@ -404,7 +404,7 @@
                         </div>
                         <div class="col-xl-3 primary-sidebar sticky-sidebar mt-30">
                             <div class="sidebar-widget widget-delivery mb-30 bg-grey-9 box-shadow-none">
-                                <h5 class="section-title style-3 mb-20">Delivery</h5>
+                                <h5 class="section-title style-3 mb-20">{% trans "Delivery" %}</h5>
                                 <ul>
                                     <li>
                                         <i class="fi fi-rs-marker mr-10 text-brand"></i>
@@ -412,34 +412,34 @@
                                             <strong>{{ address.address }}</strong><br />
                                             <br />
                                             {% if address.status == True %}
-                                            <span class="text-success">Verified Address <i class="fi fi-rs-check-circle text-success"></i></span>
+                                            <span class="text-success">{% trans "Verified Address" %} <i class="fi fi-rs-check-circle text-success"></i></span>
                                             {% else %}  
-                                            <span class="text-danger">Unverified Address <i class="fi fi-rs-cross-circle text-danger"></i></span>
+                                            <span class="text-danger">{% trans "Unverified Address" %} <i class="fi fi-rs-cross-circle text-danger"></i></span>
                                             {% endif %}
 
                                         </span>
-                                        <a href="#" class="change float-end">Change</a>
+                                        <a href="#" class="change float-end">{% trans "Change" %}</a>
                                     </li>
                                     <li class="hr"><span></span></li>
                                 </ul>
-                                <h5 class="section-title style-3 mb-20">Return & Warranty</h5>
+                                <h5 class="section-title style-3 mb-20">{% trans "Return & Warranty" %}</h5>
                                 <ul>
                                     <li>
                                         <i class="fi fi-rs-shield-check mr-10 text-brand"></i>
-                                        <span> {{ p.vendor.authentic_rating }}% Authentic </span>
+                                        <span> {{ p.vendor.authentic_rating }}% {% trans "Authentic" %} </span>
                                     </li>
                                     <li>
                                         <i class="fi fi-rs-time-forward-ten mr-10 text-brand"></i>
-                                        <span> {{ p.vendor.days_return }} Day(s) Return </span>
+                                        <span> {{ p.vendor.days_return }} {% trans "Day(s) Return" %} </span>
                                     </li>
                                     <li>
                                         <i class="fi fi-rs-diploma mr-10 text-brand"></i>
-                                        <span> {{ p.vendor.warranty_period }} Month(s) Warranty </span>
+                                        <span> {{ p.vendor.warranty_period }} {% trans "Month(s) Warranty" %} </span>
                                     </li>
                                 </ul>
                             </div>
                             <div class="sidebar-widget widget-vendor mb-30 bg-grey-9 box-shadow-none">
-                                <h5 class="section-title style-3 mb-20">Vendor</h5>
+                                <h5 class="section-title style-3 mb-20">{% trans "Vendor" %}</h5>
                                 <div class="vendor-logo d-flex mb-30">
                                     <img src="{{ p.vendor.image.url }}" alt="" />
                                     <div class="vendor-name ml-15">
@@ -476,7 +476,7 @@
                                 <ul>
                                     <li class="hr"><span></span></li>
                                 </ul>
-                                <p>Become a Vendor? <a href="page-register.html"> Register now</a></p>
+                                <p>{% trans "Become a Vendor?" %} <a href="page-register.html"> {% trans "Register now" %}</a></p>
                             </div>
                             <div class="sidebar-widget widget-category-2 mb-30">
                                 <h5 class="section-title style-1 mb-30">Category</h5>
@@ -500,7 +500,7 @@
                             </div>
                             <!-- Fillter By Price -->
                             <div class="sidebar-widget price_range range mb-30">
-                                <h5 class="section-title style-1 mb-30">Fill by price</h5>
+                                <h5 class="section-title style-1 mb-30">{% trans "Filter by price" %}</h5>
                                 <div class="price-filter">
                                     <div class="price-filter-inner">
                                         <div id="slider-range" class="mb-20"></div>
@@ -512,35 +512,35 @@
                                 </div>
                                 <div class="list-group">
                                     <div class="list-group-item mb-10 mt-10">
-                                        <label class="fw-900">Color</label>
+                                        <label class="fw-900">{% trans "Color" %}</label>
                                         <div class="custome-checkbox">
                                             <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="" />
-                                            <label class="form-check-label" for="exampleCheckbox1"><span>Red (56)</span></label>
+                                            <label class="form-check-label" for="exampleCheckbox1"><span>{% trans "Red" %} (56)</span></label>
                                             <br />
                                             <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox2" value="" />
-                                            <label class="form-check-label" for="exampleCheckbox2"><span>Green (78)</span></label>
+                                            <label class="form-check-label" for="exampleCheckbox2"><span>{% trans "Green" %} (78)</span></label>
                                             <br />
                                             <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox3" value="" />
-                                            <label class="form-check-label" for="exampleCheckbox3"><span>Blue (54)</span></label>
+                                            <label class="form-check-label" for="exampleCheckbox3"><span>{% trans "Blue" %} (54)</span></label>
                                         </div>
-                                        <label class="fw-900 mt-15">Item Condition</label>
+                                        <label class="fw-900 mt-15">{% trans "Item Condition" %}</label>
                                         <div class="custome-checkbox">
                                             <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox11" value="" />
-                                            <label class="form-check-label" for="exampleCheckbox11"><span>New (1506)</span></label>
+                                            <label class="form-check-label" for="exampleCheckbox11"><span>{% trans "New" %} (1506)</span></label>
                                             <br />
                                             <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox21" value="" />
-                                            <label class="form-check-label" for="exampleCheckbox21"><span>Refurbished (27)</span></label>
+                                            <label class="form-check-label" for="exampleCheckbox21"><span>{% trans "Refurbished" %} (27)</span></label>
                                             <br />
                                             <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox31" value="" />
-                                            <label class="form-check-label" for="exampleCheckbox31"><span>Used (45)</span></label>
+                                            <label class="form-check-label" for="exampleCheckbox31"><span>{% trans "Used" %} (45)</span></label>
                                         </div>
                                     </div>
                                 </div>
-                                <a href="shop-grid-right.html" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i> Fillter</a>
+                                <a href="shop-grid-right.html" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i> {% trans "Filter" %}</a>
                             </div>
                             <!-- Product sidebar Widget -->
                             <div class="sidebar-widget product-sidebar mb-30 p-30 bg-grey border-radius-10">
-                                <h5 class="section-title style-1 mb-30">New products</h5>
+                                <h5 class="section-title style-1 mb-30">{% trans "New products" %}</h5>
                                 <div class="single-post clearfix">
                                     <div class="image">
                                         <img src="{% static 'assets/imgs/shop/thumbnail-3.jpg' %}" alt="#" />

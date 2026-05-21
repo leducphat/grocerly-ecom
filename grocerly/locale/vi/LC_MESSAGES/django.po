@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -362,7 +363,8 @@ msgstr "Điều khoản Dịch vụ"
 msgid "There are"
 msgstr "Có"
 
-msgid "This feature is currently under development and will be available soon."
+msgid ""
+"This feature is currently under development and will be available soon."
 msgstr "Tính năng này hiện đang được phát triển và sẽ sớm ra mắt."
 
 msgid "Title"
@@ -380,8 +382,12 @@ msgstr "Tổng cộng"
 msgid "Track My Order"
 msgstr "Theo dõi đơn hàng của tôi"
 
-msgid "Tính năng này đang được đội ngũ Grocerly xây dựng và sẽ sớm ra mắt trong thời gian tới."
-msgstr "Tính năng này đang được đội ngũ Grocerly xây dựng và sẽ sớm ra mắt trong thời gian tới."
+msgid ""
+"Tính năng này đang được đội ngũ Grocerly xây dựng và sẽ sớm ra mắt trong "
+"thời gian tới."
+msgstr ""
+"Tính năng này đang được đội ngũ Grocerly xây dựng và sẽ sớm ra mắt trong "
+"thời gian tới."
 
 msgid "Unit Price"
 msgstr "Đơn giá"
@@ -452,15 +458,209 @@ msgstr "địa chỉ giao hàng và thanh toán"
 msgid "Đang Phát Triển"
 msgstr "Đang Phát Triển"
 
-msgid "Đường link bạn truy cập có thể đã bị xóa, đổi tên, hoặc tạm thời không khả dụng."
-msgstr "Đường link bạn truy cập có thể đã bị xóa, đổi tên, hoặc tạm thời không khả dụng."
+msgid ""
+"Đường link bạn truy cập có thể đã bị xóa, đổi tên, hoặc tạm thời không khả "
+"dụng."
+msgstr ""
+"Đường link bạn truy cập có thể đã bị xóa, đổi tên, hoặc tạm thời không khả "
+"dụng."
 
 msgid "← Quay về Trang Chủ"
 msgstr "← Quay về Trang Chủ"
 
-msgid "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi **%(wait_seconds)s giây** rồi thử lại nhé!"
-msgstr "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi **%(wait_seconds)s giây** rồi thử lại nhé!"
+msgid ""
+"⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi "
+"**%(wait_seconds)s giây** rồi thử lại nhé!"
+msgstr ""
+"⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi "
+"**%(wait_seconds)s giây** rồi thử lại nhé!"
 
-msgid "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 giây rồi thử lại nhé!"
-msgstr "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 giây rồi thử lại nhé!"
+msgid ""
+"⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 "
+"giây rồi thử lại nhé!"
+msgstr ""
+"⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 "
+"giây rồi thử lại nhé!"
 
+msgid "100% Secure delivery without contacting the courier"
+msgstr "Giao hàng an toàn 100% không cần tiếp xúc"
+
+msgid "Super Value Deals - Save more with coupons"
+msgstr "Siêu khuyến mãi - Tiết kiệm hơn với mã giảm giá"
+
+msgid "Trendy 25silver jewelry, save up 35% off today"
+msgstr "Trang sức bạc thời thượng, giảm đến 35% hôm nay"
+
+msgid "Shop Now"
+msgstr "Mua ngay"
+
+msgid "Everyday Fresh &"
+msgstr "Tươi mới mỗi ngày &"
+
+msgid "Clean with Our"
+msgstr "Sạch sẽ với"
+
+msgid "Products"
+msgstr "Sản phẩm"
+
+msgid "Make your Breakfast"
+msgstr "Bữa sáng của bạn"
+
+msgid "Healthy and Easy"
+msgstr "Lành mạnh và Dễ dàng"
+
+msgid "The best Organic"
+msgstr "Sản phẩm hữu cơ"
+
+msgid "Products Online"
+msgstr "Tốt nhất trực tuyến"
+
+msgid "Color"
+msgstr "Màu sắc"
+
+msgid "Red"
+msgstr "Đỏ"
+
+msgid "Green"
+msgstr "Xanh lá"
+
+msgid "Blue"
+msgstr "Xanh dương"
+
+msgid "Item Condition"
+msgstr "Tình trạng sản phẩm"
+
+msgid "New"
+msgstr "Mới"
+
+msgid "Refurbished"
+msgstr "Đã tân trang"
+
+msgid "Used"
+msgstr "Đã qua sử dụng"
+
+msgid "New products"
+msgstr "Sản phẩm mới"
+
+msgid "Organic"
+msgstr "Hữu cơ"
+
+msgid "Save 17%"
+msgstr "Tiết kiệm 17%"
+
+msgid "on"
+msgstr "cho"
+
+msgid "Juice"
+msgstr "Nước ép"
+
+msgid "Shop by Categories"
+msgstr "Mua sắm theo danh mục"
+
+msgid "Off"
+msgstr "Giảm"
+
+msgid "Add to cart"
+msgstr "Thêm vào giỏ"
+
+msgid "Type:"
+msgstr "Loại:"
+
+msgid "MFG:"
+msgstr "NSX:"
+
+msgid "Expiry period:"
+msgstr "Hạn sử dụng:"
+
+msgid "SKU:"
+msgstr "Mã SP:"
+
+msgid "Tags:"
+msgstr "Thẻ:"
+
+msgid "Item(s) In Stock"
+msgstr "sản phẩm còn hàng"
+
+msgid "Description"
+msgstr "Mô tả"
+
+msgid "Additional info"
+msgstr "Thông tin thêm"
+
+msgid "Reviews"
+msgstr "Đánh giá"
+
+msgid "Customer questions & answers"
+msgstr "Câu hỏi & trả lời từ khách hàng"
+
+msgid "No reviews yet. Be the first to review this product!"
+msgstr "Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá sản phẩm này!"
+
+msgid "Customer reviews"
+msgstr "Đánh giá của khách hàng"
+
+msgid "out of 5.0"
+msgstr "trên 5.0"
+
+msgid "star"
+msgstr "sao"
+
+msgid "How are ratings calculated?"
+msgstr "Đánh giá được tính như thế nào?"
+
+msgid "Add a review"
+msgstr "Thêm đánh giá"
+
+msgid "Submit Review"
+msgstr "Gửi đánh giá"
+
+msgid "Related products"
+msgstr "Sản phẩm liên quan"
+
+msgid "Delivery"
+msgstr "Giao hàng"
+
+msgid "Verified Address"
+msgstr "Địa chỉ đã xác minh"
+
+msgid "Unverified Address"
+msgstr "Địa chỉ chưa xác minh"
+
+msgid "Change"
+msgstr "Thay đổi"
+
+msgid "Return & Warranty"
+msgstr "Đổi trả & Bảo hành"
+
+msgid "Authentic"
+msgstr "Chính hãng"
+
+msgid "Day(s) Return"
+msgstr "ngày đổi trả"
+
+msgid "Month(s) Warranty"
+msgstr "tháng bảo hành"
+
+msgid "Rating"
+msgstr "Đánh giá"
+
+msgid "Ship on time"
+msgstr "Giao đúng hẹn"
+
+msgid "Chat response"
+msgstr "Phản hồi chat"
+
+msgid "Address:"
+msgstr "Địa chỉ:"
+
+msgid "Contact Seller:"
+msgstr "Liên hệ người bán:"
+
+msgid "Become a Vendor?"
+msgstr "Trở thành nhà bán?"
+
+msgid "Register now"
+msgstr "Đăng ký ngay"
+
+msgid "Filter by price"
+msgstr "Lọc theo giá"

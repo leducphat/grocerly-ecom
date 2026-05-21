@@ -156,7 +156,7 @@
                                                         <input type="hidden" class="product-id-{{ p.id }}" value="{{ p.id }}">
                                                         <input type="hidden" class="product-price-{{ p.id }}" value="{{ p.price }}">
                                                         <input type="hidden" class="product-title-{{ p.id }}" value="{{ p.title }}">
-                                                        <button class="add add-to-cart-btn" data-index="{{ p.id }}" style="border: none;"><i class="fi-rs-shopping-cart mr-5"></i>Add</button>
+                                                        <button class="add add-to-cart-btn" data-index="{{ p.id }}" style="border: none;"><i class="fi-rs-shopping-cart mr-5"></i>{% trans "Add" %}</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -172,9 +172,9 @@
                     <!--Products Tabs-->
                     <section class="section-padding pb-5">
                         <div class="section-title">
-                            <h3 class="">Deals Of The Day</h3>
-                            <a class="show-all" href="shop-grid-right.html">
-                                All Deals
+                            <h3 class="">{% trans "Deals Of The Day" %}</h3>
+                            <a class="show-all" href="{% url 'core:coming-soon' %}">
+                                {% trans "All Deals" %}
                                 <i class="fi-rs-angle-right"></i>
                             </a>
                         </div>
@@ -234,9 +234,9 @@
                                     <img src="{% static 'assets/imgs/banner/banner-1.png' %}" alt="" />
                                     <div class="banner-text">
                                         <h4>
-                                            Everyday Fresh & <br />Clean with Our<br /> Products
+                                            {% trans "Everyday Fresh &" %} <br />{% trans "Clean with Our" %}<br /> {% trans "Products" %}
                                         </h4>
-                                        <a href="shop-grid-right.html" class="btn btn-xs">Shop Now <i class="fi-rs-arrow-small-right"></i></a>
+                                        <a href="{% url 'core:coming-soon' %}" class="btn btn-xs">{% trans "Shop Now" %} <i class="fi-rs-arrow-small-right"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -245,7 +245,7 @@
                                     <img src="{% static 'assets/imgs/banner/banner-2.png' %}" alt="" />
                                     <div class="banner-text">
                                         <h4>
-                                            Make your Breakfast<br /> Healthy and Easy
+                                            {% trans "Make your Breakfast" %}<br /> {% trans "Healthy and Easy" %}
                                         </h4>
                                         <a href="shop-grid-right.html" class="btn btn-xs">Shop Now <i class="fi-rs-arrow-small-right"></i></a>
                                     </div>
@@ -255,7 +255,7 @@
                                 <div class="banner-img mb-sm-0">
                                     <img src="{% static 'assets/imgs/banner/banner-3.png' %}" alt="" />
                                     <div class="banner-text">
-                                        <h4>The best Organic <br />Products Online</h4>
+                                        <h4>{% trans "The best Organic" %} <br />{% trans "Products Online" %}</h4>
                                         <a href="shop-grid-right.html" class="btn btn-xs">Shop Now <i class="fi-rs-arrow-small-right"></i></a>
                                     </div>
                                 </div>
@@ -266,7 +266,7 @@
                 </div>
                 <div class="col-lg-1-5 primary-sidebar sticky-sidebar pt-30">
                     <div class="sidebar-widget widget-category-2 mb-30">
-                        <h5 class="section-title style-1 mb-30">Category</h5>
+                        <h5 class="section-title style-1 mb-30">{% trans "Category" %}</h5>
                         <ul>
                             {% for c in categories %}
                             <li>
@@ -277,47 +277,47 @@
                     </div>
                     <!-- Fillter By Price -->
                     <div class="sidebar-widget price_range range mb-30">
-                        <h5 class="section-title style-1 mb-30">Fill by price</h5>
+                        <h5 class="section-title style-1 mb-30">{% trans "Filter by price" %}</h5>
                         <div class="price-filter">
                             <div class="price-filter-inner">
                                 <div id="slider-range" class="mb-20"></div>
                                 <div class="d-flex justify-content-between">
-                                    <div class="caption">From: <strong id="slider-range-value1" class="text-brand"></strong></div>
-                                    <div class="caption">To: <strong id="slider-range-value2" class="text-brand"></strong></div>
+                                    <div class="caption">{% trans "From:" %} <strong id="slider-range-value1" class="text-brand"></strong></div>
+                                    <div class="caption">{% trans "To:" %} <strong id="slider-range-value2" class="text-brand"></strong></div>
                                 </div>
                             </div>
                         </div>
                         <div class="list-group">
                             <div class="list-group-item mb-10 mt-10">
-                                <label class="fw-900">Color</label>
+                                <label class="fw-900">{% trans "Color" %}</label>
                                 <div class="custome-checkbox">
                                     <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="" />
-                                    <label class="form-check-label" for="exampleCheckbox1"><span>Red (56)</span></label>
+                                    <label class="form-check-label" for="exampleCheckbox1"><span>{% trans "Red" %} (56)</span></label>
                                     <br />
                                     <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox2" value="" />
-                                    <label class="form-check-label" for="exampleCheckbox2"><span>Green (78)</span></label>
+                                    <label class="form-check-label" for="exampleCheckbox2"><span>{% trans "Green" %} (78)</span></label>
                                     <br />
                                     <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox3" value="" />
-                                    <label class="form-check-label" for="exampleCheckbox3"><span>Blue (54)</span></label>
+                                    <label class="form-check-label" for="exampleCheckbox3"><span>{% trans "Blue" %} (54)</span></label>
                                 </div>
-                                <label class="fw-900 mt-15">Item Condition</label>
+                                <label class="fw-900 mt-15">{% trans "Item Condition" %}</label>
                                 <div class="custome-checkbox">
                                     <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox11" value="" />
-                                    <label class="form-check-label" for="exampleCheckbox11"><span>New (1506)</span></label>
+                                    <label class="form-check-label" for="exampleCheckbox11"><span>{% trans "New" %} (1506)</span></label>
                                     <br />
                                     <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox21" value="" />
-                                    <label class="form-check-label" for="exampleCheckbox21"><span>Refurbished (27)</span></label>
+                                    <label class="form-check-label" for="exampleCheckbox21"><span>{% trans "Refurbished" %} (27)</span></label>
                                     <br />
                                     <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox31" value="" />
-                                    <label class="form-check-label" for="exampleCheckbox31"><span>Used (45)</span></label>
+                                    <label class="form-check-label" for="exampleCheckbox31"><span>{% trans "Used" %} (45)</span></label>
                                 </div>
                             </div>
                         </div>
-                        <a href="shop-grid-right.html" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i> Fillter</a>
+                        <a href="{% url 'core:coming-soon' %}" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i> {% trans "Filter" %}</a>
                     </div>
                     <!-- Product sidebar Widget -->
                     <div class="sidebar-widget product-sidebar mb-30 p-30 bg-grey border-radius-10">
-                        <h5 class="section-title style-1 mb-30">New products</h5>
+                        <h5 class="section-title style-1 mb-30">{% trans "New products" %}</h5>
                         {% for p in new_products_sidebar %}
                         <div class="single-post clearfix">
                             <div class="image">
@@ -336,9 +336,9 @@
                     <div class="banner-img wow fadeIn mb-lg-0 animated d-lg-block d-none">
                         <img src="{% static 'assets/imgs/banner/banner-11.png' %}" alt="" />
                         <div class="banner-text">
-                            <span>Oganic</span>
+                            <span>{% trans "Organic" %}</span>
                             <h4>
-                                Save 17% <br /> on <span class="text-brand">Oganic</span><br /> Juice
+                                {% trans "Save 17%" %} <br /> {% trans "on" %} <span class="text-brand">{% trans "Organic" %}</span><br /> {% trans "Juice" %}
                             </h4>
                         </div>
                     </div>
@@ -349,9 +349,9 @@
             <div class="container">
                 <div class="section-title">
                     <div class="title">
-                        <h3>Shop by Categories</h3>
-                        <a class="show-all" href="shop-grid-right.html">
-                            All Categories
+                        <h3>{% trans "Shop by Categories" %}</h3>
+                        <a class="show-all" href="{% url 'core:coming-soon' %}">
+                            {% trans "All Categories" %}
                             <i class="fi-rs-angle-right"></i>
                         </a>
                     </div>
