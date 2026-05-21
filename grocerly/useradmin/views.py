@@ -61,7 +61,8 @@ def add_product(request):
             # Handle additional images
             additional_images = request.FILES.getlist('additional_images')
             for img in additional_images:
-                ProductImage.objects.create(product=new_form, image=img)
+                if img.size > 0:
+                    ProductImage.objects.create(product=new_form, image=img)
                 
             return redirect("useradmin:dashboard-products")
     else:
@@ -85,7 +86,8 @@ def edit_product(request, pid):
             # Handle additional images
             additional_images = request.FILES.getlist('additional_images')
             for img in additional_images:
-                ProductImage.objects.create(product=new_form, image=img)
+                if img.size > 0:
+                    ProductImage.objects.create(product=new_form, image=img)
                 
             # Handle deletion of existing images
             delete_images = request.POST.getlist('delete_images')
