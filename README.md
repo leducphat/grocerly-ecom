@@ -1,6 +1,6 @@
 # Grocerly E-Commerce Platform
 
-![Grocerly Logo](https://grocerly-ecom.onrender.com/static/assets/imgs/theme/logo.svg)
+![Grocerly Logo](https://grocerly-ecom.onrender.com/static/assets/imgs/theme/logo.png)
 
 Grocerly is a fully functional, multi-vendor e-commerce web application designed to provide a seamless shopping experience. Built with Python and Django, this platform supports dynamic product management, user authentication, a comprehensive shopping cart system, and secure vendor dashboards.
 
