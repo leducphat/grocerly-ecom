@@ -4,6 +4,7 @@ def default(request):
     categories = Category.objects.all()
     address = None
     wishlist_count = 0
+    wishlist_product_ids = []
 
     if request.user.is_authenticated:
         try:
@@ -11,6 +12,7 @@ def default(request):
         except Address.DoesNotExist:
             address = None
         wishlist_count = Wishlist.objects.filter(user=request.user).count()
+        wishlist_product_ids = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
 
     # Session-based cart count
     cart_total_items = 0
@@ -21,5 +23,6 @@ def default(request):
         'categories': categories,
         'address': address,
         'wishlist_count': wishlist_count,
+        'wishlist_product_ids': wishlist_product_ids,
         'cart_total_items': cart_total_items,
     }

@@ -66,7 +66,13 @@
                                                     </a>
                                                 </div>
                                                 <div class="product-action-1">
-                                                    <a aria-label="Add To Wishlist" class="action-btn add-to-wishlist" href="#" data-product-id="{{ p.id }}"><i class="fi-rs-heart"></i></a>
+                                                    <a aria-label="Add To Wishlist" class="action-btn add-to-wishlist" href="#" data-product-id="{{ p.id }}">
+                                                        {% if p.id in wishlist_product_ids %}
+                                                        <i class="fi-ss-heart text-danger"></i>
+                                                        {% else %}
+                                                        <i class="fi-rs-heart"></i>
+                                                        {% endif %}
+                                                    </a>
                                                     <a aria-label="Quick view" class="action-btn" href="{% url 'core:product-detail' p.p_id %}"><i class="fi-rs-eye"></i></a>
                                                 </div>
                                                 <div class="product-badges product-badges-position product-badges-mrg">
@@ -123,7 +129,13 @@
                                                     </a>
                                                 </div>
                                                 <div class="product-action-1">
-                                                    <a aria-label="Add To Wishlist" class="action-btn add-to-wishlist" href="#" data-product-id="{{ p.id }}"><i class="fi-rs-heart"></i></a>
+                                                    <a aria-label="Add To Wishlist" class="action-btn add-to-wishlist" href="#" data-product-id="{{ p.id }}">
+                                                        {% if p.id in wishlist_product_ids %}
+                                                        <i class="fi-ss-heart text-danger"></i>
+                                                        {% else %}
+                                                        <i class="fi-rs-heart"></i>
+                                                        {% endif %}
+                                                    </a>
                                                     <a aria-label="Quick view" class="action-btn" href="{% url 'core:product-detail' p.p_id %}"><i class="fi-rs-eye"></i></a>
                                                 </div>
                                                 <div class="product-badges product-badges-position product-badges-mrg">
