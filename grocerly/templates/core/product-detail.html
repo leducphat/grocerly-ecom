@@ -91,7 +91,7 @@
                                                     <button type="button" class="button button-add-to-cart add-to-cart-btn" data-index="{{ p.id }}"><i class="fi-rs-shopping-cart"></i>{% trans "Add to cart" %}</button>
                                                     <a aria-label="Add To Wishlist" class="action-btn hover-up add-to-wishlist" href="#" data-product-id="{{ p.id }}">
                                                         {% if p.id in wishlist_product_ids %}
-                                                        <i class="fi-ss-heart text-danger"></i>
+                                                        <i class="fi-rs-heart text-danger"></i>
                                                         {% else %}
                                                         <i class="fi-rs-heart"></i>
                                                         {% endif %}
