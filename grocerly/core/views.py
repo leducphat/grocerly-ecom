@@ -55,7 +55,7 @@ def safe_int(val, default=1):
 
 # Create your views here.
 def index(request):
-    products = Product.objects.filter(featured=True, product_status='published').order_by('-id')
+    products = Product.objects.filter(product_status='published').order_by('-id')
     categories = Category.objects.all()
     deals_products = Product.objects.filter(product_status='published', featured=True).order_by('-id')[:4]
     new_products_sidebar = Product.objects.filter(product_status='published').order_by('-date')[:3]
