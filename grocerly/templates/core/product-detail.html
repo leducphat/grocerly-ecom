@@ -94,14 +94,18 @@
                                             </div>
                                             <div class="font-xs">
                                                 <ul class="mr-50 float-start">
-                                                    <li class="mb-5">{% trans "Type:" %} <span class="text-brand"> {{p.type}}</span></li>
-                                                    <li class="mb-5">{% trans "MFG:" %}<span class="text-brand"> {{p.mfd|date:"d M, Y"}}</span></li>
-                                                    <li>{% trans "Expiry period:" %} <span class="text-brand"> {{p.expiry_period}}</span></li>
+                                                    <li class="mb-5">{% trans "Expiry period:" %} <span class="text-brand"> {{p.expiry_period}}</span></li>
+                                                    <li>{% trans "Storage:" %} <span class="text-brand"> {{p.storage_instructions}}</span></li>
                                                 </ul>
                                                 <ul class="float-start">
                                                     <li class="mb-5">{% trans "SKU:" %} <a href="#"> {{p.sku}}</a></li>
-                                                    <li class="mb-5">{% trans "Tags:" %} {% for tag in p.tags.all %}{% if tag.slug %}<a href="{% url 'core:tags' tag.slug %}" rel="tag">#{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %} </li>
-                                                    <li>Stock:<span class="in-stock text-brand ml-5"> {{p.stock_count}} {% trans "Item(s) In Stock" %}</span></li>
+                                                    <!-- Tags hidden from frontend UI -->
+                                                    <!-- <li class="mb-5">{% trans "Tags:" %} {% for tag in p.tags.all %}{% if tag.slug %}<a href="{% url 'core:tags' tag.slug %}" rel="tag">#{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %} </li> -->
+                                                    <li>{% trans "Status:" %}
+                                                        <span class="in-stock text-brand ml-5">
+                                                            {% if p.stock_count > 0 %}{% trans "In Stock" %}{% else %}{% trans "Out of Stock" %}{% endif %}
+                                                        </span>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </div>

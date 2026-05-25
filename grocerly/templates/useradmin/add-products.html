@@ -39,9 +39,6 @@
                     <div class="col-9">
                         <div class="content-header">
                             <h2 class="content-title">Add New Product</h2>
-                            <div>
-                                <button class="btn btn-md rounded font-sm hover-up">Publish <i class="fas fa-check-circle ms-2"></i></button>
-                            </div>
                         </div>
                     </div>
                     
@@ -98,11 +95,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="mb-4">
-                                        <label class="form-label">Type</label>
-                                        {{form.type}}
-                                        <!-- <input type="text" placeholder="%" class="form-control" id="product_name" /> -->
-                                    </div>
+
                                     <div class="mb-4">
                                         <label class="form-label">Stock</label>
                                         {{form.stock_count}}
@@ -110,14 +103,19 @@
                                     </div>
 
                                     <div class="mb-4">
-                                        <label class="form-label">Life of Product</label>
-                                        {{form.expiry_period}}
-                                        <!-- <input type="text" placeholder="%" class="form-control" id="product_name" /> -->
+                                          <label class="form-label">Vendor</label>
+                                          <br>
+                                          {{form.vendor}}
+                                    </div>
+                                    <div class="mb-4">
+                                          <label class="form-label">Category</label>
+                                          <br>
+                                          {{form.category}}
                                     </div>
 
                                     <div class="mb-4">
-                                        <label class="form-label">Manufactured Date</label>
-                                        {{form.mfd}}
+                                        <label class="form-label">Life of Product</label>
+                                        {{form.expiry_period}}
                                         <!-- <input type="text" placeholder="%" class="form-control" id="product_name" /> -->
                                     </div>
 
@@ -128,11 +126,7 @@
                                         <!-- <input type="text" placeholder="%" class="form-control" id="product_name" /> -->
                                     </div>
 
-                                      <div class="mb-4">
-                                          <label class="form-label">Vendor</label>
-                                          <br>
-                                          {{form.vendor}}
-                                      </div>
+
                             </div>
                         </div>
                         <!-- card end// -->
@@ -159,24 +153,7 @@
                             </div>
                         </div>
                         <!-- card end// -->
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h4>Others</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="row gx-2">
-                                    <div class="col-sm-6 mb-3">
-                                        <label class="form-label">Category</label>
-                                        {{form.category}}
-                                    </div>
-                                    
-                                </div>
-                                <!-- row.// -->
-                            </div>
-                            <br>
-                            
-                        </div>
-                        <!-- card end// -->
+
                         <button class="btn mt-3 btn-md rounded font-sm hover-up" type="submit">Create Product</button>
                     </div>
                 </div>

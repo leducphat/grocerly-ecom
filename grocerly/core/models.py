@@ -203,13 +203,11 @@ class Product(SoftDeleteModel):
     old_price = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 
     specification = models.TextField(null=True, blank=True, default="No product's specification available")
-    type = models.CharField(max_length=100, null=True, blank=True, default="General")
     weight_volume = models.CharField(max_length=100, null=True, blank=True, default="1 kg")
     ingredients = models.TextField(null=True, blank=True, default="Đang cập nhật")
     storage_instructions = models.CharField(max_length=255, null=True, blank=True, default="Bảo quản nơi khô ráo, thoáng mát")
     stock_count = models.IntegerField(default=0, null=True, blank=True)
     expiry_period = models.CharField(max_length=100, null=True, blank=True, default="N/A")
-    mfd = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     tags = TaggableManager(blank=True)
 
     product_status = models.CharField(max_length=10, choices=STATUS, default='in_review')
