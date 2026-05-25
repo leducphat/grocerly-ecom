@@ -76,7 +76,8 @@
     </main>
 
     <script>
-        $(document).on("click", ".delete-wishlist-product", function(){
+        $(document).on("click", ".delete-wishlist-product", function(e){
+            e.preventDefault();
             let wishlist_id = $(this).attr("data-wishlist-product");
             let this_val = $(this);
 

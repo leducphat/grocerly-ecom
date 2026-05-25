@@ -911,7 +911,11 @@
                 dataType: "json",
                 success: function(response){
                     if(response.bool === true){
-                        this_val.html('<i class="fi-rs-heart text-danger"></i>');
+                        if (response.added) {
+                            this_val.html('<i class="fi-rs-heart text-danger"></i>');
+                        } else {
+                            this_val.html('<i class="fi-rs-heart"></i>');
+                        }
                         $(".wishlist-count").text(response.total_wishlist_items);
                     } else if (response.error) {
                         alert(response.error);

@@ -718,16 +718,20 @@ def add_to_wishlist(request):
     product_id = request.GET.get('id')
     product = Product.objects.get(id=product_id)
 
-    wishlist_count = Wishlist.objects.filter(product=product, user=request.user).count()
+    wishlist_qs = Wishlist.objects.filter(product=product, user=request.user)
 
-    if wishlist_count == 0:
+    if wishlist_qs.exists():
+        wishlist_qs.delete()
+        added = False
+    else:
         Wishlist.objects.create(
             user=request.user,
             product=product,
         )
+        added = True
         
     total_wishlist = Wishlist.objects.filter(user=request.user).count()
-    context = {"bool": True, "total_wishlist_items": total_wishlist}
+    context = {"bool": True, "added": added, "total_wishlist_items": total_wishlist}
 
     return JsonResponse(context)
 
@@ -751,7 +755,7 @@ def remove_wishlist(request):
         "w": wishlist,
     }
     wishlist_json = serializers.serialize('json', wishlist)
-    t = render_to_string('core/async/wishlist-list.html', context)
+    t = render_to_string('core/async/wishlist-list.html', context, request=request)
     return JsonResponse({'data': t, 'w': wishlist_json, 'total_wishlist_items': total_wishlist})
 
 # ======================== Static Pages & Contact ========================
