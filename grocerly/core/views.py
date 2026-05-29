@@ -308,6 +308,7 @@ def cart_view(request):
         return redirect("core:index")
 
 
+@login_required
 def checkout_info_view(request):
     cart_total_amount = 0
     if 'cart_data_obj' in request.session:
@@ -427,6 +428,7 @@ def _get_checkout_order_or_none(request, oid):
         order_query = order_query.filter(email=guest_email)
     return order_query.first()
 
+@login_required
 def save_checkout_info(request):
     total_amount = 0
 
@@ -498,6 +500,7 @@ def save_checkout_info(request):
 
 
 @csrf_exempt
+@login_required
 def create_checkout_session(request, oid):
     order = _get_checkout_order_or_none(request, oid)
     if not order:
@@ -542,6 +545,7 @@ def create_checkout_session(request, oid):
     return JsonResponse({"sessionId": checkout_session.id})
 
 
+@login_required
 def place_cod_order(request, oid):
     if request.method != "POST":
         return redirect("core:checkout", oid)
@@ -566,6 +570,7 @@ def place_cod_order(request, oid):
     return redirect("core:payment-completed", order.oid)
 
 
+@login_required
 def checkout(request, oid):
     order = _get_checkout_order_or_none(request, oid)
     if not order:
@@ -604,6 +609,7 @@ def checkout(request, oid):
     return render(request, 'core/checkout.html', context)
 
 
+@login_required
 def payment_completed_view(request, oid):
     order = _get_checkout_order_or_none(request, oid)
     if not order:
@@ -629,6 +635,7 @@ def payment_completed_view(request, oid):
     return render(request, 'core/payment-completed.html', context)
 
 
+@login_required
 def payment_failed_view(request):
     pending_order = _get_pending_order_from_session(request)
 
