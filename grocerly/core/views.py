@@ -403,30 +403,13 @@ def _get_pending_order_from_session(request):
             paid_status=False,
         ).first()
 
-    guest_email = request.session.get('guest_checkout_email')
-    order_query = CartOrder.objects.filter(
-        oid=pending_oid,
-        user__isnull=True,
-        paid_status=False,
-    )
-    if guest_email:
-        order_query = order_query.filter(email=guest_email)
-    return order_query.first()
+    return None
 
 
 def _get_checkout_order_or_none(request, oid):
     if request.user.is_authenticated:
         return CartOrder.objects.filter(oid=oid, user=request.user).first()
-
-    pending_oid = request.session.get('pending_order_oid')
-    if str(oid) != str(pending_oid):
-        return None
-
-    guest_email = request.session.get('guest_checkout_email')
-    order_query = CartOrder.objects.filter(oid=oid, user__isnull=True)
-    if guest_email:
-        order_query = order_query.filter(email=guest_email)
-    return order_query.first()
+    return None
 
 @login_required
 def save_checkout_info(request):
@@ -465,9 +448,8 @@ def save_checkout_info(request):
                 order.save()
                 CartOrderItem.objects.filter(order=order).delete()
             else:
-                order_user = request.user if request.user.is_authenticated else None
                 order = CartOrder.objects.create(
-                    user=order_user,
+                    user=request.user,
                     price=total_amount,
                     full_name=full_name,
                     email=email,
@@ -490,9 +472,6 @@ def save_checkout_info(request):
                 )
 
             request.session['pending_order_oid'] = str(order.oid)
-            if not request.user.is_authenticated:
-                request.session['guest_checkout_email'] = email
-                request.session['guest_checkout_phone'] = mobile or ""
 
             return redirect("core:checkout", order.oid)
 
@@ -626,8 +605,6 @@ def payment_completed_view(request, oid):
     pending_oid = request.session.get('pending_order_oid')
     if pending_oid and str(order.oid) == str(pending_oid):
         del request.session['pending_order_oid']
-        request.session.pop('guest_checkout_email', None)
-        request.session.pop('guest_checkout_phone', None)
 
     context = {
         'order': order,
