@@ -727,18 +727,6 @@ msgstr "Tiểu sử"
 msgid "Phone"
 msgstr "Số điện thoại"
 
-msgid "Home"
-msgstr "Trang chủ"
-
-msgid "Pages"
-msgstr "Trang"
-
-msgid "My Account"
-msgstr "Tài khoản của tôi"
-
-msgid "Login"
-msgstr "Đăng nhập"
-
 msgid "Don't have an account?"
 msgstr "Bạn chưa có tài khoản?"
 
@@ -774,13 +762,4 @@ msgstr "Lưu ý:"
 
 msgid "Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our privacy policy"
 msgstr "Dữ liệu cá nhân của bạn sẽ được sử dụng để hỗ trợ trải nghiệm của bạn trên toàn bộ trang web này, để quản lý quyền truy cập vào tài khoản của bạn và cho các mục đích khác được mô tả trong chính sách bảo mật của chúng tôi."
-
-msgid "Continue with Facebook"
-msgstr "Tiếp tục với Facebook"
-
-msgid "Continue with Google"
-msgstr "Tiếp tục với Google"
-
-msgid "Continue with Apple"
-msgstr "Tiếp tục với Apple"
 
