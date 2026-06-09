@@ -1,0 +1,389 @@
+<html xmlns="http://www.w3.org/TR/REC-html40" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="utf-8"/>
+<style>
+    body { font-family: "Times New Roman", Times, serif; font-size: 13pt; line-height: 1.5; text-align: justify; }
+    h2 { font-size: 13pt; text-transform: uppercase; font-weight: bold; margin-top: 18pt; margin-bottom: 6pt; text-align: left; }
+    h3 { font-size: 13pt; font-weight: bold; margin-top: 12pt; margin-bottom: 6pt; text-align: left; font-style: italic; }
+    h4 { font-size: 13pt; font-weight: bold; margin-top: 12pt; margin-bottom: 6pt; text-align: left; font-style: italic; }
+    p { margin-top: 0; margin-bottom: 6pt; text-indent: 1cm; font-weight: normal; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; margin-bottom: 5px; font-size: 12pt; font-weight: normal; font-style: normal;}
+    td, th { border: 1pt solid black; padding: 5px 8px; text-align: left; vertical-align: top; }
+    td { font-weight: normal; font-style: normal; }
+    th { text-align: center; font-weight: bold; background-color: #f2f2f2; }
+    .center { text-align: center; }
+    .image-placeholder { text-align: center; color: #ff0000; font-weight: bold; text-indent: 0; margin: 12pt 0; border: 1px dashed #ff0000; padding: 10pt; background-color: #ffe6e6;}
+    .caption-figure { font-size: 11pt; font-weight: bold; text-align: center; margin-top: 0; margin-bottom: 24pt; font-style: italic; }
+</style>
+</head>
+<body>
+<h2>3.5 THIẾT KẾ GIAO DIỆN (UI/UX)</h2>
+<h3>3.5.1 Danh sách giao diện</h3>
+<table>
+<tr><th style="width: 10%">TT</th><th style="width: 30%">Tên giao diện</th><th style="width: 60%">Mô tả</th></tr>
+<tr><td class="center">1</td><td>Trang Đăng nhập (Login)</td><td>Giao diện cho phép người dùng đăng nhập vào hệ thống</td></tr>
+<tr><td class="center">2</td><td>Trang Đăng ký (Register)</td><td>Giao diện tạo tài khoản mới</td></tr><tr><td class="center">3</td><td>Trang Quên mật khẩu / Xác thực OTP</td><td>Giao diện yêu cầu khôi phục qua email và nhập mật khẩu mới</td></tr>
+<tr><td class="center">4</td><td>Trang Chủ (Home)</td><td>Trang giới thiệu các danh mục nổi bật và tin tức mới nhất</td></tr>
+<tr><td class="center">5</td><td>Trang Cửa hàng (Shop)</td><td>Trang hiển thị toàn bộ sản phẩm với bộ lọc chuyên sâu</td></tr>
+<tr><td class="center">6</td><td>Trang Chi tiết sản phẩm</td><td>Trang hiển thị thông tin đầy đủ của một sản phẩm</td></tr>
+<tr><td class="center">7</td><td>Trang Đánh giá sản phẩm (Review)</td><td>Khu vực xem và gửi đánh giá cho sản phẩm</td></tr>
+<tr><td class="center">8</td><td>Trang Giỏ hàng (Cart)</td><td>Giao diện quản lý các sản phẩm đã chọn mua</td></tr>
+<tr><td class="center">9</td><td>Trang Thanh toán - Thông tin giao hàng</td><td>Giao diện nhập thông tin người nhận</td></tr>
+<tr><td class="center">10</td><td>Trang Thanh toán - Cổng thanh toán</td><td>Giao diện chọn phương thức thanh toán</td></tr>
+<tr><td class="center">11</td><td>Trang Thanh toán thành công (Success)</td><td>Màn hình thông báo kết quả sau khi thanh toán</td></tr>
+<tr><td class="center">12</td><td>Trang Yêu thích (Wishlist)</td><td>Quản lý các sản phẩm đã lưu lại</td></tr>
+<tr><td class="center">13</td><td>Trang Liên hệ (Contact Us)</td><td>Giao diện gửi thư khiếu nại, báo lỗi</td></tr>
+<tr><td class="center">14</td><td>Trang Quản lý Tài khoản (Dashboard/Account)</td><td>Quản lý thông tin hồ sơ và địa chỉ</td></tr>
+<tr><td class="center">15</td><td>Trang Lịch sử đơn hàng (Đơn mua)</td><td>Theo dõi danh sách các đơn hàng đã đặt của tài khoản</td></tr>
+<tr><td class="center">16</td><td>Trang Danh sách Cửa hàng (Vendor List)</td><td>Tìm kiếm các nhà cung cấp/shop trên hệ thống</td></tr>
+<tr><td class="center">17</td><td>Trang Chi tiết Cửa hàng (Vendor Detail)</td><td>Xem thông tin và sản phẩm của một Shop</td></tr>
+<tr><td class="center">18</td><td>Trang Đăng nhập Quản trị viên (Admin Login)</td><td>Giao diện bảo mật đăng nhập độc lập dành cho Admin và Vendor</td></tr>
+<tr><td class="center">19</td><td>Trang Dashboard Admin</td><td>Hiển thị các chỉ số kinh doanh tổng quan cho người quản lý</td></tr>
+<tr><td class="center">20</td><td>Trang Quản lý Sản phẩm</td><td>Liệt kê bảng toàn bộ sản phẩm đang có trên hệ thống</td></tr>
+<tr><td class="center">21</td><td>Trang Thêm / Sửa Sản phẩm</td><td>Giao diện nhập liệu để thêm sản phẩm mới hoặc cập nhật thông tin</td></tr>
+<tr><td class="center">22</td><td>Trang Quản lý Danh mục</td><td>Tổ chức và sắp xếp cây danh mục sản phẩm của hệ thống</td></tr>
+<tr><td class="center">23</td><td>Trang Quản lý Đơn hàng (Orders)</td><td>Giám sát tất cả các đơn hàng đã được đặt trên sàn</td></tr>
+<tr><td class="center">24</td><td>Trang Cập nhật Đơn hàng</td><td>Giao diện xem chi tiết để xử lý đơn và điền mã vận đơn</td></tr>
+<tr><td class="center">25</td><td>Trang Quản lý Người dùng (Users)</td><td>Quản lý danh sách toàn bộ tài khoản thành viên của hệ thống</td></tr>
+<tr><td class="center">26</td><td>Trang Quản lý Cửa hàng (Vendors)</td><td>Giao diện dành riêng cho mô hình Multi-vendor để quản lý đối tác</td></tr>
+<tr><td class="center">27</td><td>Trang Quản lý Mã giảm giá (Coupons)</td><td>Tạo và kiểm soát các chương trình giảm giá</td></tr>
+</table>
+<h3>3.5.2 Xây dựng giao diện</h3>
+<h4>3.5.2.1 Trang Đăng nhập (Login)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG ĐĂNG NHẬP (LOGIN)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.1. Trang Đăng nhập (Login)</div>
+<p>- Người dùng nhập Username/Email và mật khẩu</p>
+<p>- Hệ thống xác thực tài khoản và chuyển hướng vào trang chủ</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.1. Mô tả giao diện Trang Đăng nhập (Login)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung nhập 'Username or Email *'</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt; (password)</td><td>Khung nhập mật khẩu 'Your password *'</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung nhập mã bảo mật 'Security code *'</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;input&gt; (checkbox)</td><td>Ô tích chọn Ghi nhớ đăng nhập</td></tr>
+<tr><td class="center">5</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Log in'</td></tr>
+<tr><td class="center">6</td><td class="center">Thẻ &lt;a&gt;</td><td>Liên kết Quên mật khẩu và Tạo tài khoản</td></tr>
+</table>
+<h4>3.5.2.2 Trang Đăng ký (Register)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG ĐĂNG KÝ (REGISTER)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.2. Trang Đăng ký (Register)</div>
+<p>- Điền đầy đủ các thông tin cá nhân bắt buộc</p>
+<p>- Bấm 'Submit &amp; Register' để tạo tài khoản mới</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.2. Mô tả giao diện Trang Đăng ký (Register)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung nhập 'Username'</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung nhập 'Email'</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;input&gt; (password)</td><td>Khung nhập 'Password'</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;input&gt; (password)</td><td>Khung nhập 'Confirm password'</td></tr>
+<tr><td class="center">5</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung nhập 'Security code *'</td></tr>
+<tr><td class="center">6</td><td class="center">Thẻ &lt;input&gt; (radio)</td><td>Tùy chọn thanh toán (Payment option)</td></tr>
+<tr><td class="center">7</td><td class="center">Thẻ &lt;input&gt; (checkbox)</td><td>Đồng ý điều khoản sử dụng</td></tr>
+<tr><td class="center">8</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Submit &amp; Register'</td></tr>
+</table><h4>3.5.2.3 Trang Quên mật khẩu / Xác thực OTP</h4><div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG QUÊN MẬT KHẨU / XÁC THỰC OTP" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div><div class="caption-figure">Hình 3.5.3. Trang Quên mật khẩu / Xác thực OTP</div><p>- Nhập email để hệ thống gửi liên kết đặt lại mật khẩu</p><p>- Nhấp vào liên kết trong email và tạo mật khẩu mới</p><div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.3. Mô tả giao diện Trang Quên mật khẩu / Xác thực OTP</div><table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt;</td><td>Khung nhập Email đã đăng ký</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút Gửi liên kết xác thực</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;input&gt; (password)</td><td>Khung nhập mật khẩu mới và xác nhận mật khẩu</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút Đổi mật khẩu</td></tr>
+</table>
+<h4>3.5.2.4 Trang Chủ (Home)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG CHỦ (HOME)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.4. Trang Chủ (Home)</div>
+<p>- Hiển thị trực quan ngay khi truy cập</p>
+<p>- Tìm kiếm và thêm nhanh sản phẩm vào giỏ hàng</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.4. Mô tả giao diện Trang Chủ (Home)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung tìm kiếm 'Search for items...'</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt; (email)</td><td>Đăng ký nhận tin 'Your email address'</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Subscribe' nhận tin</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;button&gt;</td><td>Bộ lọc theo thẻ (All, Milks, Coffes, Meats,...)</td></tr>
+<tr><td class="center">5</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Add' hoặc 'Add to cart' dưới mỗi sản phẩm</td></tr>
+</table>
+<h4>3.5.2.5 Trang Cửa hàng (Shop)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG CỬA HÀNG (SHOP)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.5. Trang Cửa hàng (Shop)</div>
+<p>- Sử dụng checkbox để lọc danh mục mong muốn</p>
+<p>- Áp dụng khoảng giá</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.5. Mô tả giao diện Trang Cửa hàng (Shop)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (checkbox)</td><td>Bộ lọc Danh mục và Thương hiệu</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt; (number)</td><td>Lọc theo khoảng giá</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Apply Price'</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Add' thêm vào giỏ hàng</td></tr>
+</table>
+<h4>3.5.2.6 Trang Chi tiết sản phẩm</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG CHI TIẾT SẢN PHẨM" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.6. Trang Chi tiết sản phẩm</div>
+<p>- Chọn số lượng mong muốn</p>
+<p>- Thêm vào giỏ hàng</p>
+<p>- Viết đánh giá sản phẩm</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.6. Mô tả giao diện Trang Chi tiết sản phẩm</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (checkbox)</td><td>Tùy chọn thuộc tính phụ (nếu có)</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt; (number)</td><td>Tùy chỉnh số lượng mua</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Add to cart'</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Submit Review'</td></tr>
+</table>
+<h4>3.5.2.7 Trang Đánh giá sản phẩm (Review)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG ĐÁNH GIÁ SẢN PHẨM (REVIEW)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.7. Trang Đánh giá sản phẩm (Review)</div>
+<p>- Đọc đánh giá, trải nghiệm của người đi trước</p>
+<p>- Viết đánh giá của mình sau khi đã mua hàng thành công</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.7. Mô tả giao diện Trang Đánh giá sản phẩm (Review)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;div&gt;</td><td>Danh sách các bình luận cũ của những khách hàng khác</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;select&gt; / Component</td><td>Chọn số sao đánh giá (1-5 sao)</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;textarea&gt;</td><td>Khung nhập nội dung đánh giá của bản thân</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút Gửi đánh giá</td></tr>
+</table>
+<h4>3.5.2.8 Trang Giỏ hàng (Cart)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG GIỎ HÀNG (CART)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.8. Trang Giỏ hàng (Cart)</div>
+<p>- Thay đổi số lượng hoặc xóa bỏ sản phẩm</p>
+<p>- Kiểm tra tổng tiền trước khi chốt đơn</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.8. Mô tả giao diện Trang Giỏ hàng (Cart)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (number)</td><td>Cập nhật tăng/giảm số lượng 'Qty'</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;a&gt;</td><td>Nút Xóa sản phẩm khỏi giỏ</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;a&gt;</td><td>Liên kết chuyển đến thanh toán (Proceed to Checkout)</td></tr>
+</table>
+<h4>3.5.2.9 Trang Thanh toán - Thông tin giao hàng</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG THANH TOÁN - THÔNG TIN GIAO HÀNG" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.9. Trang Thanh toán - Thông tin giao hàng</div>
+<p>- Điền thông tin địa chỉ nhận hàng</p>
+<p>- Chuyển sang bước chọn cổng thanh toán</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.9. Mô tả giao diện Trang Thanh toán - Thông tin giao hàng</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung 'Full Name'</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt; (email)</td><td>Khung 'Email'</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung 'Mobile'</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung 'Address'</td></tr>
+<tr><td class="center">5</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung 'City', 'State', 'Country'</td></tr>
+<tr><td class="center">6</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Continue To Payment'</td></tr>
+</table>
+<h4>3.5.2.10 Trang Thanh toán - Cổng thanh toán</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG THANH TOÁN - CỔNG THANH TOÁN" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.10. Trang Thanh toán - Cổng thanh toán</div>
+<p>- Áp dụng mã giảm giá</p>
+<p>- Lựa chọn thanh toán online hoặc khi nhận hàng</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.10. Mô tả giao diện Trang Thanh toán - Cổng thanh toán</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung nhập mã giảm giá 'Enter Coupon Code...'</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Apply' áp dụng mã</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Pay With Stripe/VNPay'</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Place Order With Cash On Delivery (COD)'</td></tr>
+</table>
+<h4>3.5.2.11 Trang Thanh toán thành công (Success)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG THANH TOÁN THÀNH CÔNG (SUCCESS)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.11. Trang Thanh toán thành công (Success)</div>
+<p>- Hệ thống ghi nhận đơn hàng thành công vào Database</p>
+<p>- Cho phép khách hàng chuyển nhanh về trang quản lý đơn mua</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.11. Mô tả giao diện Trang Thanh toán thành công (Success)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;h1&gt;</td><td>Thông báo 'Đặt hàng thành công'</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;div&gt;</td><td>Hiển thị Mã đơn hàng (Tracking ID) để tiện tra cứu sau này</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút Trở về Trang chủ / Nút Xem đơn hàng</td></tr>
+</table>
+<h4>3.5.2.12 Trang Yêu thích (Wishlist)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG YÊU THÍCH (WISHLIST)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.12. Trang Yêu thích (Wishlist)</div>
+<p>- Khách hàng xem lại các sản phẩm quan tâm</p>
+<p>- Dễ dàng chuyển thẳng qua giỏ hàng để thanh toán</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.12. Mô tả giao diện Trang Yêu thích (Wishlist)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (checkbox)</td><td>Chọn sản phẩm trong danh sách</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Add to cart' chuyển sang giỏ hàng</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;a&gt;</td><td>Nút gỡ bỏ khỏi wishlist</td></tr>
+</table>
+<h4>3.5.2.13 Trang Liên hệ (Contact Us)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG LIÊN HỆ (CONTACT US)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.13. Trang Liên hệ (Contact Us)</div>
+<p>- Khách hàng gửi thông điệp và phản hồi cho Admin</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.13. Mô tả giao diện Trang Liên hệ (Contact Us)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung nhập 'First Name'</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt; (email)</td><td>Khung nhập 'Your Email'</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;input&gt; (tel)</td><td>Khung nhập 'Your Phone'</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Khung nhập 'Subject'</td></tr>
+<tr><td class="center">5</td><td class="center">Thẻ &lt;textarea&gt;</td><td>Khung nhập nội dung 'Message'</td></tr>
+<tr><td class="center">6</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Send message'</td></tr>
+</table>
+<h4>3.5.2.14 Trang Quản lý Tài khoản (Dashboard/Account)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG QUẢN LÝ TÀI KHOẢN (DASHBOARD/ACCOUNT)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.14. Trang Quản lý Tài khoản (Dashboard/Account)</div>
+<p>- Lưu nhiều địa chỉ khác nhau và đặt địa chỉ mặc định</p>
+<p>- Đổi mật khẩu tài khoản</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.14. Mô tả giao diện Trang Quản lý Tài khoản (Dashboard/Account)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Cập nhật tên, hiển thị tên (dname), số điện thoại</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Cập nhật địa chỉ 'Address'</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;input&gt; (email)</td><td>Cập nhật 'Email'</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;input&gt; (password)</td><td>Đổi mật khẩu: password, npassword, cpassword</td></tr>
+<tr><td class="center">5</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Save Address' và 'Make Default'</td></tr>
+<tr><td class="center">6</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Save Change' thay đổi hồ sơ</td></tr>
+</table>
+<h4>3.5.2.15 Trang Lịch sử đơn hàng (Đơn mua)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG LỊCH SỬ ĐƠN HÀNG (ĐƠN MUA)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.15. Trang Lịch sử đơn hàng (Đơn mua)</div>
+<p>- Khách hàng tra cứu nhanh danh sách các đơn đã và đang mua</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.15. Mô tả giao diện Trang Lịch sử đơn hàng (Đơn mua)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;div&gt;</td><td>Các Tab lọc trạng thái đơn: Tất cả, Chờ xác nhận, Đang giao, Đã hoàn thành, Đã hủy</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;div&gt;</td><td>Thẻ hiển thị tóm tắt một Đơn hàng (Mã đơn, Tổng tiền, Trạng thái)</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút Xem chi tiết đơn hàng</td></tr>
+</table>
+<h4>3.5.2.16 Trang Danh sách Cửa hàng (Vendor List)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG DANH SÁCH CỬA HÀNG (VENDOR LIST)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.16. Trang Danh sách Cửa hàng (Vendor List)</div>
+<p>- Khách hàng khám phá các shop khác nhau trên hệ thống</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.16. Mô tả giao diện Trang Danh sách Cửa hàng (Vendor List)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Tìm kiếm 'Search vendors (by name or ID)...'</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;a&gt;</td><td>Liên kết xem chi tiết Shop</td></tr>
+</table>
+<h4>3.5.2.17 Trang Chi tiết Cửa hàng (Vendor Detail)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG CHI TIẾT CỬA HÀNG (VENDOR DETAIL)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.17. Trang Chi tiết Cửa hàng (Vendor Detail)</div>
+<p>- Xem thông tin shop</p>
+<p>- Mua sản phẩm trực tiếp từ trang shop</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.17. Mô tả giao diện Trang Chi tiết Cửa hàng (Vendor Detail)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (checkbox)</td><td>Lọc sản phẩm trong phạm vi cửa hàng</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Add to cart' dưới mỗi sản phẩm</td></tr>
+</table>
+<h4>3.5.2.18 Trang Đăng nhập Quản trị viên (Admin Login)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG ĐĂNG NHẬP QUẢN TRỊ VIÊN (ADMIN LOGIN)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.18. Trang Đăng nhập Quản trị viên (Admin Login)</div>
+<p>- Hệ thống xác thực quyền Admin/Staff trước khi cho phép vào Dashboard</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.18. Mô tả giao diện Trang Đăng nhập Quản trị viên (Admin Login)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt;</td><td>Khung nhập Tài khoản quản trị</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt;</td><td>Khung nhập Mật khẩu quản trị</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút Đăng nhập</td></tr>
+</table>
+<h4>3.5.2.19 Trang Dashboard Admin</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG DASHBOARD ADMIN" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.19. Trang Dashboard Admin</div>
+<p>- Cung cấp cái nhìn bao quát về hoạt động kinh doanh</p>
+<p>- Giúp admin đưa ra quyết định dựa trên dữ liệu biểu đồ</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.19. Mô tả giao diện Trang Dashboard Admin</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;div&gt;</td><td>Các thẻ tóm tắt (Card): Tổng doanh thu, Tổng đơn hàng, Số khách hàng</td></tr>
+<tr><td class="center">2</td><td class="center">Component &lt;Chart&gt;</td><td>Biểu đồ trực quan (Biểu đồ đường/cột) doanh thu theo ngày/tháng/năm</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;select&gt;</td><td>Bộ lọc tùy chỉnh mốc thời gian để xem thống kê</td></tr>
+</table>
+<h4>3.5.2.20 Trang Quản lý Sản phẩm</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG QUẢN LÝ SẢN PHẨM" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.20. Trang Quản lý Sản phẩm</div>
+<p>- Quản lý kho hàng nhanh chóng</p>
+<p>- Tìm kiếm và theo dõi số lượng tồn kho</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.20. Mô tả giao diện Trang Quản lý Sản phẩm</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;table&gt;</td><td>Bảng dữ liệu sản phẩm (Gồm các cột: Mã, Tên, Giá, Tồn kho, Trạng thái)</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt;</td><td>Khung Tìm kiếm sản phẩm theo tên/SKU</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Cột các nút Hành động (Action): Sửa (Edit) / Xóa (Delete)</td></tr>
+</table>
+<h4>3.5.2.21 Trang Thêm / Sửa Sản phẩm</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG THÊM / SỬA SẢN PHẨM" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.21. Trang Thêm / Sửa Sản phẩm</div>
+<p>- Thao tác cung cấp đầy đủ thông tin để đưa sản phẩm lên sàn</p>
+<p>- Cập nhật dữ liệu hàng hóa trực tiếp vào Database</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.21. Mô tả giao diện Trang Thêm / Sửa Sản phẩm</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt; (text)</td><td>Nhập giá, phần trăm giảm, độ dài/rộng (inch), cân nặng (gram)</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt; (file)</td><td>Công cụ Upload Hình ảnh sản phẩm (Hỗ trợ upload nhiều ảnh)</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;select&gt;</td><td>Dropdown phân loại Danh mục (Category) và Cửa hàng (Vendor)</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;textarea&gt;</td><td>Trình soạn thảo để chỉnh sửa mô tả chi tiết sản phẩm</td></tr>
+<tr><td class="center">5</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút 'Save to draft' lưu nháp hoặc 'Publish' xuất bản</td></tr>
+</table>
+<h4>3.5.2.22 Trang Quản lý Danh mục</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG QUẢN LÝ DANH MỤC" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.22. Trang Quản lý Danh mục</div>
+<p>- Quản lý cấu trúc phân loại hàng hóa giúp khách hàng dễ tìm kiếm</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.22. Mô tả giao diện Trang Quản lý Danh mục</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;table&gt;</td><td>Bảng danh sách các danh mục đang có</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt;</td><td>Form ngắn thêm danh mục mới (Bao gồm Tên danh mục, Ảnh biểu tượng)</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút thao tác Thêm / Sửa / Xóa</td></tr>
+</table>
+<h4>3.5.2.23 Trang Quản lý Đơn hàng (Orders)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG QUẢN LÝ ĐƠN HÀNG (ORDERS)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.23. Trang Quản lý Đơn hàng (Orders)</div>
+<p>- Admin theo dõi tiến độ kinh doanh</p>
+<p>- Tiếp nhận đơn hàng mới và chuyển sang khâu đóng gói</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.23. Mô tả giao diện Trang Quản lý Đơn hàng (Orders)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;table&gt;</td><td>Bảng danh sách đơn hàng (Gồm cột: Mã ĐH, Tên Khách hàng, Tổng tiền, Trạng thái)</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;select&gt;</td><td>Bộ lọc đơn hàng theo Trạng thái (Đang xử lý, Đang giao, Đã hoàn thành)</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút Xem chi tiết (Detail) để xử lý một đơn hàng cụ thể</td></tr>
+</table>
+<h4>3.5.2.24 Trang Cập nhật Đơn hàng</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG CẬP NHẬT ĐƠN HÀNG" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.24. Trang Cập nhật Đơn hàng</div>
+<p>- Admin cập nhật mã vận chuyển sau khi gửi hàng cho shipper</p>
+<p>- Thay đổi trạng thái để khách hàng nhận được thông báo</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.24. Mô tả giao diện Trang Cập nhật Đơn hàng</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;div&gt;</td><td>Bảng tóm tắt thông tin người mua (Địa chỉ, Số điện thoại) và danh sách sản phẩm khách chọn</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;select&gt;</td><td>Dropdown thay đổi Trạng thái đơn (Ví dụ: Chuyển từ Đóng gói sang Đang giao)</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;input&gt;</td><td>Khung nhập Mã vận đơn (Tracking ID) và Link trang web hãng vận chuyển</td></tr>
+<tr><td class="center">4</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút Cập nhật thông tin giao hàng</td></tr>
+</table>
+<h4>3.5.2.25 Trang Quản lý Người dùng (Users)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG QUẢN LÝ NGƯỜI DÙNG (USERS)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.25. Trang Quản lý Người dùng (Users)</div>
+<p>- Kiểm soát người dùng hệ thống</p>
+<p>- Hỗ trợ xóa tài khoản rác hoặc spam</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.25. Mô tả giao diện Trang Quản lý Người dùng (Users)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;table&gt;</td><td>Bảng danh sách User (Tên, Email, Chức vụ/Quyền hạn, Trạng thái hoạt động)</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;button&gt;</td><td>Nút Khóa tài khoản (Ban/Unban) hoặc Xóa khỏi hệ thống</td></tr>
+</table>
+<h4>3.5.2.26 Trang Quản lý Cửa hàng (Vendors)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG QUẢN LÝ CỬA HÀNG (VENDORS)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.26. Trang Quản lý Cửa hàng (Vendors)</div>
+<p>- Mô hình sàn thương mại điện tử đa người bán</p>
+<p>- Admin có quyền duyệt hoặc cấm cửa hàng</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.26. Mô tả giao diện Trang Quản lý Cửa hàng (Vendors)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;table&gt;</td><td>Bảng danh sách các cửa hàng (Tên shop, Chủ sở hữu, Liên hệ)</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;input&gt;</td><td>Form Thêm/Sửa thông tin Vendor (Avatar, Mô tả shop)</td></tr>
+</table>
+<h4>3.5.2.27 Trang Quản lý Mã giảm giá (Coupons)</h4>
+<div class="image-placeholder">[CHÈN HÌNH ẢNH "TRANG QUẢN LÝ MÃ GIẢM GIÁ (COUPONS)" CÓ ĐÁNH SỐ CÁC THÀNH PHẦN (1, 2, 3...) VÀO ĐÂY]</div>
+<div class="caption-figure">Hình 3.5.27. Trang Quản lý Mã giảm giá (Coupons)</div>
+<p>- Tung ra các chiến dịch khuyến mãi kích cầu mua sắm</p>
+<p>- Thu hồi voucher khi hết ngân sách</p>
+<div class="caption-figure" style="margin-top: 12pt;">Bảng 3.5.27. Mô tả giao diện Trang Quản lý Mã giảm giá (Coupons)</div>
+<table>
+<tr><th style="width: 10%">STT</th><th style="width: 30%">Loại thẻ HTML / Component</th><th style="width: 60%">Ý nghĩa / Chức năng</th></tr>
+<tr><td class="center">1</td><td class="center">Thẻ &lt;input&gt;</td><td>Form nhập Mã Code (VD: SALE50), Mức giảm (Discount %) và Giới hạn</td></tr>
+<tr><td class="center">2</td><td class="center">Thẻ &lt;checkbox&gt;</td><td>Công tắc Kích hoạt (Active) hoặc Vô hiệu hóa mã</td></tr>
+<tr><td class="center">3</td><td class="center">Thẻ &lt;table&gt;</td><td>Danh sách các voucher đang hiện hành và trạng thái</td></tr>
+</table>
+</body>
+</html>
