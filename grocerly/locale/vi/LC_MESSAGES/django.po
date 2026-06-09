@@ -304,10 +304,10 @@ msgid "Setting"
 msgstr "Cài đặt"
 
 msgid "Shipping"
-msgstr "Vận chuyển"
+msgstr "Phí giao hàng"
 
 msgid "Shipping Details"
-msgstr "Chi tiết vận chuyển"
+msgstr "Chi tiết giao hàng"
 
 msgid "Shop"
 msgstr "Cửa hàng"
@@ -343,7 +343,7 @@ msgid "Subscribe"
 msgstr "Đăng ký"
 
 msgid "Subtotal"
-msgstr "Tạm tính"
+msgstr "Thành tiền"
 
 msgid "Support Center"
 msgstr "Trung tâm hỗ trợ"
@@ -368,7 +368,7 @@ msgid ""
 msgstr "Tính năng này hiện đang được phát triển và sẽ sớm ra mắt."
 
 msgid "Title"
-msgstr "Tiêu đề"
+msgstr "Tên sản phẩm"
 
 msgid "Tiếp Tục Mua Sắm"
 msgstr "Tiếp Tục Mua Sắm"
@@ -704,7 +704,6 @@ msgstr "Đổi trả dễ dàng"
 msgid "Within 30 days"
 msgstr "Trong vòng 30 ngày"
 
-
 # --- Auth Translations Added Automatically ---
 msgid "Username"
 msgstr "Tên đăng nhập"
@@ -760,6 +759,62 @@ msgstr "Xác nhận &amp; Đăng ký"
 msgid "Note:"
 msgstr "Lưu ý:"
 
-msgid "Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our privacy policy"
-msgstr "Dữ liệu cá nhân của bạn sẽ được sử dụng để hỗ trợ trải nghiệm của bạn trên toàn bộ trang web này, để quản lý quyền truy cập vào tài khoản của bạn và cho các mục đích khác được mô tả trong chính sách bảo mật của chúng tôi."
+msgid ""
+"Your personal data will be used to support your experience throughout this "
+"website, to manage access to your account, and for other purposes described "
+"in our privacy policy"
+msgstr ""
+"Dữ liệu cá nhân của bạn sẽ được sử dụng để hỗ trợ trải nghiệm của bạn trên "
+"toàn bộ trang web này, để quản lý quyền truy cập vào tài khoản của bạn và "
+"cho các mục đích khác được mô tả trong chính sách bảo mật của chúng tôi."
 
+msgid "Checkout Information"
+msgstr "Thông tin thanh toán"
+
+msgid "Guest Checkout Information"
+msgstr "Thông tin thanh toán khách"
+
+msgid "Bio Data"
+msgstr "Thông tin cá nhân"
+
+msgid "Mobile"
+msgstr "Số điện thoại"
+
+msgid "City"
+msgstr "Tỉnh/Thành phố"
+
+msgid "State"
+msgstr "Quận/Huyện"
+
+msgid "Country"
+msgstr "Quốc gia"
+
+msgid "Continue To Payment"
+msgstr "Tiếp tục thanh toán"
+
+msgid "Checkout Info"
+msgstr "Thông tin thanh toán"
+
+msgid "Qty:"
+msgstr "SL:"
+
+msgid "Price:"
+msgstr "Giá:"
+
+msgid "Total:"
+msgstr "Tổng cộng:"
+
+msgid "Order Summary"
+msgstr "Tóm tắt đơn hàng"
+
+msgid "Enter Coupon Code..."
+msgstr "Nhập mã giảm giá..."
+
+msgid "Apply"
+msgstr "Áp dụng"
+
+msgid "Pay With Stripe (Credit or Debit Card)"
+msgstr "Thanh toán thẻ tín dụng/ghi nợ (Stripe)"
+
+msgid "Place Order With Cash On Delivery (COD)"
+msgstr "Thanh toán khi nhận hàng (COD)"
