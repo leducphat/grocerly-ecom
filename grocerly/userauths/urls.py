@@ -1,6 +1,7 @@
 from django.urls import path
 from userauths import views
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 
 app_name = 'userauths'
 
@@ -28,4 +29,19 @@ urlpatterns = [
     path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(
         template_name='userauths/password-reset-complete.html'
     ), name='password_reset_complete'),
+
+    path('change-password/', auth_views.PasswordChangeView.as_view(
+        template_name='userauths/password-change.html',
+        success_url='/user/change-password/done/'
+    ), name='password_change'),
+    
+    path('change-password/done/', auth_views.PasswordChangeDoneView.as_view(
+        template_name='userauths/password-change-done.html'
+    ), name='password_change_done'),
+
+    # URL dùng để xem nhanh UI (không cần logic token/email)
+    path('test-ui/password-reset/', TemplateView.as_view(template_name='userauths/password-reset.html')),
+    path('test-ui/password-reset-done/', TemplateView.as_view(template_name='userauths/password-reset-done.html')),
+    path('test-ui/password-reset-confirm/', TemplateView.as_view(template_name='userauths/password-reset-confirm.html')),
+    path('test-ui/password-reset-complete/', TemplateView.as_view(template_name='userauths/password-reset-complete.html')),
 ]

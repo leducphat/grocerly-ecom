@@ -1,4 +1,4 @@
-﻿{% extends 'partials/base.html' %}
+{% extends 'partials/base.html' %}
 {% load i18n %}
 {% load static %}
 {% block content %}
@@ -51,13 +51,26 @@
                                             <label>Bio</label>
                                             <input type="text" class="form-control" name="bio" value="{{ form.bio.value|default_if_none:'' }}" placeholder="Bio">
                                         </div>
+                                        <div class="form-group col-md-6">
+                                            <label>{% trans "Address" %}</label>
+                                            <input type="text" class="form-control" name="address" value="{{ form.address.value|default_if_none:'' }}" placeholder="{% trans 'Address' %}">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>{% trans "Country" %}</label>
+                                            <input type="text" class="form-control" name="country" value="{{ form.country.value|default_if_none:'' }}" placeholder="{% trans 'Country' %}">
+                                        </div>
                                         <div class="form-group col-md-12">
-                                            <label>Profile Image</label>
+                                            <label>{% trans "Profile Image" %}</label>
                                             <input type="file" class="form-control" name="image" accept="image/*">
                                         </div>
-                                        <div class="col-md-12 mt-3">
-                                            <button type="submit" class="btn btn-fill-out submit font-weight-bold">Update Profile</button>
-                                            <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary ml-2">Cancel</a>
+                                        <div class="col-md-12 mt-3 d-flex justify-content-between">
+                                            <div>
+                                                <button type="submit" class="btn btn-fill-out submit font-weight-bold">{% trans "Update Profile" %}</button>
+                                                <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary ml-2">{% trans "Cancel" %}</a>
+                                            </div>
+                                            <div>
+                                                <a href="{% url 'userauths:password_change' %}" class="btn btn-danger text-white border-0" style="background-color: #dc3545;">{% trans "Change Password" %}</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
