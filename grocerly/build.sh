@@ -9,6 +9,9 @@ pip install -r requirements.txt
 echo "Collecting static files..."
 python manage.py collectstatic --no-input
 
+echo "Installing gettext for translations..."
+apt-get update && apt-get install -y gettext
+
 echo "Compiling translations..."
 python manage.py compilemessages
 
