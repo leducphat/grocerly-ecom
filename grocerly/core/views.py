@@ -147,6 +147,13 @@ def product_detail_view(request, p_id):
     # Getting average review rating
     average_rating = ProductReview.objects.filter(product=product).aggregate(rating=Avg('rating'))
 
+    total_reviews = reviews.count()
+    rating_5 = int((reviews.filter(rating=5).count() / total_reviews) * 100) if total_reviews > 0 else 0
+    rating_4 = int((reviews.filter(rating=4).count() / total_reviews) * 100) if total_reviews > 0 else 0
+    rating_3 = int((reviews.filter(rating=3).count() / total_reviews) * 100) if total_reviews > 0 else 0
+    rating_2 = int((reviews.filter(rating=2).count() / total_reviews) * 100) if total_reviews > 0 else 0
+    rating_1 = int((reviews.filter(rating=1).count() / total_reviews) * 100) if total_reviews > 0 else 0
+
     # Product Review form
     review_form = ProductReviewForm()
 
@@ -165,6 +172,11 @@ def product_detail_view(request, p_id):
         'average_rating': average_rating,
         'review_form': review_form,
         'make_review': make_review,
+        'rating_5': rating_5,
+        'rating_4': rating_4,
+        'rating_3': rating_3,
+        'rating_2': rating_2,
+        'rating_1': rating_1,
     }
 
     return render(request, 'core/product-detail.html', context)
