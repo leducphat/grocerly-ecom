@@ -710,7 +710,7 @@ msgid "Username"
 msgstr "Tên đăng nhập"
 
 msgid "Email"
-msgstr "Thư điện tử"
+msgstr "Email"
 
 msgid "Password"
 msgstr "Mật khẩu"
