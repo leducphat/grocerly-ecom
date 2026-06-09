@@ -20,8 +20,7 @@ class ProfileForm(forms.ModelForm):
     bio = forms.CharField(widget=forms.TextInput(attrs={"placeholder": _("Bio")}), required=False)
     phone = forms.CharField(widget=forms.TextInput(attrs={"placeholder": _("Phone")}), required=False)
     address = forms.CharField(widget=forms.TextInput(attrs={"placeholder": _("Address")}), required=False)
-    country = forms.CharField(widget=forms.TextInput(attrs={"placeholder": _("Country")}), required=False)
 
     class Meta:
         model = Profile
-        fields = ['full_name', 'image', 'bio', 'phone', 'address', 'country']
+        fields = ['full_name', 'image', 'bio', 'phone', 'address']

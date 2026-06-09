@@ -78,21 +78,9 @@
                             </div>
                             <h4 class="mb-30">{% trans "Shipping Details" %}</h4>
                             <div class="row">
-                                <div class="form-group col-lg-6">
+                                <div class="form-group col-lg-12">
                                     <label>{% trans "Address" %}</label>
-                                    <input type="text" name="address" value="{{ address.address|default:'' }}" placeholder="{% trans 'Address' %}">
-                                </div>
-                                <div class="form-group col-lg-6">
-                                    <label>{% trans "City" %}</label>
-                                    <input type="text" name="city" value="" placeholder="{% trans 'City' %}">
-                                </div>
-                                <div class="form-group col-lg-6">
-                                    <label>{% trans "State" %}</label>
-                                    <input type="text" name="state" value="" placeholder="{% trans 'State' %}">
-                                </div>
-                                <div class="form-group col-lg-6">
-                                    <label>{% trans "Country" %}</label>
-                                    <input type="text" name="country" value="" placeholder="{% trans 'Country' %}">
+                                    <input type="text" name="address" value="{{ request.user.profile.address|default:'' }}" placeholder="{% trans 'Address' %}">
                                 </div>
                             </div>
                         </div>

@@ -60,7 +60,6 @@
                                                     <span><input class="mb-2" type="text" value="{% trans 'Bio' %} - {{ user_profile.bio|default:'' }}" readonly></span>
                                                     <span><input class="mb-2" type="text" value="{% trans 'Phone' %} - {{ user_profile.phone|default:'' }}" readonly></span>
                                                     <span><input class="mb-2" type="text" value="{% trans 'Address' %} - {{ user_profile.address|default:'' }}" readonly></span>
-                                                    <span><input class="mb-2" type="text" value="{% trans 'Country' %} - {{ user_profile.country|default:'' }}" readonly></span>
                                                     {% if user_profile.verified %}
                                                     <div class="p-4 border rounded">
                                                         <span>{% trans "Verified" %}</span> <span><i class="fas fa-check-circle"></i></span>
