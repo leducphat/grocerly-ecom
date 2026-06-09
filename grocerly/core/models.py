@@ -277,7 +277,7 @@ class CartOrder(models.Model):
     product_status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='processing')
     sku = ShortUUIDField(null=True, blank=True, length=5, prefix="SKU", max_length=20, alphabet="1234567890")
     oid = ShortUUIDField(null=True, blank=True, length=8, max_length=20, alphabet="1234567890")
-    stripe_payment_intent = models.CharField(max_length=1000, null=True, blank=True)
+
     date = models.DateTimeField(default=timezone.now, null=True, blank=True)
 
     class Meta:

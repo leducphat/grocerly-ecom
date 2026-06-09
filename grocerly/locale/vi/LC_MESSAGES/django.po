@@ -431,7 +431,7 @@ msgstr "Đơn hàng của bạn"
 msgid "Your cart is empty"
 msgstr "Giỏ hàng của bạn đang trống"
 
-msgid "Your emaill address"
+msgid "Your email address"
 msgstr "Địa chỉ email của bạn"
 
 msgid "and"
@@ -703,3 +703,84 @@ msgstr "Đổi trả dễ dàng"
 
 msgid "Within 30 days"
 msgstr "Trong vòng 30 ngày"
+
+
+# --- Auth Translations Added Automatically ---
+msgid "Username"
+msgstr "Tên đăng nhập"
+
+msgid "Email"
+msgstr "Thư điện tử"
+
+msgid "Password"
+msgstr "Mật khẩu"
+
+msgid "Confirm Password"
+msgstr "Xác nhận mật khẩu"
+
+msgid "Full Name"
+msgstr "Họ và tên"
+
+msgid "Bio"
+msgstr "Tiểu sử"
+
+msgid "Phone"
+msgstr "Số điện thoại"
+
+msgid "Home"
+msgstr "Trang chủ"
+
+msgid "Pages"
+msgstr "Trang"
+
+msgid "My Account"
+msgstr "Tài khoản của tôi"
+
+msgid "Login"
+msgstr "Đăng nhập"
+
+msgid "Don't have an account?"
+msgstr "Bạn chưa có tài khoản?"
+
+msgid "Create here"
+msgstr "Đăng ký tại đây"
+
+msgid "Username or Email *"
+msgstr "Tên đăng nhập hoặc Email *"
+
+msgid "Your password *"
+msgstr "Mật khẩu của bạn *"
+
+msgid "Remember me"
+msgstr "Ghi nhớ đăng nhập"
+
+msgid "Forgot password?"
+msgstr "Quên mật khẩu?"
+
+msgid "Log in"
+msgstr "Đăng nhập"
+
+msgid "Create an Account"
+msgstr "Tạo tài khoản mới"
+
+msgid "Already have an account?"
+msgstr "Bạn đã có tài khoản?"
+
+msgid "Submit &amp; Register"
+msgstr "Xác nhận &amp; Đăng ký"
+
+msgid "Note:"
+msgstr "Lưu ý:"
+
+msgid "Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our privacy policy"
+msgstr "Dữ liệu cá nhân của bạn sẽ được sử dụng để hỗ trợ trải nghiệm của bạn trên toàn bộ trang web này, để quản lý quyền truy cập vào tài khoản của bạn và cho các mục đích khác được mô tả trong chính sách bảo mật của chúng tôi."
+
+msgid "Continue with Facebook"
+msgstr "Tiếp tục với Facebook"
+
+msgid "Continue with Google"
+msgstr "Tiếp tục với Google"
+
+msgid "Continue with Apple"
+msgstr "Tiếp tục với Apple"
+

@@ -9,6 +9,9 @@ pip install -r requirements.txt
 echo "Collecting static files..."
 python manage.py collectstatic --no-input
 
+echo "Compiling translations..."
+python manage.py compilemessages
+
 echo "Running database migrations..."
 python manage.py migrate
 

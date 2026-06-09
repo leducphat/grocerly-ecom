@@ -425,7 +425,7 @@ msgstr ""
 msgid "Your cart is empty"
 msgstr ""
 
-msgid "Your emaill address"
+msgid "Your email address"
 msgstr ""
 
 msgid "and"

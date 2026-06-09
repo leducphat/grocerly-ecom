@@ -1,12 +1,13 @@
-﻿{% extends 'partials/base.html' %}
+{% extends 'partials/base.html' %}
 {% load static %}
+{% load i18n %}
 {% block content %}
     <main class="main pages">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="index.html" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
-                    <span></span> Pages <span></span> My Account
+                    <a href="index.html" rel="nofollow"><i class="fi-rs-home mr-5"></i>{% trans "Home" %}</a>
+                    <span></span> {% trans "Pages" %} <span></span> {% trans "My Account" %}
                 </div>
             </div>
         </div>
@@ -22,16 +23,16 @@
                                 <div class="login_wrap widget-taber-content background-white">
                                     <div class="padding_eight_all bg-white">
                                         <div class="heading_s1">
-                                            <h1 class="mb-5">Login</h1>
-                                            <p class="mb-30">Don't have an account? <a href="{% url 'userauths:sign-up' %}">Create here</a></p>
+                                            <h1 class="mb-5">{% trans "Login" %}</h1>
+                                            <p class="mb-30">{% trans "Don't have an account?" %} <a href="{% url 'userauths:sign-up' %}">{% trans "Create here" %}</a></p>
                                         </div>
                                         <form method="post">
                                             {% csrf_token %}
                                             <div class="form-group">
-                                                <input type="text" required name="email" placeholder="Username or Email *" />
+                                                <input type="text" required name="email" placeholder="{% trans 'Username or Email *' %}" />
                                             </div>
                                             <div class="form-group">
-                                                <input required type="password" name="password" placeholder="Your password *" />
+                                                <input required type="password" name="password" placeholder="{% trans 'Your password *' %}" />
                                             </div>
                                             <!-- <div class="login_footer form-group">
                                                 <div class="chek-form">
@@ -48,13 +49,13 @@
                                                 <div class="chek-form">
                                                     <div class="custome-checkbox">
                                                         <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="" />
-                                                        <label class="form-check-label" for="exampleCheckbox1"><span>Remember me</span></label>
+                                                        <label class="form-check-label" for="exampleCheckbox1"><span>{% trans "Remember me" %}</span></label>
                                                     </div>
                                                 </div>
-                                                <a class="text-muted" href="#">Forgot password?</a>
+                                                <a class="text-muted" href="#">{% trans "Forgot password?" %}</a>
                                             </div>
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-heading btn-block hover-up" name="login">Log in</button>
+                                                <button type="submit" class="btn btn-heading btn-block hover-up" name="login">{% trans "Log in" %}</button>
                                             </div>
                                         </form>
                                     </div>
