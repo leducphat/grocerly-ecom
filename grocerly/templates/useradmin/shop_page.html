@@ -1,4 +1,5 @@
 {% extends 'useradmin/base.html' %}
+{% load i18n %}
 {% load static currency_filters %}
 {% load humanize %}
 {% block content %}
@@ -44,7 +45,7 @@
                     </p>
                 </div>
                 <div class="col-sm-6 col-lg-4 col-xl-3">
-                    <h6>Address & Location</h6>
+                    <h6>{% trans "Address" %} & Location</h6>
                     <p>
                         Address: {{request.user.profile.address}} <br />
                         Country: {{request.user.profile.country}} <br />

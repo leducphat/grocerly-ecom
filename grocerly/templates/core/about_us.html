@@ -1,4 +1,5 @@
 {% extends 'partials/base.html' %}
+{% load i18n %}
 {% load static %}
 {% block content %}
     <main class="main pages">
@@ -94,7 +95,7 @@
                                     <img src="{% static 'assets/imgs/page/about-5.png' %}" alt="" class="mb-md-3 mb-lg-0 mb-sm-4" />
                                 </div>
                                 <div class="col-lg-5">
-                                    <h4 class="mb-20 text-muted">Our performance</h4>
+                                    <h4 class="mb-20 text-muted">{% trans "Our performance" %}</h4>
                                     <h1 class="heading-1 mb-40">Your Partner for e-commerce grocery solution</h1>
                                     <p class="mb-30">Ed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto</p>
                                     <p>Pitatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia</p>

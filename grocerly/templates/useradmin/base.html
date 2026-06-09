@@ -35,7 +35,7 @@
                     <li class="menu-item {% if '/useradmin/dashboard/' in request.path %}active{% endif %}">
                         <a class="menu-link" href="/useradmin/">
                             <i class="icon material-icons md-home"></i>
-                            <span class="text">Dashboard</span>
+                            <span class="text">{% trans "Dashboard" %}</span>
                         </a>
                     </li>
                     <li class="menu-item {% if '/useradmin/products/' in request.path %}active{% endif %}">
@@ -48,7 +48,7 @@
                     <li class="menu-item {% if '/useradmin/orders/' in request.path %}active{% endif %}">
                         <a class="menu-link" href="{% url 'useradmin:orders' %}">
                             <i class="icon material-icons md-shopping_cart"></i>
-                            <span class="text">Orders</span>
+                            <span class="text">{% trans "Orders" %}</span>
                         </a>
                     </li>
                     <li class="menu-item">
@@ -89,7 +89,7 @@
                     <li class="menu-item">
                         <a class="menu-link" href="{% url 'userauths:sign-out' %}">
                             <i class="icon material-icons md-arrow_forward"></i>
-                            <span class="text">Logout</span>
+                            <span class="text">{% trans "Logout" %}</span>
                         </a>
                     </li>
                 </ul>
@@ -122,13 +122,13 @@
                                     
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                                <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                                <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>{% trans "Edit Profile" %}</a>
                                 <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
                                 <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
                                 <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
                                 <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                                <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>{% trans "Logout" %}</a>
                             </div>
                         </li>
                     </ul>

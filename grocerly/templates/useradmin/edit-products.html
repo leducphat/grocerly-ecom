@@ -1,4 +1,5 @@
 {% extends 'useradmin/base.html' %}
+{% load i18n %}
 {% load static %}
 {% load humanize %}
 {{ form.media }}
@@ -116,7 +117,7 @@
                                     </div>
 
                                     <div class="mb-4 custom_select">
-                                          <label class="form-label">Vendor</label>
+                                          <label class="form-label">{% trans "Vendor" %}</label>
                                           <br>
                                           {{form.vendor}}
                                     </div>

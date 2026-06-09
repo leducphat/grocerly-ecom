@@ -56,9 +56,9 @@
                                                     {% endif %}
                                                 </div>
                                                 <div>
-                                                    <span><input class="mb-2" type="text" value="Name - {{ user_profile.full_name }}" readonly></span>
-                                                    <span><input class="mb-2" type="text" value="Bio - {{ user_profile.bio }}" readonly></span>
-                                                    <span><input class="mb-2" type="text" value="Phone - {{ user_profile.phone }}" readonly></span>
+                                                    <span><input class="mb-2" type="text" value="{% trans 'Name' %} - {{ user_profile.full_name }}" readonly></span>
+                                                    <span><input class="mb-2" type="text" value="{% trans 'Bio' %} - {{ user_profile.bio }}" readonly></span>
+                                                    <span><input class="mb-2" type="text" value="{% trans 'Phone' %} - {{ user_profile.phone }}" readonly></span>
                                                     {% if user_profile.verified %}
                                                     <div class="p-4 border rounded">
                                                         <span>{% trans "Verified" %}</span> <span><i class="fas fa-check-circle"></i></span>
@@ -149,10 +149,10 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="form-group col-md-6">
-                                                            <input placeholder="Address" required class="form-control" name="address" type="text" />
+                                                            <input placeholder="{% trans 'Address' %}" required class="form-control" name="address" type="text" />
                                                         </div>
                                                         <div class="form-group col-md-6">
-                                                            <input placeholder="Phone" required class="form-control" name="mobile" />
+                                                            <input placeholder="{% trans 'Phone' %}" required class="form-control" name="mobile" />
                                                         </div>
                                                         <div class="col-md-12">
                                                             <button type="submit" class="btn btn-fill-out submit font-weight-bold" name="submit" value="Submit">{% trans "Save Address" %}</button>

@@ -130,7 +130,7 @@ msgid "Don’t miss amazing<br /> grocery deals"
 msgstr "Đừng bỏ lỡ<br /> siêu khuyến mãi"
 
 msgid "Edit Profile"
-msgstr "Chỉnh sửa hồ sơ"
+msgstr "Sửa hồ sơ"
 
 msgid "Eggs Substitutes"
 msgstr "Trứng và sản phẩm thay thế"
@@ -190,7 +190,7 @@ msgid "Min Price"
 msgstr "Giá thấp nhất"
 
 msgid "My Account"
-msgstr "Tài khoản của tôi"
+msgstr "Tài khoản"
 
 msgid "My Address"
 msgstr "Địa chỉ của tôi"
@@ -226,7 +226,7 @@ msgid "No vendors yet"
 msgstr "Chưa có nhà bán"
 
 msgid "Not verified"
-msgstr "Chưa xác minh"
+msgstr "Chưa xác thực"
 
 msgid "Oops! Trang này không tồn tại"
 msgstr "Oops! Trang này không tồn tại"
@@ -238,7 +238,7 @@ msgid "Order Tracking"
 msgstr "Theo dõi đơn hàng"
 
 msgid "Orders"
-msgstr "Đơn đặt hàng"
+msgstr "Đơn hàng"
 
 msgid "Our location"
 msgstr "Vị trí của chúng tôi"
@@ -247,7 +247,7 @@ msgid "Pages"
 msgstr "Trang"
 
 msgid "Paid Status"
-msgstr "Trạng thái thanh toán"
+msgstr "Thanh toán"
 
 msgid "Popular"
 msgstr "Phổ biến"
@@ -399,7 +399,7 @@ msgid "Vendors"
 msgstr "Nhà bán"
 
 msgid "Verified"
-msgstr "Đã xác minh"
+msgstr "Đã xác thực"
 
 msgid "View"
 msgstr "Xem"
@@ -417,7 +417,7 @@ msgid "We found"
 msgstr "Chúng tôi tìm thấy"
 
 msgid "Wishlist"
-msgstr "Danh sách yêu thích"
+msgstr "Yêu thích"
 
 msgid "Your Cart"
 msgstr "Giỏ hàng của bạn"
@@ -438,7 +438,7 @@ msgid "and"
 msgstr "và"
 
 msgid "edit your password and account details."
-msgstr "chỉnh sửa mật khẩu và thông tin tài khoản."
+msgstr "sửa mật khẩu và chi tiết tài khoản."
 
 msgid "items for you!"
 msgstr "sản phẩm cho bạn!"
@@ -450,7 +450,7 @@ msgid "products in your cart"
 msgstr "sản phẩm trong giỏ hàng"
 
 msgid "recent orders"
-msgstr "các đơn hàng gần đây"
+msgstr "đơn hàng gần đây"
 
 msgid "shipping and billing addresses"
 msgstr "địa chỉ giao hàng và thanh toán"
@@ -585,7 +585,7 @@ msgid "Description"
 msgstr "Mô tả"
 
 msgid "Additional info"
-msgstr "Thông tin thêm"
+msgstr "Thông tin bổ sung"
 
 msgid "Reviews"
 msgstr "Đánh giá"
@@ -721,10 +721,10 @@ msgid "Full Name"
 msgstr "Họ và tên"
 
 msgid "Bio"
-msgstr "Tiểu sử"
+msgstr "Giới thiệu"
 
 msgid "Phone"
-msgstr "Số điện thoại"
+msgstr "Điện thoại"
 
 msgid "Don't have an account?"
 msgstr "Bạn chưa có tài khoản?"
@@ -818,3 +818,72 @@ msgstr "Thanh toán thẻ tín dụng/ghi nợ (Stripe)"
 
 msgid "Place Order With Cash On Delivery (COD)"
 msgstr "Thanh toán khi nhận hàng (COD)"
+
+msgid "Name"
+msgstr "Tên"
+
+msgid "How can help you ?"
+msgstr "Chúng tôi có thể giúp gì cho bạn?"
+
+msgid "Let us know how we can help you"
+msgstr "Hãy cho chúng tôi biết bạn cần hỗ trợ gì"
+
+msgid "Visit Feedback"
+msgstr "Phản hồi chuyến thăm"
+
+msgid "Employer Services"
+msgstr "Dịch vụ nhà tuyển dụng"
+
+msgid "Billing Inquiries"
+msgstr "Thắc mắc thanh toán"
+
+msgid "General Inquiries"
+msgstr "Thắc mắc chung"
+
+msgid "Office"
+msgstr "Văn phòng"
+
+msgid "Studio"
+msgstr "Phòng thu"
+
+msgid "Contact form"
+msgstr "Biểu mẫu liên hệ"
+
+msgid "Drop Us a Line"
+msgstr "Để lại lời nhắn"
+
+msgid "Your email address will not be published. Required fields are marked *"
+msgstr "Email của bạn sẽ được bảo mật. Bắt buộc điền các mục có dấu *"
+
+msgid "First Name"
+msgstr "Tên"
+
+msgid "Your Email"
+msgstr "Email của bạn"
+
+msgid "Your Phone"
+msgstr "Số điện thoại"
+
+msgid "Subject"
+msgstr "Chủ đề"
+
+msgid "Message"
+msgstr "Nội dung"
+
+msgid "Send message"
+msgstr "Gửi tin nhắn"
+
+msgid "Welcome to Grocerly"
+msgstr "Chào mừng đến với Grocerly"
+
+msgid "Our performance"
+msgstr "Thành tích của chúng tôi"
+
+msgid "Your Partner for e-commerce grocery shop"
+msgstr "Đối tác đáng tin cậy cho tạp hóa trực tuyến"
+
+msgid "Vendor"
+msgstr "Nhà cung cấp"
+
+msgid "Customer questions &amp; answers"
+msgstr "Câu hỏi & trả lời của khách hàng"

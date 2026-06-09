@@ -1,4 +1,5 @@
 {% extends 'useradmin/base.html' %}
+{% load i18n %}
 {% load static %}
 {% load humanize %}
 {% block content %}    
@@ -21,7 +22,7 @@
                             <th>Name</th>
                             <th>Review</th>
                             <th>Rating</th>
-                            <th>Date</th>
+                            <th>{% trans "Date" %}</th>
                         </tr>
                     </thead>
                     <tbody>

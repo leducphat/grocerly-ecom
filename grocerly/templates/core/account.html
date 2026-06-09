@@ -82,7 +82,7 @@
                                         <img class="svgInject" alt="Nest" src="assets/imgs/theme/icons/icon-heart.svg" />
                                         <span class="pro-count blue">6</span>
                                     </a>
-                                    <a href="{% url 'core:wishlist' %}"><span class="lable">Wishlist</span></a>
+                                    <a href="{% url 'core:wishlist' %}"><span class="lable">{% trans "Wishlist" %}</span></a>
                                 </div>
                                 <div class="header-action-icon-2">
                                     <a class="mini-cart-icon" href="shop-cart.html">
@@ -135,7 +135,7 @@
                                     <a href="page-account.html"><span class="lable ml-0">Account</span></a>
                                     <div class="cart-dropdown-wrap cart-dropdown-hm2 account-dropdown">
                                         <ul>
-                                            <li><a href="page-account.html"><i class="fi fi-rs-user mr-10"></i>My Account</a></li>
+                                            <li><a href="page-account.html"><i class="fi fi-rs-user mr-10"></i>{% trans "My Account" %}</a></li>
                                             <li><a href="page-account.html"><i class="fi fi-rs-location-alt mr-10"></i>Order Tracking</a></li>
                                             <li><a href="page-account.html"><i class="fi fi-rs-label mr-10"></i>My Voucher</a></li>
                                             <li><a href="{% url 'core:wishlist' %}"><i class="fi fi-rs-heart mr-10"></i>My Wishlist</a></li>
@@ -368,9 +368,9 @@
                                     <li>
                                         <a href="#">Pages <i class="fi-rs-angle-down"></i></a>
                                         <ul class="sub-menu">
-                                            <li><a href="page-about.html">About Us</a></li>
-                                            <li><a href="page-contact.html">Contact</a></li>
-                                            <li><a href="page-account.html">My Account</a></li>
+                                            <li><a href="page-about.html">{% trans "About Us" %}</a></li>
+                                            <li><a href="page-contact.html">{% trans "Contact" %}</a></li>
+                                            <li><a href="page-account.html">{% trans "My Account" %}</a></li>
                                             <li><a href="page-login.html">Login</a></li>
                                             <li><a href="page-register.html">Register</a></li>
                                             <li><a href="page-forgot-password.html">Forgot password</a></li>
@@ -382,7 +382,7 @@
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="page-contact.html">Contact</a>
+                                        <a href="page-contact.html">{% trans "Contact" %}</a>
                                     </li>
                                 </ul>
                             </nav>
@@ -587,11 +587,11 @@
                                 </ul>
                             </li>
                             <li class="menu-item-has-children">
-                                <a href="#">Pages</a>
+                                <a href="#">{% trans "Pages" %}</a>
                                 <ul class="dropdown">
-                                    <li><a href="page-about.html">About Us</a></li>
-                                    <li><a href="page-contact.html">Contact</a></li>
-                                    <li><a href="page-account.html">My Account</a></li>
+                                    <li><a href="page-about.html">{% trans "About Us" %}</a></li>
+                                    <li><a href="page-contact.html">{% trans "Contact" %}</a></li>
+                                    <li><a href="page-account.html">{% trans "My Account" %}</a></li>
                                     <li><a href="page-login.html">Login</a></li>
                                     <li><a href="page-register.html">Register</a></li>
                                     <li><a href="page-forgot-password.html">Forgot password</a></li>
@@ -657,22 +657,22 @@
                                 <div class="dashboard-menu">
                                     <ul class="nav flex-column" role="tablist">
                                         <li class="nav-item">
-                                            <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                            <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>{% trans "Dashboard" %}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>{% trans "Orders" %}</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false"><i class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>{% trans "My Address" %}</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="page-login.html"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                            <a class="nav-link" href="page-login.html"><i class="fi-rs-sign-out mr-10"></i>{% trans "Logout" %}</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -686,8 +686,8 @@
                                             </div>
                                             <div class="card-body">
                                                 <p>
-                                                    From your account dashboard. you can easily check &amp; view your <a href="#">recent orders</a>,<br />
-                                                    manage your <a href="#">shipping and billing addresses</a> and <a href="#">edit your password and account details.</a>
+                                                    From your account dashboard. you can easily check &amp; view your <a href="#">{% trans "recent orders" %}</a>,<br />
+                                                    manage your <a href="#">{% trans "shipping and billing addresses" %}</a> and <a href="#">{% trans "edit your password and account details." %}</a>
                                                 </p>
                                             </div>
                                         </div>
@@ -695,18 +695,18 @@
                                     <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
                                         <div class="card">
                                             <div class="card-header">
-                                                <h3 class="mb-0">Your Orders</h3>
+                                                <h3 class="mb-0">{% trans "Your Orders" %}</h3>
                                             </div>
                                             <div class="card-body">
                                                 <div class="table-responsive">
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
-                                                                <th>Order</th>
-                                                                <th>Date</th>
-                                                                <th>Status</th>
+                                                                <th>{% trans "Order" %}</th>
+                                                                <th>{% trans "Date" %}</th>
+                                                                <th>{% trans "Status" %}</th>
                                                                 <th>Total</th>
-                                                                <th>Actions</th>
+                                                                <th>{% trans "Actions" %}</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -715,21 +715,21 @@
                                                                 <td>March 45, 2020</td>
                                                                 <td>Processing</td>
                                                                 <td>125.00 ₫ for 2 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
+                                                                <td><a href="#" class="btn-small d-block">{% trans "View" %}</a></td>
                                                             </tr>
                                                             <tr>
                                                                 <td>#2468</td>
                                                                 <td>June 29, 2020</td>
                                                                 <td>Completed</td>
                                                                 <td>364.00 ₫ for 5 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
+                                                                <td><a href="#" class="btn-small d-block">{% trans "View" %}</a></td>
                                                             </tr>
                                                             <tr>
                                                                 <td>#2366</td>
                                                                 <td>August 02, 2020</td>
                                                                 <td>Completed</td>
                                                                 <td>280.00 ₫ for 3 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
+                                                                <td><a href="#" class="btn-small d-block">{% trans "View" %}</a></td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -965,7 +965,7 @@
                     <div class="footer-link-widget col">
                         <h4 class="widget-title">Company</h4>
                         <ul class="footer-list mb-sm-5 mb-md-0">
-                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">{% trans "About Us" %}</a></li>
                             <li><a href="#">Delivery Information</a></li>
                             <li><a href="#">Privacy Policy</a></li>
                             <li><a href="#">Terms &amp; Conditions</a></li>
