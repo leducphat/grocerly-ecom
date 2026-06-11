@@ -228,12 +228,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Jazzmin settings
 JAZZMIN_SETTINGS = {
-    "site_title": "Grocerly Admin",
-    "site_header": "Grocerly Administration",
-    "site_brand": "Grocerly Administration",
+    "site_title": "Quản trị Grocerly",
+    "site_header": "Hệ thống Quản trị Grocerly",
+    "site_brand": "Quản trị Grocerly",
     # "site_logo": "",
     "copyright": "Grocerly",
-    "welcome_sign": "Welcome to the Grocerly Admin Panel",
+    "welcome_sign": "Chào mừng đến với Hệ thống Quản trị Grocerly",
     }
 
 
@@ -255,3 +255,15 @@ LOGOUT_REDIRECT_URL = 'userauths:sign-in'
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
+
+# EMAIL SETTINGS
+# For development/testing: Print emails to the console instead of sending real ones
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For Production (Uncomment and configure .env variables to use Gmail SMTP)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER') # Your Gmail address
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD') # App Password

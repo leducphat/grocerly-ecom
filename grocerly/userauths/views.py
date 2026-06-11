@@ -35,6 +35,10 @@ def register_view(request):
 def login_view(request):
     if request.user.is_authenticated:
         messages.warning(request, 'You are already logged in!')
+        if request.user.is_superuser:
+            return redirect('/admin/')
+        elif request.user.is_staff:
+            return redirect('useradmin:dashboard')
         return redirect('core:index')
     
     if request.method == 'POST':
@@ -47,7 +51,13 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome back {user.username}!')
-                return redirect('core:index')
+                
+                if user.is_superuser:
+                    return redirect('/admin/')
+                elif user.is_staff:
+                    return redirect('useradmin:dashboard')
+                else:
+                    return redirect('core:index')
             else:
                 messages.warning(request, 'User does not exist. Please try again.')
 

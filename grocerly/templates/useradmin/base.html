@@ -36,39 +36,39 @@
                     <li class="menu-item {% if '/useradmin/dashboard/' in request.path %}active{% endif %}">
                         <a class="menu-link" href="/useradmin/">
                             <i class="icon material-icons md-home"></i>
-                            <span class="text">{% trans "Dashboard" %}</span>
+                            <span class="text">Bảng điều khiển</span>
                         </a>
                     </li>
                     <li class="menu-item {% if '/useradmin/products/' in request.path %}active{% endif %}">
                         <a class="menu-link" href="{% url 'useradmin:dashboard-products' %}">
                             <i class="icon material-icons md-shopping_bag"></i>
 
-                            <span class="text">Products</span>
+                            <span class="text">Sản phẩm</span>
                         </a>
                     </li>
                     <li class="menu-item {% if '/useradmin/orders/' in request.path %}active{% endif %}">
                         <a class="menu-link" href="{% url 'useradmin:orders' %}">
                             <i class="icon material-icons md-shopping_cart"></i>
-                            <span class="text">{% trans "Orders" %}</span>
+                            <span class="text">Đơn hàng</span>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a class="menu-link" href="{% url 'useradmin:shop_page' %}">
                             <i class="icon material-icons md-store"></i>
-                            <span class="text">Shop Page</span>
+                            <span class="text">Trang Cửa Hàng</span>
                         </a>
                     </li>
                     <li class="menu-item ">
                         <a class="menu-link" href="{% url 'useradmin:dashboard-add-products' %}">
                             <i class="icon material-icons md-add_box"></i>
-                            <span class="text">Add product</span>
+                            <span class="text">Thêm Sản phẩm</span>
                         </a>
                     </li>
 
                     <li class="menu-item">
                         <a class="menu-link" href="{% url 'useradmin:reviews' %}">
                             <i class="icon material-icons md-comment"></i>
-                            <span class="text">Reviews</span>
+                            <span class="text">Đánh giá</span>
                         </a>
                     </li>
                 </ul>
@@ -77,20 +77,20 @@
                     <li class="menu-item">
                         <a class="menu-link" href="{% url 'useradmin:settings' %}">
                             <i class="icon material-icons md-settings"></i>
-                            <span class="text">Settings</span>
+                            <span class="text">Cài đặt Cửa hàng</span>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a class="menu-link" href="{% url 'useradmin:change_password' %}">
                             <i class="icon material-icons md-lock"></i>
-                            <span class="text"> Change Password </span>
+                            <span class="text"> Đổi mật khẩu </span>
                         </a>
                     </li>
 
                     <li class="menu-item">
                         <a class="menu-link" href="{% url 'userauths:sign-out' %}">
                             <i class="icon material-icons md-arrow_forward"></i>
-                            <span class="text">{% trans "Logout" %}</span>
+                            <span class="text">Đăng xuất</span>
                         </a>
                     </li>
                 </ul>
@@ -123,13 +123,10 @@
                                     
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                                <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>{% trans "Edit Profile" %}</a>
-                                <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
-                                <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
-                                <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
-                                <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
+                                <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Cập nhật hồ sơ</a>
+                                <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Cài đặt tài khoản</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>{% trans "Logout" %}</a>
+                                <a class="dropdown-item text-danger" href="{% url 'userauths:sign-out' %}"><i class="material-icons md-exit_to_app"></i>Đăng xuất</a>
                             </div>
                         </li>
                     </ul>
