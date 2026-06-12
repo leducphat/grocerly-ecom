@@ -32,7 +32,7 @@
             {% for p in all_products %}
             <article class="itemlist">
                 <div class="row align-items-center">
-                    <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                    <div class="col-lg-3 col-sm-4 col-8 flex-grow-1 col-name">
                         <a class="itemside" href="{% url 'core:product-detail' p.p_id %}">
                             <div class="left">
                                 <img src="{{p.image.url}}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 15px;" class="img-sm img-thumbnail" alt="Item" />
@@ -44,8 +44,14 @@
                     </div>
                     <div class="col-lg-2 col-sm-2 col-4 col-price"><span>{{p.price|vnd}} ₫</span></div>
                     <div class="col-lg-2 col-sm-2 col-4 col-status"><span class="badge  alert-dark">{{p.product_status|title}}</span></div>
-                    <div class="col-lg-1 col-sm-2 col-4 col-date"><span>{{p.date}}</span></div>
-                    <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
+                    <div class="col-lg-2 col-sm-2 col-4 col-stock">
+                        <div class="input-group input-group-sm">
+                            <input type="number" min="0" class="form-control stock-input-{{p.p_id}}" value="{{ p.stock_count|default:0 }}">
+                            <button class="btn btn-outline-primary update-stock-btn" data-pid="{{p.p_id}}" type="button"><i class="material-icons md-check"></i></button>
+                        </div>
+                        <small class="text-success stock-msg-{{p.p_id}}" style="display:none;">Saved</small>
+                    </div>
+                    <div class="col-lg-3 col-sm-2 col-4 col-action text-end">
                         <a href="{% url 'useradmin:dashboard-edit-products'  p.p_id %}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> Edit </a>
                         <a href="{% url 'useradmin:dashboard-delete-products' p.p_id  %}" class="btn btn-sm font-sm btn-light rounded"> <i class="material-icons md-delete_forever"></i> Delete </a>
                     </div>
@@ -56,5 +62,35 @@
     </div>
     
 </section>
+
+<script>
+    document.querySelectorAll('.update-stock-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            let pid = this.getAttribute('data-pid');
+            let stockInput = document.querySelector('.stock-input-' + pid).value;
+            let msgBox = document.querySelector('.stock-msg-' + pid);
+            
+            fetch("{% url 'useradmin:update_stock' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    'pid': pid,
+                    'stock_count': stockInput
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.bool) {
+                    msgBox.style.display = 'block';
+                    setTimeout(() => { msgBox.style.display = 'none'; }, 2000);
+                } else {
+                    alert("Error updating stock");
+                }
+            });
+        });
+    });
+</script>
 
 {% endblock content %}

@@ -23,6 +23,21 @@ def dashboard(request):
     this_month = datetime.datetime.now().month
     monthly_revenue = CartOrder.objects.filter(order_date__month=this_month).aggregate(price=Sum("price"))
 
+    from django.db.models.functions import ExtractMonth
+    import calendar
+    from django.db.models import Count
+
+    revenue_data = CartOrder.objects.filter(paid_status=True).annotate(
+        month=ExtractMonth("order_date")
+    ).values("month").annotate(total_revenue=Sum("price")).values("month", "total_revenue")
+    
+    rev_month = []
+    rev_total = []
+    for i in revenue_data:
+        if i["month"]:
+            rev_month.append(calendar.month_name[i["month"]])
+            rev_total.append(float(i["total_revenue"]))
+
     context = {
         "monthly_revenue": monthly_revenue,
         "revenue": revenue,
@@ -31,6 +46,8 @@ def dashboard(request):
         "new_customers": new_customers,
         "latest_orders": latest_orders,
         "total_orders_count": total_orders_count,
+        "rev_month": rev_month,
+        "rev_total": rev_total,
     }
     return render(request, "useradmin/dashboard.html", context)
 
@@ -44,6 +61,23 @@ def products(request):
         "all_categories": all_categories,
     }
     return render(request, "useradmin/products.html", context)
+
+from django.http import JsonResponse
+
+@admin_required
+@csrf_exempt
+def update_stock(request):
+    if request.method == "POST":
+        pid = request.POST.get("pid")
+        stock_count = request.POST.get("stock_count")
+        try:
+            product = Product.objects.get(p_id=pid)
+            product.stock_count = int(stock_count)
+            product.save()
+            return JsonResponse({"bool": True, "stock_count": product.stock_count})
+        except Exception as e:
+            return JsonResponse({"bool": False, "error": str(e)})
+    return JsonResponse({"bool": False})
 
 @admin_required
 def add_product(request):
@@ -141,6 +175,18 @@ def change_order_status(request, oid):
     order = CartOrder.objects.get(oid=oid)
     if request.method == "POST":
         status = request.POST.get("status")
+        
+        # Nếu chuyển sang trạng thái shipped và trạng thái cũ chưa phải là shipped
+        if status == 'shipped' and order.product_status != 'shipped':
+            order_items = CartOrderItem.objects.filter(order=order)
+            for item in order_items:
+                product = Product.objects.filter(title=item.item).first()
+                if product and product.stock_count is not None:
+                    product.stock_count -= item.quantity
+                    if product.stock_count < 0:
+                        product.stock_count = 0
+                    product.save()
+                    
         messages.success(request, f"Order status changed to {status}")
         order.product_status = status
         order.save()

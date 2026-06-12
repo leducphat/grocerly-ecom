@@ -39,14 +39,14 @@
                 <div class="row">
                     <div class="col-9">
                         <div class="content-header">
-                            <h2 class="content-title">Add New Product</h2>
+                            <h2 class="content-title">Thêm sản phẩm mới</h2>
                         </div>
                     </div>
                     
                     <div class="col-lg-6">
                         <div class="card mb-4">
                             <div class="card-header">
-                                <h4>Basic</h4>
+                                <h4>Thông tin cơ bản</h4>
                             </div>
                             <div class="card-body">
                                 
@@ -59,12 +59,12 @@
                                 {% endif %}
                                     {% csrf_token %}
                                     <div class="mb-4">
-                                        <label for="product_name" class="form-label">Product title</label>
+                                        <label for="product_name" class="form-label">Tên sản phẩm</label>
                                         {{form.title}}
                                         <!-- <input type="text" placeholder="Type here" class="form-control" id="product_name" /> -->
                                     </div>
                                     <div class="mb-4">
-                                        <label class="form-label">Full description</label>
+                                        <label class="form-label">Mô tả chi tiết</label>
                                         {{form.description}}
 
                                         <!-- <textarea placeholder="Type here" class="form-control" rows="4"></textarea> -->
@@ -72,7 +72,7 @@
                                     <div class="row">
                                         <div class="col-lg-4">
                                             <div class="mb-4">
-                                                <label class="form-label">Selling price</label>
+                                                <label class="form-label">Giá bán</label>
                                                 <div class="row gx-2">
                                         {{form.price}}
 
@@ -82,14 +82,14 @@
                                         </div>
                                         <div class="col-lg-4">
                                             <div class="mb-4">
-                                                <label class="form-label">Old price</label>
+                                                <label class="form-label">Giá cũ</label>
                                         {{form.old_price}}
 
                                                 <!-- <input placeholder="$" type="text" class="form-control" /> -->
                                             </div>
                                         </div>
                                         <div class="col-lg-4">
-                                        <label class="form-label">Currency</label>
+                                        <label class="form-label">Tiền tệ</label>
                                             <select class="form-select">
                                                 <option>VND</option>
                                                
@@ -98,7 +98,7 @@
                                     </div>
 
                                     <div class="mb-4">
-                                        <label class="form-label">Stock</label>
+                                        <label class="form-label">Số lượng trong kho</label>
                                         {{form.stock_count}}
                                         <!-- <input type="text" placeholder="%" class="form-control" id="product_name" /> -->
                                     </div>
@@ -109,21 +109,21 @@
                                           {{form.vendor}}
                                     </div>
                                     <div class="mb-4 custom_select">
-                                          <label class="form-label">Category</label>
+                                          <label class="form-label">Danh mục</label>
                                           <br>
                                           {{form.category}}
                                     </div>
 
                                     <div class="mb-4">
-                                        <label class="form-label">Life of Product</label>
+                                        <label class="form-label">Hạn sử dụng</label>
                                         {{form.expiry_period}}
                                         <!-- <input type="text" placeholder="%" class="form-control" id="product_name" /> -->
                                     </div>
 
                                     <div class="mb-4">
-                                        <label class="form-label">Tags</label>
+                                        <label class="form-label">Từ khóa (Tags)</label>
                                         {{form.tags}}
-                                        <small class="text-muted">Seperate tag using comma</small>
+                                        <small class="text-muted">Ngăn cách các từ khóa bằng dấu phẩy</small>
                                         <!-- <input type="text" placeholder="%" class="form-control" id="product_name" /> -->
                                     </div>
 
@@ -136,16 +136,16 @@
                     <div class="col-lg-3">
                         <div class="card mb-4">
                             <div class="card-header">
-                                <h4>Media</h4>
+                                <h4>Hình ảnh</h4>
                             </div>
                             <div class="card-body">
                                 <div class="input-upload">
-                                    <label class="form-label text-start d-block">Primary Image</label>
+                                    <label class="form-label text-start d-block">Ảnh đại diện</label>
                                     <img src="{% static 'assets2/imgs/theme/upload.svg' %}" alt="" />
                                     <!-- <input class="form-control" type="file" /> -->
                                     {{form.image}}
                                     
-                                    <label class="form-label text-start d-block mt-4">Additional Images</label>
+                                    <label class="form-label text-start d-block mt-4">Ảnh phụ</label>
                                     <input class="form-control" type="file" name="additional_images" id="additional_images" multiple />
                                     
                                     <div id="image-preview-container" class="row mt-3"></div>
@@ -154,7 +154,7 @@
                         </div>
                         <!-- card end// -->
 
-                        <button class="btn mt-3 btn-md rounded font-sm hover-up" type="submit">Create Product</button>
+                        <button class="btn mt-3 btn-md rounded font-sm hover-up" type="submit">Tạo sản phẩm</button>
                     </div>
                 </div>
                 </form>

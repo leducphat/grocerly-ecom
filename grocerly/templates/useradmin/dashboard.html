@@ -8,10 +8,10 @@
     <div class="content-header">
         <div>
             <h2 class="content-title card-title">{% trans "Dashboard" %}</h2>
-            <p>Whole data about your business here</p>
+            <p>Toàn bộ dữ liệu về hoạt động kinh doanh của bạn</p>
         </div>
         <div>
-            <a href="#" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create Product</a>
+            <a href="{% url 'useradmin:dashboard-add-products' %}" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Thêm sản phẩm</a>
         </div>
     </div>
     <div class="row">
@@ -20,7 +20,7 @@
                 <article class="icontext">
                     <span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
                     <div class="text">
-                        <h6 class="mb-1 card-title">Revenue</h6>
+                        <h6 class="mb-1 card-title">Tổng doanh thu</h6>
                         <span>{{ revenue.price|vnd }} ₫</span>
                     </div>
                 </article>
@@ -42,7 +42,7 @@
                 <article class="icontext">
                     <span class="icon icon-sm rounded-circle bg-warning-light"><i class="text-warning material-icons md-qr_code"></i></span>
                     <div class="text">
-                        <h6 class="mb-1 card-title">Products</h6>
+                        <h6 class="mb-1 card-title">Sản phẩm</h6>
                         <span>{{all_products.count}}</span>
                     </div>
                 </article>
@@ -53,7 +53,7 @@
                 <article class="icontext">
                     <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
                     <div class="text">
-                        <h6 class="mb-1 card-title">Monthly Earning</h6>
+                        <h6 class="mb-1 card-title">Doanh thu tháng này</h6>
                         <span>{{ monthly_revenue.price|vnd }} ₫</span>
                     </div>
                 </article>
@@ -61,9 +61,47 @@
         </div>
     </div>
     
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card mb-4">
+                <article class="card-body">
+                    <h5 class="card-title">Biểu đồ doanh thu theo tháng</h5>
+                    <canvas id="myChart" height="100px"></canvas>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const ctx = document.getElementById('myChart');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: {{ rev_month|safe }},
+                    datasets: [{
+                        label: 'Doanh thu (VND)',
+                        data: {{ rev_total|safe }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    
     <div class="card mb-4">
         <header class="card-header">
-            <h4 class="card-title">Latest orders</h4>
+            <h4 class="card-title">Đơn hàng mới nhất</h4>
         </header>
         <div class="card-body">
             <div class="table-responsive">
@@ -72,14 +110,14 @@
                         <thead class="table-light">
                             <tr>
                                 
-                                <th class="align-middle" scope="col">Order ID</th>
-                                <th class="align-middle" scope="col">Name</th>
+                                <th class="align-middle" scope="col">Mã đơn</th>
+                                <th class="align-middle" scope="col">Tên khách</th>
                                 <th class="align-middle" scope="col">Email</th>
-                                <th class="align-middle" scope="col">Phone</th>
+                                <th class="align-middle" scope="col">SĐT</th>
                                 <th class="align-middle" scope="col">{% trans "Date" %}</th>
-                                <th class="align-middle" scope="col">Total</th>
-                                <th class="align-middle" scope="col">Payment Status</th>
-                                <th class="align-middle" scope="col">View Details</th>
+                                <th class="align-middle" scope="col">Tổng tiền</th>
+                                <th class="align-middle" scope="col">Thanh toán</th>
+                                <th class="align-middle" scope="col">Chi tiết</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -93,13 +131,13 @@
                                 <td>{{l.price|vnd}} ₫</td>
                                 <td>
                                     {% if l.paid_status == True %}
-                                    <span class="badge badge-pill badge-soft-success">Paid</span>
+                                    <span class="badge badge-pill badge-soft-success">Đã thanh toán</span>
                                     {% else %}
-                                    <span class="badge badge-pill badge-soft-danger">Not Paid</span>
+                                    <span class="badge badge-pill badge-soft-danger">Chưa thanh toán</span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{% url 'useradmin:order_detail' l.id %}" class="btn btn-xs"> View details</a>
+                                    <a href="{% url 'useradmin:order_detail' l.id %}" class="btn btn-xs"> Xem chi tiết</a>
                                 </td>
                             </tr>
                             {% endfor %}

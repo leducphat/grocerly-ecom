@@ -55,6 +55,12 @@ def safe_int(val, default=1):
 
 # Create your views here.
 def index(request):
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            return redirect('/admin/')
+        elif request.user.is_staff:
+            return redirect('useradmin:dashboard')
+            
     products = Product.objects.filter(product_status='published').order_by('-id')
     categories = Category.objects.all()
     deals_products = Product.objects.filter(product_status='published', featured=True).order_by('-id')[:4]

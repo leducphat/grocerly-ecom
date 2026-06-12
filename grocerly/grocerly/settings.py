@@ -84,6 +84,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'grocerly.middleware.RestrictStaffMiddleware',
 ]
 
 ROOT_URLCONF = 'grocerly.urls'

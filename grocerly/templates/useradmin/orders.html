@@ -7,32 +7,32 @@
 <section class="content-main">
     <div class="content-header">
         <div>
-            <h2 class="content-title card-title">Order List</h2>
-            <p>Manage all your orders from here</p>
+            <h2 class="content-title card-title">Danh sách Đơn hàng</h2>
+            <p>Quản lý tất cả đơn hàng tại đây</p>
         </div>
         <div>
-            <input type="text" placeholder="Search order ID" class="form-control bg-white" />
+            <input type="text" placeholder="Tìm mã đơn hàng" class="form-control bg-white" />
         </div>
     </div>
     <div class="card mb-4">
         <header class="card-header">
             <div class="row gx-3">
                 <div class="col-lg-4 col-md-6 me-auto">
-                    <input type="text" placeholder="Search..." class="form-control" />
+                    <input type="text" placeholder="Tìm kiếm..." class="form-control" />
                 </div>
                 <div class="col-lg-2 col-6 col-md-3">
                     <select class="form-select">
-                        <option>{% trans "Status" %}</option>
-                        <option>Active</option>
-                        <option>Disabled</option>
-                        <option>Show all</option>
+                        <option>Trạng thái</option>
+                        <option>Đang hoạt động</option>
+                        <option>Đã vô hiệu</option>
+                        <option>Hiện tất cả</option>
                     </select>
                 </div>
                 <div class="col-lg-2 col-6 col-md-3">
                     <select class="form-select">
-                        <option>Show 20</option>
-                        <option>Show 30</option>
-                        <option>Show 40</option>
+                        <option>Hiển thị 20</option>
+                        <option>Hiển thị 30</option>
+                        <option>Hiển thị 40</option>
                     </select>
                 </div>
             </div>
@@ -43,13 +43,13 @@
                 <table class="table table-hover">
                     <thead>
                             <tr>
-                            <th>#ID</th>
-                            <th scope="col">Name</th>
+                            <th>#Mã đơn</th>
+                            <th scope="col">Tên khách hàng</th>
                             <th scope="col">Email</th>
-                            <th scope="col">Total</th>
-                            <th scope="col">Order Status</th>
-                            <th scope="col">Payment Status</th>
-                            <th scope="col">Action</th>
+                            <th scope="col">Tổng tiền</th>
+                            <th scope="col">Trạng thái đơn hàng</th>
+                            <th scope="col">Trạng thái thanh toán</th>
+                            <th scope="col">Hành động</th>
                         </tr>
                             
                     </thead>
@@ -60,14 +60,14 @@
                                 <td><b>{{c.full_name|title}}</b></td>
                                 <td>{{c.email}}</td>
                                 <td>{{c.price|vnd}} ₫</td>
-                                <td><span class="badge alert-secondary">Pending</span></td>
+                                <td><span class="badge alert-secondary">{{ c.product_status|title }}</span></td>
                                 {% if c.paid_status == True %}
-                                    <td><span class="badge alert-success"></span>Paid</td>
+                                    <td><span class="badge alert-success"></span>Đã thanh toán</td>
                                 {% else %}
-                                    <td><span class="badge alert-danger">Not Paid</span></td>
+                                    <td><span class="badge alert-danger">Chưa thanh toán</span></td>
                                 {% endif %}
                                 <td>
-                                    <a href="{% url 'useradmin:order_detail' c.id %}" class="btn btn-md rounded font-sm">View Detail</a>
+                                    <a href="{% url 'useradmin:order_detail' c.id %}" class="btn btn-md rounded font-sm">Xem chi tiết</a>
                                 </td>
                             </tr>
                         {% endfor %}
