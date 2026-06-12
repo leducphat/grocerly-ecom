@@ -20,8 +20,8 @@
                 <article class="icontext">
                     <span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
                     <div class="text">
-                        <h6 class="mb-1 card-title">Tổng doanh thu</h6>
-                        <span>{{ revenue.price|vnd }} ₫</span>
+                        <h6 class="mb-1 card-title">Doanh thu thực tế</h6>
+                        <span>{{ revenue.price|default:0|vnd }} ₫</span>
                     </div>
                 </article>
             </div>
@@ -53,8 +53,8 @@
                 <article class="icontext">
                     <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
                     <div class="text">
-                        <h6 class="mb-1 card-title">Doanh thu tháng này</h6>
-                        <span>{{ monthly_revenue.price|vnd }} ₫</span>
+                        <h6 class="mb-1 card-title">Doanh thu thực tế tháng này</h6>
+                        <span>{{ monthly_revenue.price|default:0|vnd }} ₫</span>
                     </div>
                 </article>
             </div>
@@ -76,13 +76,22 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const ctx = document.getElementById('myChart');
+            
+            let rev_month = {{ rev_month|safe }};
+            let rev_total = {{ rev_total|safe }};
+            
+            if (rev_month.length === 0) {
+                ctx.parentElement.innerHTML = '<div class="text-center mt-5 mb-5"><i class="material-icons md-info text-muted" style="font-size: 48px;"></i><p class="text-muted mt-2">Chưa có dữ liệu doanh thu thực tế (chưa có đơn hàng nào thanh toán thành công).</p></div>';
+                return;
+            }
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: {{ rev_month|safe }},
+                    labels: rev_month,
                     datasets: [{
                         label: 'Doanh thu (VND)',
-                        data: {{ rev_total|safe }},
+                        data: rev_total,
                         backgroundColor: 'rgba(54, 162, 235, 0.5)',
                         borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 1

@@ -13,7 +13,7 @@ import datetime
 
 @admin_required
 def dashboard(request):
-    revenue = CartOrder.objects.aggregate(price=Sum("price"))
+    revenue = CartOrder.objects.filter(paid_status=True).aggregate(price=Sum("price"))
     total_orders_count = CartOrder.objects.all()
     all_products = Product.objects.all()
     all_categories = Category.objects.all()
@@ -21,7 +21,7 @@ def dashboard(request):
     latest_orders = CartOrder.objects.all()
 
     this_month = datetime.datetime.now().month
-    monthly_revenue = CartOrder.objects.filter(order_date__month=this_month).aggregate(price=Sum("price"))
+    monthly_revenue = CartOrder.objects.filter(paid_status=True, order_date__month=this_month).aggregate(price=Sum("price"))
 
     from django.db.models.functions import ExtractMonth
     import calendar
@@ -64,8 +64,8 @@ def products(request):
 
 from django.http import JsonResponse
 
-@admin_required
 @csrf_exempt
+@admin_required
 def update_stock(request):
     if request.method == "POST":
         pid = request.POST.get("pid")
@@ -169,8 +169,8 @@ def order_detail(request, id):
     }
     return render(request, "useradmin/order_detail.html", context)
 
-@admin_required
 @csrf_exempt
+@admin_required
 def change_order_status(request, oid):
     order = CartOrder.objects.get(oid=oid)
     if request.method == "POST":
@@ -186,6 +186,10 @@ def change_order_status(request, oid):
                     if product.stock_count < 0:
                         product.stock_count = 0
                     product.save()
+                    
+        # Nếu chuyển sang trạng thái delivered và là đơn hàng COD, đánh dấu đã thanh toán
+        if status == 'delivered' and order.payment_method == 'cod':
+            order.paid_status = True
                     
         messages.success(request, f"Order status changed to {status}")
         order.product_status = status
