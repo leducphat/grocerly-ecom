@@ -235,7 +235,14 @@ JAZZMIN_SETTINGS = {
     # "site_logo": "",
     "copyright": "Grocerly",
     "welcome_sign": "Chào mừng đến với Hệ thống Quản trị Grocerly",
-    }
+    "topmenu_links": [
+        {"name": "Trang chủ",  "url": "admin:index", "permissions": ["auth.view_user"]},
+    ],
+    "usermenu_links": [
+        {"name": "Về trang UserAdmin", "url": "/useradmin/", "icon": "fas fa-tachometer-alt", "new_window": False},
+    ],
+    "custom_js": "assets2/js/admin_custom.js",
+}
 
 
 AUTH_USER_MODEL = 'userauths.User'

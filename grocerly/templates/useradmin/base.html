@@ -125,6 +125,10 @@
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
                                 <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Cập nhật hồ sơ</a>
                                 <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Cài đặt tài khoản</a>
+                                {% if request.user.is_superuser %}
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-primary" href="/admin/"><i class="material-icons md-admin_panel_settings"></i>Về trang Admin</a>
+                                {% endif %}
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger" href="{% url 'userauths:sign-out' %}"><i class="material-icons md-exit_to_app"></i>Đăng xuất</a>
                             </div>
