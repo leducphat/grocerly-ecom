@@ -41,7 +41,7 @@
                                     <div class="row">
                                         <div class="form-group col-md-6">
                                             <label>Full Name</label>
-                                            <input type="text" class="form-control" name="full_name" value="{{ form.full_name.value|default_if_none:'' }}" placeholder="Full Name">
+                                            <input type="text" class="form-control" name="full_name" value="{% if form.full_name.value %}{{ form.full_name.value }}{% else %}{{ profile.user.username }}{% endif %}" placeholder="Full Name">
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>Phone</label>

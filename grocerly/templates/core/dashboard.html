@@ -55,11 +55,22 @@
                                                     <span><img src="https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg" style="width: 150px; object-fit: cover; border-radius:50%; height:150px;" alt=""></span>
                                                     {% endif %}
                                                 </div>
-                                                <div>
-                                                    <span><input class="mb-2" type="text" value="{% trans 'Name' %} - {{ user_profile.full_name|default:'' }}" readonly></span>
-                                                    <span><input class="mb-2" type="text" value="{% trans 'Bio' %} - {{ user_profile.bio|default:'' }}" readonly></span>
-                                                    <span><input class="mb-2" type="text" value="{% trans 'Phone' %} - {{ user_profile.phone|default:'' }}" readonly></span>
-                                                    <span><input class="mb-2" type="text" value="{% trans 'Address' %} - {{ user_profile.address|default:'' }}" readonly></span>
+                                                <div style="flex: 1;">
+                                                    <div class="mb-3">
+                                                        <input class="form-control" type="text" value="{% trans 'Name' %}: {{ user_profile.full_name|default:user_profile.user.username }}" readonly>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <input class="form-control" type="text" value="{% trans 'Email' %}: {{ user_profile.user.email }}" readonly>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <input class="form-control" type="text" value="{% trans 'Bio' %}: {{ user_profile.bio|default:'' }}" readonly>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <input class="form-control" type="text" value="{% trans 'Phone' %}: {{ user_profile.phone|default:'' }}" readonly>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <input class="form-control" type="text" value="{% trans 'Address' %}: {{ user_profile.address|default:'' }}" readonly>
+                                                    </div>
                                                     {% if user_profile.verified %}
                                                     <div class="p-4 border rounded">
                                                         <span>{% trans "Verified" %}</span> <span><i class="fas fa-check-circle"></i></span>
