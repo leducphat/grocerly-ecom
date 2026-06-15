@@ -12,7 +12,10 @@ from django.core import serializers
 from taggit.models import Tag
 
 import calendar
-import stripe
+from core.vnpay import vnpay
+from datetime import datetime
+from django.utils import timezone
+from zoneinfo import ZoneInfo
 
 from core.models import (
     Category, Vendor, Product, ProductReview, ProductImage,
@@ -496,50 +499,123 @@ def save_checkout_info(request):
     return redirect("core:index")
 
 
-@csrf_exempt
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 @login_required
-def create_checkout_session(request, oid):
+def vnpay_payment(request, oid):
     order = _get_checkout_order_or_none(request, oid)
     if not order:
-        return JsonResponse({"error": "Order not found"}, status=404)
-
-    if order.payment_method == 'cod':
-        return JsonResponse({"error": "This order is set to Cash on Delivery"}, status=400)
+        messages.warning(request, "Order not found. Please start checkout again.")
+        return redirect("core:checkout-info")
 
     if order.paid_status:
-        return JsonResponse({"error": "Order is already paid"}, status=400)
+        messages.info(request, "This order has already been paid.")
+        return redirect("core:payment-completed", order.oid)
+        
+    order.payment_method = 'online' # vnpay is an online method
+    order.product_status = 'processing'
+    order.save(update_fields=['payment_method', 'product_status'])
+    
+    import time
+    amount = int(order.price) * 100 # VNPAY expects amount * 100
+    order_desc = f"Thanh_toan_don_hang_{order.oid}"
+    txn_ref = f"{order.oid}-{int(time.time())}"
 
-    stripe.api_key = settings.STRIPE_SECRET_KEY
+    vnp = vnpay()
+    vnp.requestData['vnp_Version'] = '2.1.0'
+    vnp.requestData['vnp_Command'] = 'pay'
+    vnp.requestData['vnp_TmnCode'] = settings.VNPAY_TMN_CODE
+    vnp.requestData['vnp_Amount'] = str(amount)
+    vnp.requestData['vnp_CurrCode'] = 'VND'
+    vnp.requestData['vnp_TxnRef'] = txn_ref
+    vnp.requestData['vnp_OrderInfo'] = order_desc
+    vnp.requestData['vnp_OrderType'] = 'billpayment'
+    vnp.requestData['vnp_Locale'] = 'vn'
+    
+    vnp.requestData['vnp_ReturnUrl'] = request.build_absolute_uri(reverse("core:vnpay_return"))
+    vnp.requestData['vnp_IpAddr'] = get_client_ip(request)
+    
+    vn_tz = ZoneInfo('Asia/Ho_Chi_Minh')
+    now = timezone.now().astimezone(vn_tz)
+    vnp.requestData['vnp_CreateDate'] = now.strftime('%Y%m%d%H%M%S')
+    
+    vnpay_payment_url = vnp.get_payment_url(settings.VNPAY_PAYMENT_URL, settings.VNPAY_HASH_SECRET)
+    
+    return redirect(vnpay_payment_url)
 
-    checkout_session = stripe.checkout.Session.create(
-        customer_email=order.email,
-        payment_method_types=['card'],
-        line_items=[
-            {
-                'price_data': {
-                    'currency': 'vnd',
-                    'product_data': {
-                        'name': order.full_name,
-                    },
-                    'unit_amount': int(order.price),
-                },
-                'quantity': 1,
-            }
-        ],
-        mode='payment',
-        success_url=request.build_absolute_uri(
-            reverse("core:payment-completed", args=[order.oid])
-        ) + "?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url=request.build_absolute_uri(
-            reverse("core:checkout", args=[order.oid])
-        ),
-    )
+def vnpay_return(request):
+    inputData = request.GET
+    if inputData:
+        vnp = vnpay()
+        vnp.responseData = inputData.dict()
+        txn_ref = inputData.get('vnp_TxnRef')
+        order_id = txn_ref.split('-')[0] if txn_ref else None
+        vnp_ResponseCode = inputData.get('vnp_ResponseCode')
+        
+        if vnp.validate_response(settings.VNPAY_HASH_SECRET):
+            if vnp_ResponseCode == "00":
+                try:
+                    order = CartOrder.objects.get(oid=order_id)
+                    order.paid_status = True
+                    order.save()
+                    
+                    if 'cart_data_obj' in request.session:
+                        del request.session['cart_data_obj']
+                        
+                    pending_oid = request.session.get('pending_order_oid')
+                    if pending_oid and str(order.oid) == str(pending_oid):
+                        del request.session['pending_order_oid']
+                        
+                    messages.success(request, "Thanh toán VNPay thành công!")
+                    return redirect("core:payment-completed", order.oid)
+                except CartOrder.DoesNotExist:
+                    messages.error(request, "Đơn hàng không tồn tại.")
+                    return redirect("core:index")
+            else:
+                messages.error(request, f"Lỗi thanh toán VNPay. Mã lỗi: {vnp_ResponseCode}")
+                return redirect("core:payment-failed")
+        else:
+            messages.error(request, "Sai chữ ký bảo mật (Invalid signature).")
+            return redirect("core:payment-failed")
+    return redirect("core:index")
 
-    order.paid_status = False
-    order.stripe_payment_intent = checkout_session['id']
-    order.save()
-
-    return JsonResponse({"sessionId": checkout_session.id})
+@csrf_exempt
+def vnpay_ipn(request):
+    inputData = request.GET
+    if inputData:
+        vnp = vnpay()
+        vnp.responseData = inputData.dict()
+        txn_ref = inputData.get('vnp_TxnRef')
+        order_id = txn_ref.split('-')[0] if txn_ref else None
+        amount = inputData.get('vnp_Amount')
+        vnp_ResponseCode = inputData.get('vnp_ResponseCode')
+        
+        if vnp.validate_response(settings.VNPAY_HASH_SECRET):
+            try:
+                order = CartOrder.objects.get(oid=order_id)
+                if int(amount) != int(order.price) * 100:
+                    return JsonResponse({'RspCode': '04', 'Message': 'Invalid amount'})
+                    
+                if order.paid_status:
+                    return JsonResponse({'RspCode': '02', 'Message': 'Order already confirmed'})
+                    
+                if vnp_ResponseCode == '00':
+                    order.paid_status = True
+                    order.save()
+                    return JsonResponse({'RspCode': '00', 'Message': 'Confirm Success'})
+                else:
+                    return JsonResponse({'RspCode': '00', 'Message': 'Confirm Success'})
+            except CartOrder.DoesNotExist:
+                return JsonResponse({'RspCode': '01', 'Message': 'Order not found'})
+        else:
+            return JsonResponse({'RspCode': '97', 'Message': 'Invalid signature'})
+    return JsonResponse({'RspCode': '99', 'Message': 'Unknown error'})
 
 
 @login_required
@@ -601,7 +677,6 @@ def checkout(request, oid):
     context = {
         'order': order,
         'order_items': order_items,
-        'stripe_publishable_key': settings.STRIPE_PUBLIC_KEY,
     }
     return render(request, 'core/checkout.html', context)
 

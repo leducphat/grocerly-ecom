@@ -36,7 +36,9 @@ urlpatterns = [
     # Checkout + Payment
     path('checkout-info/', views.checkout_info_view, name='checkout-info'),
     path('save-checkout-info/', views.save_checkout_info, name='save_checkout_info'),
-    path('api/create-checkout-session/<oid>/', views.create_checkout_session, name='api_checkout_session'),
+    path('payment/vnpay/<oid>/', views.vnpay_payment, name='vnpay_payment'),
+    path('payment/vnpay_return/', views.vnpay_return, name='vnpay_return'),
+    path('payment/vnpay_ipn/', views.vnpay_ipn, name='vnpay_ipn'),
     path('place-cod-order/<oid>/', views.place_cod_order, name='place-cod-order'),
     path('checkout/<oid>/', views.checkout, name='checkout'),
     path('payment-completed/<oid>/', views.payment_completed_view, name='payment-completed'),

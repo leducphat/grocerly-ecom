@@ -248,9 +248,12 @@ JAZZMIN_SETTINGS = {
 AUTH_USER_MODEL = 'userauths.User'
 
 
-# Stripe settings (use test keys for development)
-STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', 'pk_test_your_stripe_public_key')
-STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_your_stripe_secret_key')
+# VNPay settings
+VNPAY_TMN_CODE = os.environ.get('VNPAY_TMN_CODE', '')
+VNPAY_HASH_SECRET = os.environ.get('VNPAY_HASH_SECRET', '')
+VNPAY_PAYMENT_URL = os.environ.get('VNPAY_PAYMENT_URL', '')
+# We will construct VNPAY_RETURN_URL dynamically in views.py using request.build_absolute_uri
+VNPAY_API_URL = os.environ.get('VNPAY_API_URL', '')
 
 
 # Authentication URLs
