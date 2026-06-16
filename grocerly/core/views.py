@@ -247,8 +247,8 @@ def search_view(request):
 
 
 def filter_product(request):
-    category_ids = request.GET.getlist("category[]")
-    vendor_ids = request.GET.getlist("vendor[]")
+    category_ids = [c for c in (request.GET.getlist("category") + request.GET.getlist("category[]")) if c.isdigit()]
+    vendor_ids = [v for v in (request.GET.getlist("vendor") + request.GET.getlist("vendor[]")) if v.isdigit()]
     min_price = request.GET.get("min_price")
     max_price = request.GET.get("max_price")
 
@@ -272,7 +272,7 @@ def filter_product(request):
     if vendor_ids:
         products = products.filter(vendor__id__in=vendor_ids).distinct()
 
-    data = render_to_string("core/async/product-list.html", {"products": products})
+    data = render_to_string("core/async/product-list.html", {"products": products}, request=request)
     return JsonResponse({
         "data": data,
         "count": products.count(),

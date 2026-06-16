@@ -104,11 +104,11 @@
                                         <div class="custome-checkbox">
                                             <div class="mb-2">
                                                 <label class="mb-1">{% trans "Min Price" %}</label>
-                                                <input type="number" step="0.01" id="min-price-filter" class="form-control" value="{{ min_price }}" min="0">
+                                                <input type="number" step="1" id="min-price-filter" class="form-control" value="{{ min_price|stringformat:'d' }}" min="0">
                                             </div>
                                             <div class="mb-2">
                                                 <label class="mb-1">{% trans "Max Price" %}</label>
-                                                <input type="number" step="0.01" id="max-price-filter" class="form-control" value="{{ max_price }}" min="0">
+                                                <input type="number" step="1" id="max-price-filter" class="form-control" value="{{ max_price|stringformat:'d' }}" min="0">
                                             </div>
                                             <button type="button" id="apply-price-filter" class="btn btn-sm">{% trans "Apply Price" %}</button>
                                         </div>
@@ -279,8 +279,8 @@
 
             $("#slider-range-value1").text(formatPriceLabel(currentMin));
             $("#slider-range-value2").text(formatPriceLabel(currentMax));
-            $("#min-price-filter").val(currentMin.toFixed(2));
-            $("#max-price-filter").val(currentMax.toFixed(2));
+            $("#min-price-filter").val(Math.round(currentMin));
+            $("#max-price-filter").val(Math.round(currentMax));
         });
 
         slider.noUiSlider.on('set', function(){
@@ -305,11 +305,12 @@
         $.ajax({
             url: "{% url 'core:filter-product' %}",
             data: {
-                "category[]": selectedCategories,
-                "vendor[]": selectedVendors,
+                "category": selectedCategories,
+                "vendor": selectedVendors,
                 "min_price": minPrice,
                 "max_price": maxPrice
             },
+            traditional: true,
             dataType: "json",
             success: function(response){
                 $("#filtered-product-grid").html(response.data);
