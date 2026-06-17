@@ -677,8 +677,8 @@ msgstr "Bắt đầu mua sắm hàng ngày cùng"
 msgid "Best prices & offers"
 msgstr "Giá & ưu đãi tốt nhất"
 
-msgid "Orders 50 ₫ or more"
-msgstr "Đơn hàng từ 50 ₫ trở lên"
+msgid "Orders 100k or more"
+msgstr "Đơn hàng từ 100k trở lên"
 
 msgid "Free delivery"
 msgstr "Giao hàng miễn phí"
