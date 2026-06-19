@@ -2,7 +2,7 @@
 
 ![Grocerly Logo](https://grocerly-ecom.onrender.com/static/assets/imgs/theme/logo.png)
 
-Grocerly is a fully functional, multi-vendor e-commerce web application designed to provide a seamless shopping experience. Built with Python and Django, this platform supports dynamic product management, user authentication, a comprehensive shopping cart system, and secure vendor dashboards.
+Grocerly is a fully functional, multi-vendor e-commerce web application designed to provide a seamless shopping experience. Built with Python and Django, this platform supports dynamic product management, user authentication, a comprehensive shopping cart system, secure vendor dashboards, and an AI-powered shopping assistant.
 
 ## 🌐 Live Demo
 **Check out the live deployment here:** [https://grocerly-ecom.onrender.com](https://grocerly-ecom.onrender.com/)
@@ -11,19 +11,25 @@ Grocerly is a fully functional, multi-vendor e-commerce web application designed
 
 ## 🚀 Key Features
 
+*   **AI Shopping Assistant**: Integrated with Google's Gemini AI to provide a smart chat widget that helps customers search for products, answer queries, and manage their cart.
+*   **VNPay Payment Gateway**: Secure online checkout process with VNPay integration for fast and reliable payments.
+*   **Dynamic AJAX Filtering**: Real-time product filtering by categories, tags, vendors, and price slider without reloading the page.
+*   **Multilingual Support (i18n)**: Fully supports English and Vietnamese, with smart middleware ensuring the preferred default language.
 *   **Multi-Vendor System**: Vendors can register, upload products, manage inventory, and track their sales via a dedicated dashboard.
-*   **Dynamic Shopping Cart**: Real-time cart updates, coupon application, and a seamless checkout process.
+*   **Dynamic Shopping Cart**: Real-time cart updates, session-based cart management, coupon application, and a seamless checkout process.
+*   **Robust Data Safety**: Implements soft-deletion for critical models (like Products) to prevent accidental data loss.
 *   **User Profiles & Authentication**: Secure sign-up/login, wishlists, address management, and order history tracking.
 *   **Product Reviews & Ratings**: Customers can leave feedback and ratings on products they've purchased.
 *   **Cloud Media Storage**: All product images and user uploads are securely stored and delivered via Cloudinary.
-*   **Robust Admin Panel**: Powered by `django-jazzmin` for an intuitive and modern admin interface.
+*   **Modern Admin Panel**: Powered by `django-jazzmin` for an intuitive and beautiful admin interface.
 
 ## 🛠️ Technology Stack
 
 *   **Backend framework:** Django 5.2 (Python 3)
+*   **AI Integration:** Google Generative AI SDK (Gemini)
 *   **Database:** PostgreSQL (Hosted on Neon.tech)
 *   **Media Storage:** Cloudinary & WhiteNoise (for static assets)
-*   **Frontend:** HTML5, CSS3, JavaScript, Bootstrap
+*   **Frontend:** HTML5, CSS3, Vanilla JavaScript, Bootstrap, jQuery (for AJAX)
 *   **Hosting/Deployment:** Render
 
 ## ⚙️ Local Development Setup

@@ -112,7 +112,7 @@ def ai_chat(request):
         response = chat.send_message(user_message)
         
         # Manual loop to process function calls (max 3 loops to prevent recursion)
-        for _ in range(3):
+        for _step in range(3):
             if not response.parts:
                 break
                 
