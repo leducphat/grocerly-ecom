@@ -209,6 +209,11 @@ def ai_chat(request):
         traceback.print_exc()
         error_msg = str(e)
         if "429" in error_msg or "Quota" in error_msg or "ResourceExhausted" in error_msg:
+            if "PerDay" in error_msg:
+                return Response({
+                    "reply": str(_("🛑 Hệ thống AI đã hết lượt sử dụng miễn phí (giới hạn 20 tin nhắn/ngày). Vui lòng quay lại vào ngày mai!"))
+                }, status=200)
+            
             # Try to extract the retry delay from Google's error response
             retry_match = re.search(r'retry in (\d+\.?\d*)', error_msg, re.IGNORECASE)
             if not retry_match:
