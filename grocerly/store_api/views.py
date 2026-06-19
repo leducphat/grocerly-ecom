@@ -23,7 +23,10 @@ def search_products(query: str) -> list[dict]:
     Call this whenever the user asks about product availability, price, details, or stock.
     Returns a list of matching products.
     """
-    products = Product.objects.filter(title__icontains=query, status=True, in_stock=True)[:5]
+    products = Product.objects.filter(status=True, in_stock=True)
+    for word in query.split():
+        products = products.filter(title__icontains=word)
+    products = products[:5]
     if not products.exists():
         return [{"message": "No matching products found."}]
         

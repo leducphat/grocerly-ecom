@@ -1002,7 +1002,9 @@
                 document.getElementById('chat-messages').innerHTML = '';
                 // Loop through history and render messages
                 chatHistory.forEach(msg => {
-                    appendMessage(msg.role === 'user' ? 'user' : 'bot', msg.content);
+                    if (!msg.hidden && !msg.content.includes('(SYSTEM CONTEXT')) {
+                        appendMessage(msg.role === 'user' ? 'user' : 'bot', msg.content);
+                    }
                 });
             }
         });
@@ -1067,13 +1069,13 @@
                     // Add to local history
                     chatHistory.push({role: 'assistant', content: data.reply});
                     if (data.hidden_context) {
-                        chatHistory.push({role: 'user', content: data.hidden_context});
+                        chatHistory.push({role: 'user', content: data.hidden_context, hidden: true});
                     }
                     sessionStorage.setItem('grocerlyChatHistory', JSON.stringify(chatHistory));
 
                     if (data.action === "confirm_add_cart") {
                         const p = data.product;
-                        const btnHtml = `<button style="margin-top:10px; width:100%; border-radius:5px;" class="btn btn-sm btn-success" onclick="aiConfirmCartAdd('${p.id}', '${p.title.replace(/'/g, "\\'")}', '${p.qty}', '${p.price}', '${p.image}', '${p.p_id}')">Yes, Add to Cart</button>`;
+                        const btnHtml = `<button style="margin-top:10px; width:100%; border-radius:5px;" class="btn btn-sm btn-success" onclick="aiConfirmCartAdd('${p.id}', '${p.title.replace(/'/g, "\\'")}', '${p.qty}', '${p.price}', '${p.image}', '${p.pid}')">Yes, Add to Cart</button>`;
                         appendMessage('bot', btnHtml);
                     } else if (data.action === "confirm_checkout") {
                         const btnHtml = `<button style="margin-top:10px; width:100%; border-radius:5px;" class="btn btn-sm btn-success" onclick="window.location.href='/cart/'">Proceed to Checkout</button>`;
