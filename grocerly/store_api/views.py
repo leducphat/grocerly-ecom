@@ -71,7 +71,7 @@ genai.configure(api_key=api_key)
 try:
     # Initialize the model with tools and system instruction
     model = genai.GenerativeModel(
-        model_name='gemini-2.5-flash',
+        model_name='gemini-3.1-flash-lite',
         tools=[search_products, get_bestsellers, request_add_to_cart, request_checkout],
         system_instruction=(
             "You are Grocerly Assistant, the AI shopping assistant for Grocerly E-commerce. "
@@ -211,7 +211,7 @@ def ai_chat(request):
         if "429" in error_msg or "Quota" in error_msg or "ResourceExhausted" in error_msg:
             if "PerDay" in error_msg:
                 return Response({
-                    "reply": str(_("🛑 Hệ thống AI đã hết lượt sử dụng miễn phí (giới hạn 20 tin nhắn/ngày). Vui lòng quay lại vào ngày mai!"))
+                    "reply": str(_("🛑 Hệ thống AI đã hết lượt sử dụng miễn phí (giới hạn 500 tin nhắn/ngày). Vui lòng quay lại vào ngày mai!"))
                 }, status=200)
             
             # Try to extract the retry delay from Google's error response
