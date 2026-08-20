@@ -211,3 +211,6 @@ grocerly-deploy_accessKeys.csv
 
 # Original template files
 og_template/
+
+# AI tooling (ECC skills/agents/commands) - khong thuoc ma nguon du an
+.claude/
