@@ -14,6 +14,9 @@ msgstr ""
 msgid "404 - Không tìm thấy trang | Grocerly"
 msgstr ""
 
+msgid "A draft is not visible to customers, on the storefront or to the AI assistant."
+msgstr ""
+
 msgid "About"
 msgstr ""
 
@@ -107,6 +110,9 @@ msgstr ""
 msgid "Could not update your cart. Please try again."
 msgstr ""
 
+msgid "Current status:"
+msgstr ""
+
 msgid "Cảm ơn bạn đã kiên nhẫn chờ đợi!"
 msgstr ""
 
@@ -195,6 +201,9 @@ msgid "Milk & Flavoured Milk"
 msgstr ""
 
 msgid "Min Price"
+msgstr ""
+
+msgid "Move back to draft"
 msgstr ""
 
 msgid "My Account"
@@ -290,6 +299,9 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
+msgid "Publish"
+msgstr ""
+
 msgid "Purchase Guide"
 msgstr ""
 
@@ -306,6 +318,12 @@ msgid "Remove"
 msgstr ""
 
 msgid "Save Address"
+msgstr ""
+
+msgid "Save as draft"
+msgstr ""
+
+msgid "Save changes"
 msgstr ""
 
 msgid "Save up to 50% off on your first order"
@@ -354,6 +372,9 @@ msgid "Sour Cream and Dips"
 msgstr ""
 
 msgid "Status"
+msgstr ""
+
+msgid "Stop selling"
 msgstr ""
 
 msgid "Subscribe"

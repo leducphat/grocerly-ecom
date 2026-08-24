@@ -17,12 +17,12 @@ PAYMENT_METHOD_CHOICES = (
     ('cod', 'Cash on Delivery'),
 )
 
+# Không có bước duyệt: nhân viên tự quyết khi nào sản phẩm sẵn sàng (ADR-0002).
+# 'in_review' và 'rejected' đã bị bỏ ở migration 0005.
 STATUS = (
     ('draft', 'Draft'),
-    ('disabled', 'Disabled'),
-    ('in_review', 'In Review'),
-    ('rejected', 'Rejected'),
     ('published', 'Published'),
+    ('disabled', 'Disabled'),
 )
 
 RATING = (
@@ -187,6 +187,25 @@ class Vendor(SoftDeleteModel):
             )
 
 
+class ProductQuerySet(SoftDeleteQuerySet):
+    def published(self):
+        """Sản phẩm đang được bán — điều kiện hiển thị duy nhất của storefront và API."""
+        return self.filter(product_status='published')
+
+
+class ProductManager(SoftDeleteManager):
+    def get_queryset(self):
+        return ProductQuerySet(self.model, using=self._db).alive()
+
+    def published(self):
+        return self.get_queryset().published()
+
+
+class ProductAllObjectsManager(AllObjectsManager):
+    def get_queryset(self):
+        return ProductQuerySet(self.model, using=self._db)
+
+
 class Product(SoftDeleteModel):
     p_id = ShortUUIDField(unique=True, length=10, max_length=20, alphabet="abcdefgh12345")
 
@@ -210,7 +229,7 @@ class Product(SoftDeleteModel):
     expiry_period = models.CharField(max_length=100, null=True, blank=True, default="N/A")
     tags = TaggableManager(blank=True)
 
-    product_status = models.CharField(max_length=10, choices=STATUS, default='in_review')
+    product_status = models.CharField(max_length=10, choices=STATUS, default='draft')
 
     status = models.BooleanField(default=True)
     in_stock = models.BooleanField(default=True)
@@ -221,6 +240,11 @@ class Product(SoftDeleteModel):
 
     date = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(null=True, blank=True)
+
+    # Ghi đè manager của SoftDeleteModel để có thêm .published().
+    # Thứ tự khai báo giữ nguyên nên `objects` vẫn là _default_manager.
+    objects = ProductManager()
+    all_objects = ProductAllObjectsManager()
 
     class Meta:
         verbose_name_plural = "Products"

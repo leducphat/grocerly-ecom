@@ -154,7 +154,11 @@
                         </div>
                         <!-- card end// -->
 
-                        <button class="btn mt-3 btn-md rounded font-sm hover-up" type="submit">Tạo sản phẩm</button>
+                        <div class="d-flex gap-2 mt-3">
+                            <button class="btn btn-md rounded font-sm hover-up" type="submit" name="action" value="publish">{% trans "Publish" %}</button>
+                            <button class="btn btn-md btn-light rounded font-sm hover-up" type="submit" name="action" value="save_draft">{% trans "Save as draft" %}</button>
+                        </div>
+                        <small class="text-muted d-block mt-2">{% trans "A draft is not visible to customers, on the storefront or to the AI assistant." %}</small>
                     </div>
                 </div>
                 </form>

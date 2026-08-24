@@ -15,6 +15,9 @@ msgstr ""
 msgid "404 - Không tìm thấy trang | Grocerly"
 msgstr "404 - Không tìm thấy trang | Grocerly"
 
+msgid "A draft is not visible to customers, on the storefront or to the AI assistant."
+msgstr "Sản phẩm nháp không hiển thị với khách hàng, trên cửa hàng hay với trợ lý AI."
+
 msgid "About"
 msgstr "Giới thiệu"
 
@@ -108,6 +111,9 @@ msgstr "Liên hệ với chúng tôi"
 msgid "Could not update your cart. Please try again."
 msgstr "Không cập nhật được giỏ hàng. Vui lòng thử lại."
 
+msgid "Current status:"
+msgstr "Trạng thái hiện tại:"
+
 msgid "Cảm ơn bạn đã kiên nhẫn chờ đợi!"
 msgstr "Cảm ơn bạn đã kiên nhẫn chờ đợi!"
 
@@ -197,6 +203,9 @@ msgstr "Sữa & Sữa tươi"
 
 msgid "Min Price"
 msgstr "Giá thấp nhất"
+
+msgid "Move back to draft"
+msgstr "Chuyển về nháp"
 
 msgid "My Account"
 msgstr "Tài khoản"
@@ -291,6 +300,9 @@ msgstr "Sản phẩm"
 msgid "Profile"
 msgstr "Hồ sơ"
 
+msgid "Publish"
+msgstr "Đăng bán"
+
 msgid "Purchase Guide"
 msgstr "Hướng dẫn mua hàng"
 
@@ -308,6 +320,12 @@ msgstr "Xóa"
 
 msgid "Save Address"
 msgstr "Lưu địa chỉ"
+
+msgid "Save as draft"
+msgstr "Lưu nháp"
+
+msgid "Save changes"
+msgstr "Lưu thay đổi"
 
 msgid "Save up to 50% off on your first order"
 msgstr "Giảm giá lên đến 50% cho đơn hàng đầu tiên"
@@ -356,6 +374,9 @@ msgstr "Kem chua và Sốt chấm"
 
 msgid "Status"
 msgstr "Trạng thái"
+
+msgid "Stop selling"
+msgstr "Ngừng bán"
 
 msgid "Subscribe"
 msgstr "Đăng ký"

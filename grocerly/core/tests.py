@@ -9,7 +9,7 @@ from decimal import Decimal
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import CartOrder, Product, ProductReview
+from core.models import CartOrder, Category, Product, ProductReview, Vendor
 from userauths.models import User
 
 
@@ -162,3 +162,79 @@ class AddReviewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ProductReview.objects.count(), 1)
+
+
+class DraftProductVisibilityTests(TestCase):
+    """ADR-0002 / PLAN 5.1 — hàng nháp không được lọt ra storefront."""
+
+    def setUp(self):
+        self.category = Category.objects.create(title="Trái cây")
+        self.vendor = Vendor.objects.create(name="Vinamilk")
+        common = dict(category=self.category, vendor=self.vendor, featured=True)
+        self.published = Product.objects.create(
+            title="Dưa hấu đỏ", product_status='published', **common
+        )
+        self.draft = Product.objects.create(
+            title="Dưa hấu vàng", product_status='draft', **common
+        )
+        self.disabled = Product.objects.create(
+            title="Dưa hấu xanh", product_status='disabled', **common
+        )
+
+    def test_published_manager_returns_only_published(self):
+        self.assertEqual(list(Product.objects.published()), [self.published])
+
+    def test_draft_hidden_from_search(self):
+        response = self.client.get(reverse("core:search"), {'q': "Dưa hấu"})
+
+        self.assertContains(response, "Dưa hấu đỏ")
+        self.assertNotContains(response, "Dưa hấu vàng")
+        self.assertNotContains(response, "Dưa hấu xanh")
+
+    def test_draft_hidden_from_category_page(self):
+        response = self.client.get(
+            reverse("core:category-product-list", args=[self.category.c_id])
+        )
+
+        self.assertContains(response, "Dưa hấu đỏ")
+        self.assertNotContains(response, "Dưa hấu vàng")
+
+    def test_draft_cannot_be_added_to_cart(self):
+        response = self.client.get(reverse("core:add-to-cart"), {
+            'id': self.draft.id, 'qty': 1,
+        })
+
+        self.assertEqual(response.status_code, 404)
+
+
+class ProductStatusMigrationTests(TestCase):
+    """PLAN 5.4 — dữ liệu cũ chuyển sang trạng thái ẩn tương đương, không tự lên sàn."""
+
+    def test_forwards_maps_old_statuses(self):
+        import importlib
+
+        from django.apps import apps as global_apps
+
+        # Tên module bắt đầu bằng số nên không import bằng cú pháp `from ... import`.
+        migration = importlib.import_module(
+            'core.migrations.0005_product_status_drop_review_flow'
+        )
+
+        # `choices` không được ép ở tầng DB nên vẫn tạo được giá trị cũ để kiểm thử.
+        in_review = Product.objects.create(title="Cũ chờ duyệt", product_status='in_review')
+        rejected = Product.objects.create(title="Cũ bị từ chối", product_status='rejected')
+        published = Product.objects.create(title="Đang bán", product_status='published')
+        draft = Product.objects.create(title="Nháp", product_status='draft')
+
+        # Lưu ý: `apps` thật trả về manager có lọc soft-delete, còn model lịch sử trong
+        # migration dùng Manager thường. Test này vì vậy chỉ phủ bản ghi chưa xóa mềm.
+        migration.forwards(global_apps, None)
+
+        for product, expected in [
+            (in_review, 'draft'),
+            (rejected, 'disabled'),
+            (published, 'published'),
+            (draft, 'draft'),
+        ]:
+            product.refresh_from_db()
+            self.assertEqual(product.product_status, expected, product.title)

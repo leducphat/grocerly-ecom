@@ -11,6 +11,21 @@ from useradmin.decorators import admin_required
 
 import datetime
 
+
+# Không có bước duyệt: nhân viên tự quyết trạng thái bằng nút bấm (ADR-0002).
+# Giá trị đến từ client nên phải qua whitelist, không gán thẳng vào model.
+PRODUCT_STATUS_ACTIONS = {
+    'save_draft': 'draft',
+    'publish': 'published',
+    'disable': 'disabled',
+}
+
+
+def resolve_product_status(request, default):
+    """Đổi nút bấm thành `product_status`; nút lạ hoặc thiếu thì giữ `default`."""
+    return PRODUCT_STATUS_ACTIONS.get(request.POST.get('action'), default)
+
+
 @admin_required
 def dashboard(request):
     revenue = CartOrder.objects.filter(paid_status=True).aggregate(price=Sum("price"))
@@ -86,7 +101,8 @@ def add_product(request):
         if form.is_valid():
             new_form = form.save(commit=False)
             new_form.user = request.user
-            new_form.product_status = 'published'
+            # Mặc định 'draft': lỡ tay bấm Enter thì sản phẩm chưa lên sàn.
+            new_form.product_status = resolve_product_status(request, 'draft')
             if not new_form.vendor:
                 new_form.vendor = Vendor.objects.filter(user=request.user).first() or Vendor.objects.first()
             new_form.save()
@@ -117,6 +133,9 @@ def edit_product(request, pid):
         form = AddProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             new_form = form.save(commit=False)
+            # `product_status` không nằm trong AddProductForm.fields nên giá trị cũ vẫn
+            # còn nguyên ở đây — không bấm nút đổi trạng thái thì giữ nguyên.
+            new_form.product_status = resolve_product_status(request, product.product_status)
             new_form.save()
             form.save_m2m()
             

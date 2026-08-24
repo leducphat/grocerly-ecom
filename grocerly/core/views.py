@@ -74,10 +74,10 @@ def index(request):
         elif request.user.is_staff:
             return redirect('useradmin:dashboard')
             
-    products = Product.objects.filter(product_status='published').order_by('-id')
+    products = Product.objects.published().order_by('-id')
     categories = Category.objects.all()
-    deals_products = Product.objects.filter(product_status='published', featured=True).order_by('-id')[:4]
-    new_products_sidebar = Product.objects.filter(product_status='published').order_by('-date')[:3]
+    deals_products = Product.objects.published().filter(featured=True).order_by('-id')[:4]
+    new_products_sidebar = Product.objects.published().order_by('-date')[:3]
 
     context = {
         'products': products,
@@ -100,11 +100,11 @@ def category_list_view(request):
 
 
 def product_list_view(request):
-    products = Product.objects.filter(product_status='published').order_by('-id')
+    products = Product.objects.published().order_by('-id')
     tags = Tag.objects.all().order_by('-id')[:6]
     categories = Category.objects.all().order_by('title')
     vendors = Vendor.objects.all().order_by('name')
-    deals_products = Product.objects.filter(product_status='published', featured=True).order_by('-id')[:4]
+    deals_products = Product.objects.published().filter(featured=True).order_by('-id')[:4]
 
     price_range = products.aggregate(min_price=Min('price'), max_price=Max('price'))
 
@@ -124,7 +124,7 @@ def product_list_view(request):
 
 def category_product_list_view(request, c_id):
     category = Category.objects.get(c_id=c_id)
-    products = Product.objects.filter(category=category, product_status='published').order_by('-id')
+    products = Product.objects.published().filter(category=category).order_by('-id')
 
     context = {
         'category': category,
@@ -146,7 +146,7 @@ def vendor_list_view(request):
 
 def vendor_detail_view(request, v_id):
     vendor = Vendor.objects.get(v_id=v_id)
-    products = Product.objects.filter(vendor=vendor, product_status='published').order_by('-id')
+    products = Product.objects.published().filter(vendor=vendor).order_by('-id')
     context = {
         'vendor': vendor,
         'products': products
@@ -158,7 +158,7 @@ def vendor_detail_view(request, v_id):
 def product_detail_view(request, p_id):
     product = get_object_or_404(Product, p_id=p_id)
     images = product.p_image.all()
-    related_products = Product.objects.filter(category=product.category, product_status='published').exclude(p_id=p_id).order_by('-id')[:4]
+    related_products = Product.objects.published().filter(category=product.category).exclude(p_id=p_id).order_by('-id')[:4]
 
     # Getting all reviews related to the product
     reviews = ProductReview.objects.filter(product=product).order_by('-date')
@@ -202,7 +202,7 @@ def product_detail_view(request, p_id):
 
 
 def tag_list(request, tag_slug=None):
-    products = Product.objects.filter(product_status='published').order_by('-id')
+    products = Product.objects.published().order_by('-id')
 
     tag = None
     if tag_slug:
@@ -268,7 +268,7 @@ def ajax_add_review(request, p_id):
 
 def search_view(request):
     query = request.GET.get("q")
-    products = Product.objects.filter(title__icontains=query, product_status='published').order_by('-date')
+    products = Product.objects.published().filter(title__icontains=query).order_by('-date')
 
     context = {
         'products': products,
@@ -283,7 +283,7 @@ def filter_product(request):
     min_price = request.GET.get("min_price")
     max_price = request.GET.get("max_price")
 
-    products = Product.objects.filter(product_status='published').order_by('-id').distinct()
+    products = Product.objects.published().order_by('-id').distinct()
 
     if min_price:
         try:
@@ -319,7 +319,7 @@ def add_to_cart(request):
     if not product_id.isdigit():
         return JsonResponse({'error': _("Invalid product.")}, status=400)
 
-    product = Product.objects.filter(pk=int(product_id), product_status='published').first()
+    product = Product.objects.published().filter(pk=int(product_id)).first()
     if product is None:
         return JsonResponse({'error': _("This product is no longer on sale.")}, status=404)
 

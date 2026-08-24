@@ -9,7 +9,10 @@ from core.models import Product, Category
 from store_api.serializers import ProductSerializer, CategorySerializer
 
 class ProductListAPI(generics.ListAPIView):
-    queryset = Product.objects.filter(status=True, in_stock=True)
+    # `published()` la dieu kien dang ban; `status`/`in_stock` la hai co cu con lai
+    # tu template goc (xem ARCHITECTURE.md muc 3). Thieu `published()` thi hang nhap
+    # lot ra API cong khai va ra ca chatbot — SECURITY.md S-04.
+    queryset = Product.objects.published().filter(status=True, in_stock=True)
     serializer_class = ProductSerializer
 
 class CategoryListAPI(generics.ListAPIView):
@@ -23,7 +26,7 @@ def search_products(query: str) -> list[dict]:
     Call this whenever the user asks about product availability, price, details, or stock.
     Returns a list of matching products.
     """
-    products = Product.objects.filter(status=True, in_stock=True)
+    products = Product.objects.published().filter(status=True, in_stock=True)
     for word in query.split():
         products = products.filter(title__icontains=word)
     products = products[:5]
@@ -56,7 +59,7 @@ def get_bestsellers() -> list[dict]:
     """Get the bestselling and featured products of the store.
     Call this when the user asks what is popular or what to buy.
     """
-    products = Product.objects.filter(featured=True, status=True, in_stock=True)[:5]
+    products = Product.objects.published().filter(featured=True, status=True, in_stock=True)[:5]
     results = []
     for p in products:
         results.append({
