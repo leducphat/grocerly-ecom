@@ -104,6 +104,9 @@ msgstr ""
 msgid "Contact Us"
 msgstr ""
 
+msgid "Could not update your cart. Please try again."
+msgstr ""
+
 msgid "Cảm ơn bạn đã kiên nhẫn chờ đợi!"
 msgstr ""
 
@@ -159,6 +162,12 @@ msgid "Help Ticket"
 msgstr ""
 
 msgid "Home"
+msgstr ""
+
+msgid "Invalid product."
+msgstr ""
+
+msgid "Invalid request."
 msgstr ""
 
 msgid "Items"
@@ -227,6 +236,9 @@ msgstr ""
 msgid "Not verified"
 msgstr ""
 
+msgid "Only %(count)s item(s) left in stock."
+msgstr ""
+
 msgid "Oops! Trang này không tồn tại"
 msgstr ""
 
@@ -246,6 +258,12 @@ msgid "Pages"
 msgstr ""
 
 msgid "Paid Status"
+msgstr ""
+
+msgid "Please choose a rating."
+msgstr ""
+
+msgid "Please write a review."
 msgstr ""
 
 msgid "Popular"
@@ -365,6 +383,12 @@ msgstr ""
 msgid "This feature is currently under development and will be available soon."
 msgstr ""
 
+msgid "This order has not been paid yet. Please complete the payment."
+msgstr ""
+
+msgid "This product is no longer on sale."
+msgstr ""
+
 msgid "Title"
 msgstr ""
 
@@ -411,6 +435,9 @@ msgid "We found"
 msgstr ""
 
 msgid "Wishlist"
+msgstr ""
+
+msgid "You have already reviewed this product."
 msgstr ""
 
 msgid "Your Cart"

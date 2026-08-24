@@ -792,6 +792,17 @@
             $(".mini-cart-count").text(count);
         }
 
+        // Cart endpoints now answer 400/404 with {error: "..."} when a product is out of
+        // stock, no longer on sale, or the parameters are invalid. Without this handler the
+        // error is swallowed: the user clicks "Add" and nothing appears to happen.
+        function showCartError(xhr) {
+            let message = "{% trans 'Could not update your cart. Please try again.' %}";
+            if (xhr && xhr.responseJSON && xhr.responseJSON.error) {
+                message = xhr.responseJSON.error;
+            }
+            alert(message);
+        }
+
         $(document).on("click", ".add-to-cart-btn", function(){
             let this_val = $(this);
             let index = this_val.attr("data-index");
@@ -835,7 +846,8 @@
                     console.log("Added to cart successfully!", response);
                     updateMiniCartCount(response.totalcartitems);
                     renderMiniCartItems(response.data);
-                }
+                },
+                error: showCartError
             });
         });
 
@@ -874,6 +886,10 @@
                 success: function(response){
                     updateMiniCartCount(response.totalcartitems);
                     $("#cart-list").html(response.data);
+                },
+                error: function(xhr){
+                    showCartError(xhr);
+                    location.reload();  // reset the input back to the quantity held in session
                 }
             });
         }
@@ -1129,6 +1145,17 @@
                     const botReply = `✅ Đã thêm **${qty}x ${title}** vào giỏ hàng thành công! Bạn có muốn tiến hành **Thanh toán (Checkout)** luôn không, hay muốn tìm thêm đồ gì khác?`;
                     appendMessage('bot', botReply);
                     
+                    chatHistory.push({role: 'assistant', content: botReply});
+                    sessionStorage.setItem('grocerlyChatHistory', JSON.stringify(chatHistory));
+                },
+                error: function(xhr){
+                    // Report inside the chat window instead of an alert, to keep the conversation flowing.
+                    let reason = "{% trans 'Could not update your cart. Please try again.' %}";
+                    if (xhr && xhr.responseJSON && xhr.responseJSON.error) {
+                        reason = xhr.responseJSON.error;
+                    }
+                    const botReply = `⚠️ ${reason}`;
+                    appendMessage('bot', botReply);
                     chatHistory.push({role: 'assistant', content: botReply});
                     sessionStorage.setItem('grocerlyChatHistory', JSON.stringify(chatHistory));
                 }

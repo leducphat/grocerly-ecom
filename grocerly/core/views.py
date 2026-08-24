@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.conf import settings
 from django.core import serializers
+from django.utils.translation import gettext as _
 from taggit.models import Tag
 
 import calendar
@@ -18,6 +19,7 @@ from django.utils import timezone
 from zoneinfo import ZoneInfo
 
 from core.models import (
+    RATING,
     Category, Vendor, Product, ProductReview, ProductImage,
     CartOrder, CartOrderItem, Wishlist, Address, Coupon,
 )
@@ -53,6 +55,14 @@ def safe_int(val, default=1):
         return int(safe_float(val, default))
     except (ValueError, TypeError):
         return default
+
+
+def product_image_url(product):
+    """URL ảnh sản phẩm, trả chuỗi rỗng nếu file ảnh không tồn tại."""
+    try:
+        return product.image.url
+    except (ValueError, AttributeError):
+        return ''
 
 
 
@@ -207,21 +217,42 @@ def tag_list(request, tag_slug=None):
     return render(request, 'core/tag.html', context)
 
 
+@login_required
 def ajax_add_review(request, p_id):
-    product = Product.objects.get(pk=p_id)
+    # Chốt chặn cũ chỉ nằm ở context 'make_review' của template nên POST thẳng vào đây
+    # là bỏ qua được: khách chưa đăng nhập gây 500, user đã đăng nhập spam review vô hạn.
+    if request.method != "POST":
+        return JsonResponse({'bool': False, 'error': _("Invalid request.")}, status=405)
+
+    product = get_object_or_404(Product, pk=p_id)
     user = request.user
 
-    review = ProductReview.objects.create(
+    if ProductReview.objects.filter(user=user, product=product).exists():
+        return JsonResponse({
+            'bool': False,
+            'error': _("You have already reviewed this product."),
+        }, status=400)
+
+    review_text = (request.POST.get('review') or '').strip()
+    if not review_text:
+        return JsonResponse({'bool': False, 'error': _("Please write a review.")}, status=400)
+
+    valid_ratings = [str(value) for value, _label in RATING]
+    rating = request.POST.get('rating')
+    if rating not in valid_ratings:
+        return JsonResponse({'bool': False, 'error': _("Please choose a rating.")}, status=400)
+
+    ProductReview.objects.create(
         user=user,
         product=product,
-        review=request.POST['review'],
-        rating=request.POST['rating'],
+        review=review_text,
+        rating=rating,
     )
 
     context = {
         'user': user.username,
-        'review': request.POST['review'],
-        'rating': request.POST['rating'],
+        'review': review_text,
+        'rating': rating,
     }
 
     average_reviews = ProductReview.objects.filter(product=product).aggregate(rating=Avg('rating'))
@@ -282,28 +313,33 @@ def filter_product(request):
 # ======================== Cart (Session-based) ========================
 
 def add_to_cart(request):
-    cart_product = {}
+    # Client chỉ được gửi 'id' và 'qty'. Tên, giá, ảnh đều đọc lại từ database:
+    # tin giá từ query string cho phép mua hàng 500.000đ với giá 1đ (SECURITY.md S-02).
+    product_id = str(request.GET.get('id', '')).strip()
+    if not product_id.isdigit():
+        return JsonResponse({'error': _("Invalid product.")}, status=400)
 
-    cart_product[str(request.GET['id'])] = {
-        'title': request.GET['title'],
-        'qty': safe_int(request.GET.get('qty')),
-        'price': safe_float(request.GET.get('price')),
-        'image': request.GET['image'],
-        'pid': request.GET['pid'],
+    product = Product.objects.filter(pk=int(product_id), product_status='published').first()
+    if product is None:
+        return JsonResponse({'error': _("This product is no longer on sale.")}, status=404)
+
+    qty = max(1, safe_int(request.GET.get('qty')))
+
+    if product.stock_count is not None and qty > product.stock_count:
+        return JsonResponse({
+            'error': _("Only %(count)s item(s) left in stock.") % {'count': product.stock_count},
+            'stock_count': product.stock_count,
+        }, status=400)
+
+    cart_data = request.session.get('cart_data_obj', {})
+    cart_data[product_id] = {
+        'title': product.title,
+        'qty': qty,
+        'price': float(product.price),
+        'image': product_image_url(product),
+        'pid': product.p_id,
     }
-
-    if 'cart_data_obj' in request.session:
-        if str(request.GET['id']) in request.session['cart_data_obj']:
-            cart_data = request.session['cart_data_obj']
-            cart_data[str(request.GET['id'])]['qty'] = safe_int(cart_product[str(request.GET['id'])]['qty'])
-            cart_data.update(cart_data)
-            request.session['cart_data_obj'] = cart_data
-        else:
-            cart_data = request.session['cart_data_obj']
-            cart_data.update(cart_product)
-            request.session['cart_data_obj'] = cart_data
-    else:
-        request.session['cart_data_obj'] = cart_product
+    request.session['cart_data_obj'] = cart_data
 
     return JsonResponse({
         'data': request.session['cart_data_obj'],
@@ -381,13 +417,23 @@ def delete_item_from_cart(request):
 
 
 def update_cart(request):
-    product_id = str(request.GET['id'])
-    product_qty = request.GET['qty']
+    product_id = str(request.GET.get('id', '')).strip()
+    qty = max(1, safe_int(request.GET.get('qty')))
+
+    # Chặn sửa số lượng vượt tồn kho (UC 3.2.6 Exception Flow). Thiếu bước này thì chốt
+    # chặn tồn kho ở add_to_cart vô nghĩa: thêm 1 rồi update lên 999.
+    if product_id.isdigit():
+        product = Product.objects.filter(pk=int(product_id)).first()
+        if product is not None and product.stock_count is not None and qty > product.stock_count:
+            return JsonResponse({
+                'error': _("Only %(count)s item(s) left in stock.") % {'count': product.stock_count},
+                'stock_count': product.stock_count,
+            }, status=400)
 
     if 'cart_data_obj' in request.session:
         if product_id in request.session['cart_data_obj']:
             cart_data = request.session['cart_data_obj']
-            cart_data[str(request.GET['id'])]['qty'] = safe_int(product_qty)
+            cart_data[product_id]['qty'] = qty
             request.session['cart_data_obj'] = cart_data
 
     cart_total_amount = 0
@@ -688,9 +734,13 @@ def payment_completed_view(request, oid):
         messages.warning(request, "Order not found. Please start checkout again.")
         return redirect("core:checkout-info")
 
-    if order.payment_method == 'online' and order.paid_status == False:
-        order.paid_status = True
-        order.save()
+    # View này chỉ HIỂN THỊ kết quả, không được ghi paid_status (SECURITY.md S-01):
+    # gõ thẳng URL này sẽ biến đơn chưa trả thành đã trả. paid_status chỉ được đặt bởi
+    # vnpay_return / vnpay_ipn (online, đã kiểm chữ ký) hoặc khi nhân viên chuyển đơn
+    # COD sang 'delivered'.
+    if order.payment_method == 'online' and not order.paid_status:
+        messages.warning(request, _("This order has not been paid yet. Please complete the payment."))
+        return redirect("core:checkout", order.oid)
 
     if 'cart_data_obj' in request.session:
         del request.session['cart_data_obj']

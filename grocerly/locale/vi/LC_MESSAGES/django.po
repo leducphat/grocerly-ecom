@@ -105,6 +105,9 @@ msgstr "Liên hệ"
 msgid "Contact Us"
 msgstr "Liên hệ với chúng tôi"
 
+msgid "Could not update your cart. Please try again."
+msgstr "Không cập nhật được giỏ hàng. Vui lòng thử lại."
+
 msgid "Cảm ơn bạn đã kiên nhẫn chờ đợi!"
 msgstr "Cảm ơn bạn đã kiên nhẫn chờ đợi!"
 
@@ -161,6 +164,12 @@ msgstr "Gửi hỗ trợ"
 
 msgid "Home"
 msgstr "Trang chủ"
+
+msgid "Invalid product."
+msgstr "Sản phẩm không hợp lệ."
+
+msgid "Invalid request."
+msgstr "Yêu cầu không hợp lệ."
 
 msgid "Items"
 msgstr "Sản phẩm"
@@ -228,6 +237,9 @@ msgstr "Chưa có nhà bán"
 msgid "Not verified"
 msgstr "Chưa xác thực"
 
+msgid "Only %(count)s item(s) left in stock."
+msgstr "Chỉ còn %(count)s sản phẩm trong kho."
+
 msgid "Oops! Trang này không tồn tại"
 msgstr "Oops! Trang này không tồn tại"
 
@@ -248,6 +260,12 @@ msgstr "Trang"
 
 msgid "Paid Status"
 msgstr "Thanh toán"
+
+msgid "Please choose a rating."
+msgstr "Vui lòng chọn số sao đánh giá."
+
+msgid "Please write a review."
+msgstr "Vui lòng nhập nội dung đánh giá."
 
 msgid "Popular"
 msgstr "Phổ biến"
@@ -367,6 +385,12 @@ msgid ""
 "This feature is currently under development and will be available soon."
 msgstr "Tính năng này hiện đang được phát triển và sẽ sớm ra mắt."
 
+msgid "This order has not been paid yet. Please complete the payment."
+msgstr "Đơn hàng này chưa được thanh toán. Vui lòng hoàn tất thanh toán."
+
+msgid "This product is no longer on sale."
+msgstr "Sản phẩm này đã ngừng bán."
+
 msgid "Title"
 msgstr "Tên sản phẩm"
 
@@ -418,6 +442,9 @@ msgstr "Chúng tôi tìm thấy"
 
 msgid "Wishlist"
 msgstr "Yêu thích"
+
+msgid "You have already reviewed this product."
+msgstr "Bạn đã đánh giá sản phẩm này rồi."
 
 msgid "Your Cart"
 msgstr "Giỏ hàng của bạn"
