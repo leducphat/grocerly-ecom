@@ -54,9 +54,9 @@ thiết kế. Ranh giới nằm ở **phạm vi thẩm quyền**, không ở kh�
 
 ## ADR-0002 — Bỏ quy trình duyệt sản phẩm (`in_review`)
 
-**Trạng thái:** Đã chốt · 2026-08-20 · **Code đã triển khai 2026-08-24**
-(migration `0005_product_status_drop_review_flow`); phần sửa báo cáo — [PLAN.md](PLAN.md)
-giai đoạn 4 — chưa làm
+**Trạng thái:** Đã chốt · 2026-08-20 · **Đã triển khai 2026-08-24** — code và
+migration `0005_product_status_drop_review_flow` (đã áp lên production); phần sửa báo
+cáo — [PLAN.md](PLAN.md) giai đoạn 4 — chưa làm
 
 ### Bối cảnh
 

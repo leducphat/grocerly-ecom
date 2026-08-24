@@ -4,10 +4,9 @@
 
 ## Đang triển khai — Bỏ luồng duyệt sản phẩm
 
-> **Trạng thái 2026-08-24:** Giai đoạn 1, 2, 3, 5 **đã xong** (27 test xanh).
-> Migration 0005 chưa áp lên production nhưng đã xác minh là **no-op** (bước 1.1) — sẽ
-> tự chạy khi merge `develop` → `main` vì `build.sh` có lệnh `migrate`.
-> Còn lại: **Giai đoạn 4** — sửa file báo cáo, làm thủ công.
+> **Trạng thái 2026-08-24:** Giai đoạn 1, 2, 3, 5 **đã xong** (27 test xanh) và
+> migration 0005 **đã áp lên production Neon**. Còn lại: **Giai đoạn 4** — sửa file báo
+> cáo, làm thủ công.
 
 Quyết định và lý do: [ADR-0002](DECISIONS.md#adr-0002--bỏ-quy-trình-duyệt-sản-phẩm-in_review).
 
@@ -38,8 +37,13 @@ Quyết định và lý do: [ADR-0002](DECISIONS.md#adr-0002--bỏ-quy-trình-du
 - [x] **1.3** `Product.product_status` — `default='draft'`
 - [x] **1.4** [0005_product_status_drop_review_flow.py](../grocerly/core/migrations/0005_product_status_drop_review_flow.py)
       — `AlterField` + data migration `in_review` → `draft`, `rejected` → `disabled`.
-      **Chưa áp lên production.** Chiều lùi là no-op có chủ ý: hai giá trị cũ gộp vào
-      trạng thái đã tồn tại nên không tách ngược được.
+      Chiều lùi là no-op có chủ ý: hai giá trị cũ gộp vào trạng thái đã tồn tại nên
+      không tách ngược được.
+
+      ✅ **Đã áp lên production Neon 2026-08-24** bằng `migrate core 0005` (có phạm vi,
+      không dùng `migrate` trần). Đây là migration duy nhất đang treo trên toàn dự án.
+      Đếm lại sau khi áp: vẫn đúng 7 sản phẩm `published`, **không dòng nào đổi** —
+      khớp dự đoán ở bước 1.1.
 
 ### Giai đoạn 2 — Luồng đăng sản phẩm
 
