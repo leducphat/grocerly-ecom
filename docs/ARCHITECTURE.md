@@ -101,12 +101,22 @@ Ghi chú quan trọng:
 
 | Trường | Kiểu | Ý nghĩa | Ai đọc |
 |---|---|---|---|
-| `product_status` | choices | Trạng thái đăng bán | storefront (`='published'`) |
+| `product_status` | `draft` / `published` / `disabled` | Trạng thái đăng bán, nhân viên tự đặt | storefront **và** `store_api` |
 | `status` | bool | Cờ bật/tắt kế thừa từ template gốc | `store_api` |
 | `in_stock` | bool | Còn hàng (tách rời `stock_count`) | `store_api` |
 
-Ba cờ này chồng lấn nhau và **hai nhóm consumer đang lọc theo hai tiêu chí khác nhau** —
-đây là nợ kỹ thuật, xem [SECURITY.md](SECURITY.md) mục S-04 và [PLAN.md](PLAN.md) bước 3.3.
+`product_status` **không còn** `in_review`/`rejected` — không có bước duyệt, xem
+[ADR-0002](DECISIONS.md).
+
+Điều kiện hiển thị nay nằm ở **một chỗ duy nhất**:
+
+```python
+Product.objects.published()   # ProductQuerySet.published() trong core/models.py
+```
+
+Trước 2026-08-24, điều kiện này bị chép tay 12 lần trong `core/views.py` còn `store_api`
+lại lọc theo `status`/`in_stock` — chính sự lệch đó là lỗ hổng S-04. Ba cờ vẫn chồng lấn
+nhau (nợ kỹ thuật còn lại), nhưng `published()` giờ là điều kiện bắt buộc ở mọi nơi.
 
 ## 4. Các luồng chính
 
@@ -235,7 +245,7 @@ khi `settings.py` hiện chỉ hiểu `USE_CLOUDINARY` — cấu hình này đã
 | 2 | Truy vấn không `select_related` → N+1 | Chậm khi dữ liệu lớn |
 | 3 | Không phân trang ở mọi trang danh sách | Tải toàn bộ sản phẩm mỗi request |
 | 4 | `useradmin` không giới hạn phạm vi theo nhân viên | Mọi staff thấy toàn bộ dữ liệu |
-| 5 | Ba cờ trạng thái Product chồng chéo | Nguồn gốc lỗi S-04 |
+| 5 | Ba cờ trạng thái Product chồng chéo (`product_status` / `status` / `in_stock`) | S-04 đã vá, nhưng `status` và `in_stock` vẫn là cờ thừa chưa ai dọn |
 | 6 | `CartOrderItem` khớp sản phẩm bằng `title` | Trừ kho sai khi trùng tên |
 | 7 | ~20 template mồ côi (`index2`, `product-lists`, `login`…) | Gây nhiễu khi tìm file |
 | 8 | `login_view` dùng `except:` trần | Nuốt lỗi thật, khó debug |

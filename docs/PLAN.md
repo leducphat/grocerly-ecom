@@ -4,6 +4,10 @@
 
 ## Đang triển khai — Bỏ luồng duyệt sản phẩm
 
+> **Trạng thái 2026-08-24:** Giai đoạn 1–3 và 5 đã xong ở phía code (27 test xanh).
+> Còn lại **bước 1.1** và **áp migration lên production** — cả hai cần người dùng cho
+> phép vì `.env` trỏ vào database thật. **Giai đoạn 4** là sửa file báo cáo, làm thủ công.
+
 Quyết định và lý do: [ADR-0002](DECISIONS.md#adr-0002--bỏ-quy-trình-duyệt-sản-phẩm-in_review).
 
 **Phạm vi ảnh hưởng hẹp:** `Product.product_status` chỉ được **ghi ở đúng một chỗ**
@@ -18,38 +22,36 @@ Quyết định và lý do: [ADR-0002](DECISIONS.md#adr-0002--bỏ-quy-trình-du
 - [ ] **1.1** Đếm sản phẩm theo từng `product_status` trên Neon (chỉ SELECT) — biết bao
       nhiêu bản ghi đang `in_review`/`rejected` cần chuyển. *Cần người dùng cho phép,
       vì `.env` trỏ vào database production.*
-- [ ] **1.2** [core/models.py:20](../grocerly/core/models.py#L20) — rút `STATUS` còn
+- [x] **1.2** [core/models.py](../grocerly/core/models.py) — `STATUS` còn
       `draft` / `published` / `disabled`
-- [ ] **1.3** [core/models.py:213](../grocerly/core/models.py#L213) — `default='in_review'`
-      → `default='draft'`
-- [ ] **1.4** Migration `AlterField` + **data migration**: `in_review` → `draft`,
-      `rejected` → `disabled` (giữ nguyên trạng thái ẩn, không sản phẩm nào tự lên sàn)
+- [x] **1.3** `Product.product_status` — `default='draft'`
+- [x] **1.4** [0005_product_status_drop_review_flow.py](../grocerly/core/migrations/0005_product_status_drop_review_flow.py)
+      — `AlterField` + data migration `in_review` → `draft`, `rejected` → `disabled`.
+      **Chưa áp lên production.** Chiều lùi là no-op có chủ ý: hai giá trị cũ gộp vào
+      trạng thái đã tồn tại nên không tách ngược được.
 
 ### Giai đoạn 2 — Luồng đăng sản phẩm
 
-- [ ] **2.1** [useradmin/views.py:89](../grocerly/useradmin/views.py#L89) — bỏ
-      `product_status = 'published'` cứng, đọc từ nút bấm (`request.POST.get('action')`),
-      **whitelist** giá trị hợp lệ để không nhận bừa từ client
-- [ ] **2.2** [add-products.html:157](../grocerly/templates/useradmin/add-products.html#L157)
-      — tách nút "Tạo sản phẩm" thành **"Lưu nháp"** + **"Đăng bán"**
-- [ ] **2.3** [edit-products.html:176](../grocerly/templates/useradmin/edit-products.html#L176)
-      — tương tự, thêm **"Ngừng bán"** (→ `disabled`)
-- [ ] **2.4** `edit_product` hiện **không đụng** tới `product_status` → phải bổ sung xử
-      lý, nếu không nút mới sẽ vô tác dụng
+- [x] **2.1** `add_product` đọc nút bấm qua `resolve_product_status()`, whitelist
+      `PRODUCT_STATUS_ACTIONS`. Mặc định `draft` khi thiếu/lạ giá trị
+- [x] **2.2** [add-products.html](../grocerly/templates/useradmin/add-products.html) —
+      **"Đăng bán"** + **"Lưu nháp"**
+- [x] **2.3** [edit-products.html](../grocerly/templates/useradmin/edit-products.html) —
+      nút đổi trạng thái hiện theo trạng thái hiện tại (không hiện "Đăng bán" cho sản
+      phẩm đang bán), kèm dòng hiển thị trạng thái hiện tại
+- [x] **2.4** `edit_product` giữ nguyên `product_status` khi bấm "Lưu thay đổi"; chỉ đổi
+      khi bấm đúng nút trạng thái
 
 ### Giai đoạn 3 — Bịt lỗ rò hàng nháp
 
 Trước đây mọi sản phẩm đều được đặt thẳng `published` nên không ai để ý. Khi có `draft`
 thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.md) mục S-04.
 
-- [ ] **3.1** [store_api/views.py:11](../grocerly/store_api/views.py#L11) —
-      `ProductListAPI` bổ sung `product_status='published'`
-- [ ] **3.2** [store_api/views.py:21](../grocerly/store_api/views.py#L21)
-      (`search_products`) và `get_bestsellers` — cùng lỗi; nếu không sửa, **chatbot sẽ
-      tư vấn khách mua sản phẩm chưa đăng bán**
-- [ ] **3.3** *(Tùy chọn, khuyến nghị)* Gom điều kiện hiển thị vào
-      `Product.objects.published()` thay cho 9 lần lặp `filter(product_status='published')`
-      — đúng DRY và tránh tái diễn đúng lỗi 3.1
+- [x] **3.1** `ProductListAPI` → `Product.objects.published().filter(status=True, in_stock=True)`
+- [x] **3.2** `search_products` và `get_bestsellers` — cùng cách
+- [x] **3.3** `ProductQuerySet.published()` + `ProductManager` trong
+      [core/models.py](../grocerly/core/models.py). **12** chỗ lặp
+      `filter(product_status='published')` nay gom về một định nghĩa duy nhất
 
 ### Giai đoạn 4 — Cập nhật báo cáo
 
@@ -64,11 +66,16 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
 
 ### Giai đoạn 5 — Kiểm thử
 
-- [ ] **5.1** Nhân viên lưu nháp → khách vãng lai **không** thấy ở trang chủ / cửa hàng /
-      tìm kiếm
-- [ ] **5.2** Nháp **không** xuất hiện ở `/api/v1/products/` và chatbot không gợi ý
-- [ ] **5.3** Bấm "Đăng bán" → lên sàn ngay, không cần Admin
-- [ ] **5.4** Sản phẩm cũ đang `published` **không** đổi trạng thái sau migration
+Đã tự động hóa thay cho kiểm thử tay — chạy `python manage.py test --settings=grocerly.settings_test`:
+
+- [x] **5.1** `DraftProductVisibilityTests` — nháp không ra tìm kiếm, trang danh mục, và
+      không thêm được vào giỏ
+- [x] **5.2** `store_api.tests.DraftLeakTests` — nháp không ra `/api/v1/products/`,
+      `search_products`, `get_bestsellers`
+- [x] **5.3** `useradmin.tests.AddProductStatusTests` — "Đăng bán" lên sàn ngay, không
+      cần Admin; nút lạ hoặc thiếu thì về `draft`
+- [x] **5.4** `ProductStatusMigrationTests` — `published`/`draft` không đổi,
+      `in_review`→`draft`, `rejected`→`disabled`
 
 ---
 
@@ -87,6 +94,7 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
 | I | Nối dây filter "Status" ở trang sản phẩm | 🔵 | [products.html:22](../grocerly/templates/useradmin/products.html#L22) là UI chết — `<select>` không có `name`, không nằm trong form |
 | J | Phân trang danh sách sản phẩm | 🔵 | Báo cáo UC 3.2.3 có nhắc, code không có |
 | K | Đổi mật khẩu 3 tài khoản mẫu in ở trang 108 báo cáo | 🔴 | Sau khi bảo vệ xong — repo public + site đang chạy thật |
+| L | Quyết định về cột `cartorder.stripe_payment_intent` | 🟡 | Field đã bị bỏ khỏi model từ commit `0925f27` nhưng **chưa từng có migration**, nên cột vẫn còn trên production. `makemigrations` sẽ luôn đòi tạo `RemoveField`. Cố ý **không** gộp vào migration 0005: đó là lệnh `DROP COLUMN` trên dữ liệu thật, phải là quyết định riêng |
 
 Mức độ: 🔴 nghiêm trọng · 🟠 lệch đặc tả · 🟡 tài liệu · 🔵 cải thiện
 

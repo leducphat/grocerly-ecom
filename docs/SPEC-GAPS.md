@@ -27,10 +27,12 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 | A8 | Không đổi được trạng thái khi đơn đã **Delivered** — UC 3.2.20 Exception Flow | `change_order_status` không kiểm tra gì | [useradmin/views.py](../grocerly/useradmin/views.py) |
 | A9 | Cập nhật **mã vận đơn** ở dashboard nhân viên — UC 3.2.20 Alternate Flow | Field `tracking_id` có trong model nhưng `useradmin` không có giao diện nhập (chỉ sửa được qua Django Admin) | — |
 | A10 | **Gửi email hàng loạt** cho người dùng — UC 3.2.22 Alternate Flow | Không có | — |
-| A11 | **Quy trình duyệt sản phẩm** (`in_review`) — UC 3.2.19, Hình 28, Hình 40 | `add_product` đặt thẳng `'published'` | [useradmin/views.py:89](../grocerly/useradmin/views.py#L89) |
+| A11 | **Quy trình duyệt sản phẩm** (`in_review`) — UC 3.2.19, Hình 28, Hình 40 | ⚠️ **Khoảng cách nay rộng hơn, có chủ ý.** `in_review`/`rejected` đã bị **xóa khỏi code** (2026-08-24); nhân viên tự bấm "Lưu nháp" / "Đăng bán" | [ADR-0002](DECISIONS.md) |
 
-> A11 **sẽ được xử lý bằng cách sửa báo cáo, không sửa code** — xem
-> [ADR-0002](DECISIONS.md). Các mục còn lại chờ quyết định.
+> A11 được xử lý bằng cách **sửa báo cáo cho khớp code**, không cài luồng duyệt — xem
+> [ADR-0002](DECISIONS.md). Phần code đã xong; phần báo cáo là
+> [PLAN.md](PLAN.md) giai đoạn 4 (UC 3.2.19, UC 3.2.24, Hình 28, Hình 29, bỏ Hình 40,
+> Bảng 30, Hình 4) — **chưa làm**. Các mục còn lại chờ quyết định.
 
 ## B. Code làm khác mô tả trong báo cáo
 

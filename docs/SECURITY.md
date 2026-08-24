@@ -13,7 +13,7 @@ mục dưới đây là **lỗi logic nghiệp vụ** mà framework không đỡ
 | S-01 | Bỏ qua thanh toán bằng cách truy cập URL | 🔴 Nghiêm trọng | ✅ Đã sửa 2026-08-24 |
 | S-02 | Giả mạo giá sản phẩm qua query string | 🔴 Nghiêm trọng | ✅ Đã sửa 2026-08-24 |
 | S-03 | Endpoint AI không xác thực, không giới hạn tần suất | 🟠 Cao | Chưa sửa |
-| S-04 | Rò rỉ sản phẩm chưa đăng bán qua API và chatbot | 🟠 Cao | Nằm trong [PLAN](PLAN.md) bước 3.1–3.2 |
+| S-04 | Rò rỉ sản phẩm chưa đăng bán qua API và chatbot | 🟠 Cao | ✅ Đã sửa 2026-08-24 |
 | S-05 | `SECRET_KEY` có giá trị mặc định | 🟡 Trung bình | Chưa sửa |
 | S-06 | Lộ thông tin đăng nhập production trong báo cáo | 🔴 Nghiêm trọng | Cần đổi mật khẩu sau bảo vệ |
 | S-07 | `except:` trần nuốt lỗi ở luồng đăng nhập | 🔵 Thấp | Chưa sửa |
@@ -126,20 +126,29 @@ lai), giới hạn độ dài `message` và số lượt `history`. Không nhấ
 
 ## S-04 — Rò rỉ sản phẩm chưa đăng bán
 
-**Vị trí:** [store_api/views.py:11](../grocerly/store_api/views.py#L11),
-[store_api/views.py:21](../grocerly/store_api/views.py#L21), `get_bestsellers`
+> ✅ **Đã sửa 2026-08-24** cùng lượt với [ADR-0002](DECISIONS.md). Test hồi quy:
+> `store_api/tests.py::DraftLeakTests`.
+
+**Vị trí:** `store_api/views.py` — `ProductListAPI`, `search_products`, `get_bestsellers`
 
 **Vấn đề:** Storefront lọc `product_status='published'`, nhưng `store_api` lọc
 `status=True, in_stock=True` — **hai tiêu chí khác nhau**. Sản phẩm ở trạng thái
 `draft`/`disabled` vẫn lọt qua API công khai và qua chatbot.
 
-Hiện tại tác động thấp vì `add_product` đặt mọi sản phẩm thành `published`. Nhưng khi
-[ADR-0002](DECISIONS.md) được triển khai và `draft` trở thành trạng thái thật, đây thành
-lỗi thấy được ngay: **chatbot sẽ tư vấn khách mua sản phẩm chưa đăng bán**.
+Trước đây tác động thấp vì `add_product` đặt mọi sản phẩm thành `published`. Từ khi
+[ADR-0002](DECISIONS.md) được triển khai và `draft` là trạng thái thật, đây là lỗi thấy
+được ngay: **chatbot sẽ tư vấn khách mua sản phẩm chưa đăng bán**. Vì vậy hai việc phải
+làm cùng một lượt.
 
-**Hướng sửa:** Bổ sung `product_status='published'` vào cả ba nơi. Tốt hơn nữa là gom
-điều kiện vào một manager method duy nhất (`Product.objects.published()`) để không tái
-diễn — [PLAN](PLAN.md) bước 3.3.
+**Đã sửa:** Cả ba nơi nay đi qua `Product.objects.published()`. Điều kiện hiển thị được
+gom về **một định nghĩa duy nhất** trong `ProductQuerySet.published()`
+([core/models.py](../grocerly/core/models.py)) thay cho 12 lần lặp
+`filter(product_status='published')` rải khắp `core/views.py` — chính sự lặp lại đó là
+lý do `store_api` bị bỏ sót ngay từ đầu.
+
+Hai cờ `status` và `in_stock` **vẫn được giữ** ở `store_api` (`published().filter(status=True,
+in_stock=True)`). Việc ba cờ chồng chéo là nợ kỹ thuật riêng, xem
+[ARCHITECTURE.md](ARCHITECTURE.md) mục 3.
 
 ---
 
