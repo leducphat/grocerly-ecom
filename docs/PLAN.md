@@ -4,9 +4,10 @@
 
 ## Đang triển khai — Bỏ luồng duyệt sản phẩm
 
-> **Trạng thái 2026-08-24:** Giai đoạn 1–3 và 5 đã xong ở phía code (27 test xanh).
-> Còn lại **bước 1.1** và **áp migration lên production** — cả hai cần người dùng cho
-> phép vì `.env` trỏ vào database thật. **Giai đoạn 4** là sửa file báo cáo, làm thủ công.
+> **Trạng thái 2026-08-24:** Giai đoạn 1, 2, 3, 5 **đã xong** (27 test xanh).
+> Migration 0005 chưa áp lên production nhưng đã xác minh là **no-op** (bước 1.1) — sẽ
+> tự chạy khi merge `develop` → `main` vì `build.sh` có lệnh `migrate`.
+> Còn lại: **Giai đoạn 4** — sửa file báo cáo, làm thủ công.
 
 Quyết định và lý do: [ADR-0002](DECISIONS.md#adr-0002--bỏ-quy-trình-duyệt-sản-phẩm-in_review).
 
@@ -19,9 +20,19 @@ Quyết định và lý do: [ADR-0002](DECISIONS.md#adr-0002--bỏ-quy-trình-du
 
 ### Giai đoạn 1 — Model & dữ liệu
 
-- [ ] **1.1** Đếm sản phẩm theo từng `product_status` trên Neon (chỉ SELECT) — biết bao
-      nhiêu bản ghi đang `in_review`/`rejected` cần chuyển. *Cần người dùng cho phép,
-      vì `.env` trỏ vào database production.*
+- [x] **1.1** Đếm trên Neon (chỉ SELECT, 2026-08-24):
+
+      | product_status | đã xóa mềm | số lượng |
+      |---|---|---|
+      | `published` | không | 7 |
+
+      **Toàn bộ 7 sản phẩm đang `published`, không có bản ghi nào `in_review` hay
+      `rejected`, không bản ghi nào bị xóa mềm.** Data migration sẽ đổi **0 dòng**.
+
+      `sqlmigrate core 0005` xác nhận `AlterField` là `-- (no-op)`: `choices` và
+      `default` là khái niệm tầng ứng dụng, Postgres không lưu, `max_length` không đổi.
+      Nên áp migration này lên production **không sinh DDL và không đổi dữ liệu** —
+      chỉ ghi thêm một dòng vào `django_migrations`.
 - [x] **1.2** [core/models.py](../grocerly/core/models.py) — `STATUS` còn
       `draft` / `published` / `disabled`
 - [x] **1.3** `Product.product_status` — `default='draft'`
