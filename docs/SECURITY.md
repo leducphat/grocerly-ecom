@@ -1,7 +1,7 @@
 # Ghi nhận vấn đề bảo mật
 
-> Rà soát ngày 2026-08-20 trên commit `42f6fdb`. Đây là tài liệu nội bộ của dự án,
-> phục vụ việc tự khắc phục.
+> Rà soát ngày 2026-08-20 trên commit `42f6fdb`, cập nhật 2026-08-24. Đây là tài liệu
+> nội bộ của dự án, phục vụ việc tự khắc phục.
 
 Báo cáo (mục 1.2.2 — Yêu cầu phi chức năng) cam kết *"mọi giao dịch thanh toán đều được
 thực hiện qua các kênh kết nối an toàn"* và *"có cơ chế ngăn chặn hiệu quả các cuộc tấn
@@ -10,19 +10,31 @@ mục dưới đây là **lỗi logic nghiệp vụ** mà framework không đỡ
 
 | Mã | Vấn đề | Mức | Trạng thái |
 |---|---|---|---|
-| S-01 | Bỏ qua thanh toán bằng cách truy cập URL | 🔴 Nghiêm trọng | Chưa sửa |
-| S-02 | Giả mạo giá sản phẩm qua query string | 🔴 Nghiêm trọng | Chưa sửa |
+| S-01 | Bỏ qua thanh toán bằng cách truy cập URL | 🔴 Nghiêm trọng | ✅ Đã sửa 2026-08-24 |
+| S-02 | Giả mạo giá sản phẩm qua query string | 🔴 Nghiêm trọng | ✅ Đã sửa 2026-08-24 |
 | S-03 | Endpoint AI không xác thực, không giới hạn tần suất | 🟠 Cao | Chưa sửa |
 | S-04 | Rò rỉ sản phẩm chưa đăng bán qua API và chatbot | 🟠 Cao | Nằm trong [PLAN](PLAN.md) bước 3.1–3.2 |
 | S-05 | `SECRET_KEY` có giá trị mặc định | 🟡 Trung bình | Chưa sửa |
 | S-06 | Lộ thông tin đăng nhập production trong báo cáo | 🔴 Nghiêm trọng | Cần đổi mật khẩu sau bảo vệ |
 | S-07 | `except:` trần nuốt lỗi ở luồng đăng nhập | 🔵 Thấp | Chưa sửa |
+| S-08 | Chốt chặn đánh giá chỉ nằm ở template | 🟠 Cao | ✅ Đã sửa 2026-08-24 |
+
+Các mục đã sửa đều có test hồi quy ở [core/tests.py](../grocerly/core/tests.py):
+
+```bash
+cd grocerly
+python manage.py test core --settings=grocerly.settings_test
+```
 
 ---
 
 ## S-01 — Bỏ qua thanh toán bằng cách truy cập URL
 
-**Vị trí:** [core/views.py:691](../grocerly/core/views.py#L691) — `payment_completed_view`
+> ✅ **Đã sửa 2026-08-24.** `payment_completed_view` không còn ghi `paid_status`; đơn
+> online chưa thanh toán bị đá về `/checkout/<oid>/` kèm cảnh báo. Test hồi quy:
+> `PaymentCompletedTests` trong [core/tests.py](../grocerly/core/tests.py).
+
+**Vị trí:** `core/views.py` — `payment_completed_view`
 
 ```python
 if order.payment_method == 'online' and order.paid_status == False:
@@ -41,15 +53,23 @@ không có đồng nào được chuyển. `oid` lấy được ngay từ URL c�
 `vnpay_return` (đã kiểm tra chữ ký) và `vnpay_ipn` (đã kiểm tra chữ ký + số tiền) đã làm
 đúng việc này rồi — đoạn code trên là dư thừa và phá vỡ toàn bộ vòng bảo vệ.
 
-**Hướng sửa:** Bỏ hẳn việc ghi `paid_status` trong view này. View chỉ nên *hiển thị* kết
-quả. Trạng thái thanh toán chỉ được đặt bởi `vnpay_return`/`vnpay_ipn` (online) hoặc khi
-nhân viên xác nhận giao hàng (COD).
+**Đã sửa:** Bỏ hẳn việc ghi `paid_status` trong view này. View chỉ *hiển thị* kết quả.
+Trạng thái thanh toán chỉ được đặt bởi `vnpay_return`/`vnpay_ipn` (online) hoặc khi nhân
+viên chuyển đơn COD sang `delivered`.
+
+Luồng thanh toán thành công **không bị ảnh hưởng**: `vnpay_return` đã đặt
+`paid_status = True` và `save()` **trước khi** redirect sang `payment-completed`, còn
+`place_cod_order` đã đổi `payment_method` sang `'cod'` nên không rơi vào nhánh cảnh báo.
 
 ---
 
 ## S-02 — Giả mạo giá sản phẩm
 
-**Vị trí:** [core/views.py:290](../grocerly/core/views.py#L290) — `add_to_cart`
+> ✅ **Đã sửa 2026-08-24.** `add_to_cart` chỉ còn nhận `id` và `qty`; tên, giá, ảnh đọc
+> từ database. Test hồi quy: `AddToCartPriceTamperingTests` trong
+> [core/tests.py](../grocerly/core/tests.py).
+
+**Vị trí:** `core/views.py` — `add_to_cart`
 
 ```python
 cart_product[str(request.GET['id'])] = {
@@ -67,9 +87,19 @@ cùng là số tiền gửi sang VNPay.
 `/add-to-cart/?id=5&title=X&qty=1&price=1&image=…&pid=…` → mua sản phẩm 500.000đ với
 giá 1đ. Không cần công cụ gì ngoài thanh địa chỉ.
 
-**Hướng sửa:** Chỉ nhận `id` (hoặc `pid`) và `qty` từ client. Đọc `title`, `price`,
-`image` từ `Product` trong database. Đây cũng là cơ hội kiểm tra luôn `stock_count`
-(mục A5 trong [SPEC-GAPS](SPEC-GAPS.md)).
+**Đã sửa:** Chỉ nhận `id` và `qty` từ client; `title`, `price`, `image` đọc từ
+`Product`. Kèm theo ba chốt chặn phát sinh tự nhiên từ việc truy vấn database:
+
+- `id` không phải số → `400`
+- sản phẩm không ở trạng thái `published` → `404` (chặn trước một phần [S-04](#s-04--rò-rỉ-sản-phẩm-chưa-đăng-bán) ở phía storefront)
+- `qty` vượt `stock_count` → `400`, đóng mục **A5** trong [SPEC-GAPS](SPEC-GAPS.md)
+
+`update_cart` cũng phải kiểm `stock_count`, nếu không chốt chặn ở `add_to_cart` vô nghĩa
+— thêm 1 rồi update lên 999 là qua.
+
+Hai JS gọi endpoint này ([base.html](../grocerly/templates/partials/base.html) dòng ~820
+cho nút "Add" và ~1116 cho luồng xác nhận của chatbot) vẫn gửi dư `title`/`price`/`image`.
+Server bỏ qua nên **không cần sửa template** — nhưng đây là rác nên dọn khi có dịp.
 
 ---
 
@@ -165,3 +195,44 @@ bị nuốt, không log, rất khó chẩn đoán khi sự cố xảy ra lúc de
 **Hướng sửa:** Bắt đúng `User.DoesNotExist`. Thực ra khối `try` này không cần thiết:
 `authenticate()` đã trả `None` khi thông tin sai, nên có thể bỏ hẳn truy vấn
 `User.objects.get()` phía trên.
+
+---
+
+## S-08 — Chốt chặn đánh giá chỉ nằm ở template
+
+> ✅ **Đã sửa 2026-08-24.** Test hồi quy: `AddReviewTests` trong
+> [core/tests.py](../grocerly/core/tests.py).
+
+**Vị trí:** `core/views.py` — `ajax_add_review`
+
+**Vấn đề:** View tạo `ProductReview` vô điều kiện — không `@login_required`, không kiểm
+tra trùng, không kiểm tra `rating` hợp lệ. Điều kiện "mỗi user chỉ đánh giá một lần" chỉ
+được tính ở **context của template** (`make_review`), tức là chỉ để *ẩn cái form đi*:
+
+```python
+def ajax_add_review(request, p_id):        # không có decorator
+    product = Product.objects.get(pk=p_id)
+    review = ProductReview.objects.create(
+        user=request.user,                  # AnonymousUser → 500
+        rating=request.POST['rating'],      # không kiểm giá trị
+    )
+```
+
+**Kịch bản khai thác:**
+
+1. POST thẳng vào `/vi/ajax-add-review/<id>/` bỏ qua form → một tài khoản spam vô hạn
+   đánh giá 5 sao, đẩy điểm trung bình sản phẩm lên tùy ý.
+2. Khách **chưa đăng nhập** POST vào cùng URL → `AnonymousUser` không gán được vào khóa
+   ngoại `user` → **500**. Nghĩa là đây vừa là lỗ hổng, vừa là lỗi làm sập trang.
+
+**Đã sửa:** Thêm `@login_required`, chỉ nhận `POST`, kiểm tra trùng bằng
+`ProductReview.objects.filter(user=..., product=...).exists()`, bắt buộc `review` không
+rỗng và `rating` phải nằm trong `RATING`.
+
+**Còn lại:** Điều kiện *"phải mua hàng rồi mới được đánh giá"* (UC 3.2.14 Pre-Conditions,
+mục **A2** trong [SPEC-GAPS](SPEC-GAPS.md)) **vẫn chưa được cài** — đây là việc riêng.
+
+**Ghi chú UX (có sẵn từ trước, không do lần sửa này):** form `#commentForm` trong
+`product-detail.html` **không có JS xử lý** dù URL tên là `ajax-*` — nó submit cả trang và
+người dùng nhìn thấy JSON thô. Sửa được bằng cách thêm một handler `$.ajax` giống các
+endpoint giỏ hàng.

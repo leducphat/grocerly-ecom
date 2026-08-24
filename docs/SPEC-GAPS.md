@@ -1,6 +1,6 @@
 # Khoảng cách giữa báo cáo và code
 
-> Đối chiếu ngày 2026-08-20 với commit `42f6fdb`.
+> Đối chiếu ngày 2026-08-20 với commit `42f6fdb`, cập nhật 2026-08-24.
 > Nguồn: `CLC_CNPM_1_LEDUCPHAT.pdf` — *"Xây dựng website bán thực phẩm tích hợp trợ lý AI
 > tự động đặt hàng"*, tiểu luận chuyên ngành CNPM, HCMUTE.
 
@@ -18,10 +18,10 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 | # | Báo cáo | Thực tế | Kiểm chứng |
 |---|---|---|---|
 | A1 | **Sửa & Xóa đánh giá** — UC 3.2.14, Hình 22–23 ghi rõ `core.views.ajax_edit_review`, `ajax_delete_review` | Không tồn tại. [core/urls.py](../grocerly/core/urls.py) chỉ có `ajax-add-review` | `grep -rn "edit_review\|delete_review"` → rỗng |
-| A2 | Đánh giá yêu cầu **đã mua hàng (đơn Shipped)** — UC 3.2.14 Pre-Conditions | Chỉ chặn khi user đã review sản phẩm đó 1 lần. Ai đăng nhập cũng đánh giá được | [core/views.py:172](../grocerly/core/views.py#L172) |
+| A2 | Đánh giá yêu cầu **đã mua hàng (đơn Shipped)** — UC 3.2.14 Pre-Conditions | **Vẫn thiếu.** Ai đăng nhập cũng đánh giá được. (Điều kiện "mỗi user 1 lần" nay đã được kiểm ở server — [S-08](SECURITY.md#s-08--chốt-chặn-đánh-giá-chỉ-nằm-ở-template) — trước đó chỉ ẩn form ở template) | `ajax_add_review` |
 | A3 | **Phân trang** — UC 3.2.3 Alternate Flow | Không có `Paginator` ở đâu | `grep -rn "Paginator\|paginate"` → rỗng |
 | A4 | **"Làm sạch giỏ hàng"** — UC 3.2.6 Alternate Flow | Không có view/URL | `grep -rn "clear_cart"` → rỗng |
-| A5 | Cập nhật SL **vượt tồn kho → báo lỗi** — UC 3.2.6 Exception Flow | `add_to_cart`/`update_cart` không đọc `stock_count` | `grep -n "stock_count" core/views.py` → rỗng |
+| A5 | ~~Cập nhật SL **vượt tồn kho → báo lỗi** — UC 3.2.6 Exception Flow~~ | ✅ **Đã đóng 2026-08-24** — `add_to_cart` và `update_cart` đều kiểm `stock_count`, trả `400` kèm số lượng còn lại | Sửa cùng [S-02](SECURITY.md#s-02--giả-mạo-giá-sản-phẩm) |
 | A6 | Coupon có **ngày hết hạn** và **số lượt đã dùng** — UC 3.2.21 | Model `Coupon` chỉ có `code`, `discount`, `active` | [core/models.py](../grocerly/core/models.py) |
 | A7 | **Hủy đơn (Cancel)** — UC 3.2.25 | `STATUS_CHOICES` chỉ có `processing`/`shipped`/`delivered` | [core/models.py:9](../grocerly/core/models.py#L9) |
 | A8 | Không đổi được trạng thái khi đơn đã **Delivered** — UC 3.2.20 Exception Flow | `change_order_status` không kiểm tra gì | [useradmin/views.py](../grocerly/useradmin/views.py) |

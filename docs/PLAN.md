@@ -1,6 +1,6 @@
 # Kế hoạch công việc
 
-> Cập nhật: 2026-08-20 · Nhánh làm việc: `develop`
+> Cập nhật: 2026-08-24 · Nhánh làm việc: `develop`
 
 ## Đang triển khai — Bỏ luồng duyệt sản phẩm
 
@@ -76,11 +76,11 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
 
 | # | Việc | Mức | Ghi chú |
 |---|---|---|---|
-| A | Vá lỗ hổng `payment_completed_view` tự set `paid_status=True` | 🔴 | [S-01](SECURITY.md) — mâu thuẫn trực tiếp yêu cầu phi chức năng mục 1.2.2 của báo cáo |
-| B | `add_to_cart` đọc giá từ DB thay vì query string | 🔴 | [S-02](SECURITY.md) |
+| ~~A~~ | ~~Vá lỗ hổng `payment_completed_view` tự set `paid_status=True`~~ | ✅ | Xong 2026-08-24 — [S-01](SECURITY.md) |
+| ~~B~~ | ~~`add_to_cart` đọc giá từ DB thay vì query string~~ | ✅ | Xong 2026-08-24 — [S-02](SECURITY.md), đóng luôn A5 của [SPEC-GAPS](SPEC-GAPS.md) |
 | C | Giới hạn truy cập `/api/v1/chat/` | 🟠 | [S-03](SECURITY.md) — hiện ai cũng đốt được quota Gemini |
 | D | Sửa/Xóa đánh giá sản phẩm | 🟠 | Báo cáo có (UC 3.2.14, Hình 22–23), code không — [SPEC-GAPS](SPEC-GAPS.md) |
-| E | Điều kiện "đã mua mới được đánh giá" | 🟠 | Báo cáo yêu cầu, code chỉ chặn trùng lặp |
+| E | Điều kiện "đã mua mới được đánh giá" | 🟠 | Báo cáo yêu cầu ([A2](SPEC-GAPS.md)); chốt chặn trùng lặp đã chuyển về server ở [S-08](SECURITY.md) nhưng điều kiện đã mua thì chưa có |
 | F | Actor generalization + đổi thuật ngữ Vendor | 🟡 | [ADR-0001](DECISIONS.md), [ADR-0003](DECISIONS.md) |
 | G | Bổ sung test case AI Chatbot + VNPay vào chương 4 | 🟡 | Hiện chỉ có 5 TC, không TC nào cho 2 điểm nhấn của đề tài |
 | H | Sửa lỗi đánh số mục/hình trong báo cáo | 🟡 | Trùng số mục 3.5; Hình trang 92 ghi sai "Hình 3.5.23" |
@@ -89,6 +89,33 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
 | K | Đổi mật khẩu 3 tài khoản mẫu in ở trang 108 báo cáo | 🔴 | Sau khi bảo vệ xong — repo public + site đang chạy thật |
 
 Mức độ: 🔴 nghiêm trọng · 🟠 lệch đặc tả · 🟡 tài liệu · 🔵 cải thiện
+
+---
+
+## Đã xong
+
+### 2026-08-24 — Vá ba lỗ hổng nghiệp vụ
+
+Backlog **A** + **B** + [S-08](SECURITY.md#s-08--chốt-chặn-đánh-giá-chỉ-nằm-ở-template)
+(phát hiện thêm trong lúc rà), kèm mục **A5** của [SPEC-GAPS](SPEC-GAPS.md).
+Chỉ chạm `core/views.py` — **không sửa model, không migration**, nên không sequence
+diagram nào của báo cáo bị lệch.
+
+Kèm theo:
+
+- [core/tests.py](../grocerly/core/tests.py) — 12 test hồi quy, tái hiện đúng kịch bản
+  khai thác. Chạy trên code cũ: 9 đỏ. Đây là **test tự động đầu tiên** của dự án.
+- [grocerly/settings_test.py](../grocerly/grocerly/settings_test.py) — ép SQLite
+  in-memory. Cần thiết vì `.env` trỏ DB production: `manage.py test` với settings mặc
+  định sẽ tạo database `test_*` **trên Neon**.
+
+```bash
+cd grocerly
+python manage.py test core --settings=grocerly.settings_test
+```
+
+Việc này **đóng góp được cho mục G** của backlog (báo cáo chương 4 chỉ có 5 test case):
+12 test case tự động cho luồng giỏ hàng / thanh toán / đánh giá.
 
 ---
 

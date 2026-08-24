@@ -1,6 +1,6 @@
 # Kiến trúc hệ thống Grocerly
 
-> Cập nhật: 2026-08-20 · Đối chiếu với commit `42f6fdb`
+> Cập nhật: 2026-08-24 · Đối chiếu với commit `42f6fdb` + bản vá S-01/S-02/S-08
 
 ## 1. Bối cảnh nghiệp vụ
 
@@ -119,8 +119,11 @@ vào giỏ mà không cần đăng nhập.
 Helper `safe_float()` / `safe_int()` trong [core/views.py](../grocerly/core/views.py)
 xử lý định dạng số kiểu Việt Nam (dấu chấm ngăn nghìn) đến từ template.
 
-⚠️ Giá được **client gửi lên qua query string**, server không đọc lại từ DB → xem
-[SECURITY.md](SECURITY.md) mục S-02.
+`add_to_cart` chỉ nhận `id` + `qty` từ client; `title`, `price`, `image` đọc lại từ
+`Product`, kèm kiểm `product_status='published'` và `stock_count`. Trước 2026-08-24 giá
+lấy thẳng từ query string — xem [SECURITY.md](SECURITY.md) mục S-02.
+
+Hai JS gọi endpoint này vẫn gửi dư `title`/`price`/`image`; server bỏ qua.
 
 ### 4.2 Đặt hàng & thanh toán
 
@@ -228,7 +231,7 @@ khi `settings.py` hiện chỉ hiểu `USE_CLOUDINARY` — cấu hình này đã
 
 | # | Vấn đề | Ảnh hưởng |
 |---|---|---|
-| 1 | Không có test tự động (4 `tests.py` rỗng) | Mọi thay đổi phải kiểm thử tay |
+| 1 | Test chỉ phủ 3 luồng đã vá ở `core` (12 test); `userauths`/`useradmin`/`store_api` vẫn rỗng | Phần lớn thay đổi vẫn phải kiểm thử tay |
 | 2 | Truy vấn không `select_related` → N+1 | Chậm khi dữ liệu lớn |
 | 3 | Không phân trang ở mọi trang danh sách | Tải toàn bộ sản phẩm mỗi request |
 | 4 | `useradmin` không giới hạn phạm vi theo nhân viên | Mọi staff thấy toàn bộ dữ liệu |

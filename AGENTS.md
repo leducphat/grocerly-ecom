@@ -33,8 +33,18 @@ python manage.py compilemessages    # biên dịch .po -> .mo sau khi sửa bả
 python manage.py makemessages -l vi # trích chuỗi cần dịch
 ```
 
-Chưa có test tự động (4 file `tests.py` đều là stub rỗng). Kiểm thử hiện tại là thủ công
-theo kịch bản hộp đen ở chương 4 báo cáo.
+```bash
+# Test phải chạy với settings riêng — xem cảnh báo bên dưới
+python manage.py test core --settings=grocerly.settings_test
+```
+
+⚠️ **Luôn dùng `--settings=grocerly.settings_test` khi chạy test.** Với settings mặc định,
+`manage.py test` sẽ tạo database `test_<tên-db>` **trên máy chủ production Neon** (bẫy #5).
+Module này ép SQLite in-memory.
+
+Hiện chỉ [core/tests.py](grocerly/core/tests.py) có test (12 test hồi quy cho các lỗ hổng
+đã vá ở [docs/SECURITY.md](docs/SECURITY.md)). `userauths`, `useradmin`, `store_api` vẫn là
+stub rỗng — các luồng đó kiểm thử thủ công theo kịch bản hộp đen ở chương 4 báo cáo.
 
 ## Ngăn xếp công nghệ
 
@@ -120,6 +130,7 @@ Chi tiết kiến trúc và luồng xử lý: [docs/ARCHITECTURE.md](docs/ARCHIT
 ## Trước khi báo hoàn thành
 
 - [ ] Đã chạy `python manage.py check` không lỗi
+- [ ] Đã chạy `python manage.py test core --settings=grocerly.settings_test` không đỏ
 - [ ] Nếu sửa model: đã tạo migration và giải thích ảnh hưởng tới dữ liệu hiện có
 - [ ] Nếu thêm chuỗi hiển thị: đã bọc i18n và cập nhật `locale/vi/LC_MESSAGES/django.po`
 - [ ] Nếu sửa chức năng có trong báo cáo: đã ghi chú cần cập nhật mục nào
