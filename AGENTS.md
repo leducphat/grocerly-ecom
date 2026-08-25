@@ -3,6 +3,21 @@
 Chỉ dẫn cho AI coding agent làm việc trong repo **Grocerly**.
 Đây là **nguồn duy nhất** — `CLAUDE.md` và `.github/copilot-instructions.md` đều trỏ về file này.
 
+## Bắt đầu một phiên làm việc
+
+File này tự động được nạp, nhưng `docs/` thì **không**. Đọc theo thứ tự:
+
+1. **[docs/PLAN.md](docs/PLAN.md)** — luôn đọc trước. Có bối cảnh hiện tại, việc đang
+   làm, và mục *Đã xong* để biết cái gì **không** cần làm lại.
+2. **[docs/DECISIONS.md](docs/DECISIONS.md)** — trước khi định "sửa cho hợp lý" một chỗ
+   trông có vẻ sai. Nhiều chỗ trông sai là do đã cân nhắc rồi chốt.
+3. Còn lại đọc khi cần: [SPEC-GAPS](docs/SPEC-GAPS.md) trước khi khẳng định một chức
+   năng tồn tại · [SECURITY](docs/SECURITY.md) khi đụng thanh toán, giỏ hàng, đánh giá ·
+   [ARCHITECTURE](docs/ARCHITECTURE.md) khi cần bản đồ tổng thể.
+
+**Không cần đọc toàn bộ repo mỗi lần.** Bốn file trên cộng mục *Bẫy đã biết* bên dưới đã
+đủ để không phá thứ gì. Việc quét code chỉ cần khi PLAN không trả lời được câu hỏi.
+
 ## Dự án là gì
 
 Grocerly là website thương mại điện tử bán thực phẩm/tạp hóa, có tích hợp trợ lý AI
