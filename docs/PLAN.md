@@ -111,7 +111,7 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
 | ~~I~~ | ~~Nối dây filter "Status" ở trang sản phẩm~~ | ✅ | Xong 2026-08-25. Ba lựa chọn cũ (*Active / Disabled / Show all*) còn **không khớp** giá trị model, nên có nối dây nguyên trạng cũng sai — đã thay bằng đúng `draft`/`published`/`disabled` kèm số lượng |
 | J | Phân trang danh sách sản phẩm | 🔵 | Báo cáo UC 3.2.3 có nhắc, code không có |
 | K | Đổi mật khẩu 3 tài khoản mẫu in ở trang 108 báo cáo | 🔴 | Sau khi bảo vệ xong — repo public + site đang chạy thật |
-| L | Quyết định về cột `cartorder.stripe_payment_intent` | 🟡 | Field đã bị bỏ khỏi model từ commit `0925f27` nhưng **chưa từng có migration**, nên cột vẫn còn trên production. `makemigrations` sẽ luôn đòi tạo `RemoveField`. Cố ý **không** gộp vào migration 0005: đó là lệnh `DROP COLUMN` trên dữ liệu thật, phải là quyết định riêng |
+| L | Drop cột `core_cartorder.stripe_payment_intent` | 🔵 | Tàn dư template: Stripe bị bỏ ở `0925f27`, **trước** khi VNPay vào ở `51c4b96`; dự án chưa bao giờ dùng Stripe. Field đã rời model nhưng **chưa từng có migration** nên cột vẫn còn trên production và `makemigrations` sẽ luôn đòi tạo `RemoveField`. **Đã kiểm production 2026-08-25: 11 đơn hàng, 0 đơn có dữ liệu ở cột này** — drop không mất gì. Hoãn theo yêu cầu: `DROP COLUMN` là DDL thật, không rollback được. Package `stripe` và biến `STRIPE_*` ở `.env.example` đã dọn. Trước khi drop nên kiểm ERD (Hình 45) và Bảng 28 của báo cáo có liệt kê cột này không |
 
 Mức độ: 🔴 nghiêm trọng · 🟠 lệch đặc tả · 🟡 tài liệu · 🔵 cải thiện
 
