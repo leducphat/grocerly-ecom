@@ -173,3 +173,62 @@ cũng sẽ lệch y hệt.
 ### Hệ quả
 
 Sửa chỉ dẫn ở một chỗ duy nhất. Ba công cụ AI khác nhau đọc cùng một nội dung.
+
+---
+
+## ADR-0005 — Không cài điều kiện "đã mua mới được đánh giá"
+
+**Trạng thái:** Đã chốt · 2026-08-25 · Hệ quả: [SPEC-GAPS](SPEC-GAPS.md) A2,
+[PLAN.md](PLAN.md) bước 4.7
+
+### Bối cảnh
+
+UC 3.2.14 Pre-Conditions yêu cầu khách phải **đã mua hàng (đơn Shipped)** mới được đánh
+giá. Code hiện chỉ chặn mỗi người một đánh giá cho mỗi sản phẩm.
+
+Để cài điều kiện này phải trả lời được: *"người này đã mua sản phẩm kia chưa?"*. Nhưng
+`CartOrderItem` **không có khóa ngoại tới `Product`** — nó lưu snapshot dạng chuỗi:
+
+```python
+class CartOrderItem(models.Model):
+    order = models.ForeignKey(CartOrder, ...)
+    item = models.CharField(max_length=200)   # chỉ có TÊN sản phẩm
+```
+
+Snapshot là thiết kế **có chủ ý** (hóa đơn không đổi khi sản phẩm bị sửa hay xóa), nhưng
+hệ quả là không truy ngược được về sản phẩm gốc.
+
+### Quyết định
+
+**Không cài.** Chuyển yêu cầu này xuống mục *Hướng phát triển* của báo cáo.
+
+### Lý do
+
+Chỉ còn cách so khớp theo tên — đúng nguồn gốc nợ kỹ thuật #6 ở
+[ARCHITECTURE.md](ARCHITECTURE.md) (`change_order_status` trừ kho sai khi trùng tên).
+Hai lỗi âm thầm đi kèm:
+
+- Nhân viên **sửa tên sản phẩm** sau khi bán → người mua thật **mất quyền đánh giá**
+- Hai sản phẩm **trùng tên** → mua cái này lại đánh giá được cái kia
+
+Sai kiểu này tệ hơn là không có điều kiện: nó chặn nhầm người dùng hợp lệ mà không báo
+lý do, và chỉ lộ ra khi ai đó đổi tên sản phẩm.
+
+Thêm nữa, bật điều kiện lên thì muốn demo chức năng đánh giá phải dựng sẵn đơn đã giao —
+thêm ma sát cho đúng buổi bảo vệ.
+
+### Phương án đã cân nhắc
+
+| Phương án | Đánh giá |
+|---|---|
+| Khớp theo tên | Không migration, nhưng chặn nhầm người mua thật khi tên đổi |
+| Thêm FK `Product` vào `CartOrderItem` | Đúng dữ liệu và vá luôn nợ #6, nhưng phải sửa `save_checkout_info` — luồng rủi ro nhất, lại có sequence diagram trong báo cáo — cộng một migration nữa lên production ngay trước bảo vệ |
+| **Bỏ, sửa báo cáo** ✔ | Nhất quán với [ADR-0002](DECISIONS.md): khi code và báo cáo lệch nhau, sửa bên nào rẻ và đúng hơn |
+
+### Hệ quả
+
+- Ai đăng nhập cũng đánh giá được, mỗi người một lần cho mỗi sản phẩm.
+- Nếu sau này muốn cài, **việc cần làm trước là thêm FK** cho `CartOrderItem`, không phải
+  viết thêm điều kiện ở view.
+- Báo cáo phải sửa UC 3.2.14 Pre-Conditions — [PLAN.md](PLAN.md) bước 4.7. Phần *Sửa &
+  Xóa đánh giá* của cùng use case thì giữ nguyên, đã cài xong 2026-08-25.

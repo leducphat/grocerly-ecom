@@ -18,7 +18,7 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 | # | Báo cáo | Thực tế | Kiểm chứng |
 |---|---|---|---|
 | A1 | ~~**Sửa & Xóa đánh giá** — UC 3.2.14, Hình 22–23~~ | ✅ **Đã đóng 2026-08-25** — `ajax_edit_review` và `ajax_delete_review` đúng tên báo cáo ghi, kèm nút Sửa/Xóa ở trang chi tiết. Chỉ chủ đánh giá đụng được; của người khác trả 404 | `EditDeleteReviewTests` |
-| A2 | Đánh giá yêu cầu **đã mua hàng (đơn Shipped)** — UC 3.2.14 Pre-Conditions | **Vẫn thiếu.** Ai đăng nhập cũng đánh giá được. (Điều kiện "mỗi user 1 lần" nay đã được kiểm ở server — [S-08](SECURITY.md#s-08--chốt-chặn-đánh-giá-chỉ-nằm-ở-template) — trước đó chỉ ẩn form ở template) | `ajax_add_review` |
+| A2 | Đánh giá yêu cầu **đã mua hàng (đơn Shipped)** — UC 3.2.14 Pre-Conditions | ⛔ **Cố ý không cài** — [ADR-0005](DECISIONS.md). Ai đăng nhập cũng đánh giá được, mỗi người một lần (kiểm ở server từ [S-08](SECURITY.md#s-08--chốt-chặn-đánh-giá-chỉ-nằm-ở-template)). **Đóng bằng cách sửa báo cáo**, xem [PLAN](PLAN.md) bước 4.7 | `ajax_add_review` |
 | A3 | **Phân trang** — UC 3.2.3 Alternate Flow | Không có `Paginator` ở đâu | `grep -rn "Paginator\|paginate"` → rỗng |
 | A4 | **"Làm sạch giỏ hàng"** — UC 3.2.6 Alternate Flow | Không có view/URL | `grep -rn "clear_cart"` → rỗng |
 | A5 | ~~Cập nhật SL **vượt tồn kho → báo lỗi** — UC 3.2.6 Exception Flow~~ | ✅ **Đã đóng 2026-08-24** — `add_to_cart` và `update_cart` đều kiểm `stock_count`, trả `400` kèm số lượng còn lại | Sửa cùng [S-02](SECURITY.md#s-02--giả-mạo-giá-sản-phẩm) |

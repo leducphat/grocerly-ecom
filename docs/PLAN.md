@@ -78,6 +78,9 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
       trong câu UPDATE
 - [ ] **4.5** Bảng 30 (tr.57), dòng `product_status`: cập nhật giá trị hợp lệ
 - [ ] **4.6** Hình 4: bỏ liên kết duyệt sản phẩm của Quản trị viên
+- [ ] **4.7** UC 3.2.14 Pre-Conditions: bỏ vế *"đã mua hàng (đơn Shipped)"*, chuyển
+      xuống *Hướng phát triển* kèm lý do ở [ADR-0005](DECISIONS.md). Phần *Sửa & Xóa
+      đánh giá* của cùng use case thì **giữ nguyên** — đã cài đặt xong
 
 ### Giai đoạn 5 — Kiểm thử
 
@@ -102,7 +105,6 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
 | ~~B~~ | ~~`add_to_cart` đọc giá từ DB thay vì query string~~ | ✅ | Xong 2026-08-24 — [S-02](SECURITY.md), đóng luôn A5 của [SPEC-GAPS](SPEC-GAPS.md) |
 | ~~C~~ | ~~Giới hạn truy cập `/api/v1/chat/`~~ | ✅ | Xong 2026-08-25 — [S-03](SECURITY.md). Còn thiếu trần theo ngày toàn hệ thống, xem ghi chú ở S-03 |
 | ~~D~~ | ~~Sửa/Xóa đánh giá sản phẩm~~ | ✅ | Xong 2026-08-25 — đóng [A1](SPEC-GAPS.md). Tên hàm đặt đúng như Hình 22–23 để khớp báo cáo |
-| E | Điều kiện "đã mua mới được đánh giá" | 🟠 | Báo cáo yêu cầu ([A2](SPEC-GAPS.md)); chốt chặn trùng lặp đã chuyển về server ở [S-08](SECURITY.md) nhưng điều kiện đã mua thì chưa có |
 | F | Actor generalization + đổi thuật ngữ Vendor | 🟡 | [ADR-0001](DECISIONS.md), [ADR-0003](DECISIONS.md) |
 | G | Bổ sung test case AI Chatbot + VNPay vào chương 4 | 🟡 | Hiện chỉ có 5 TC, không TC nào cho 2 điểm nhấn của đề tài |
 | H | Sửa lỗi đánh số mục/hình trong báo cáo | 🟡 | Trùng số mục 3.5; Hình trang 92 ghi sai "Hình 3.5.23" |
@@ -151,3 +153,4 @@ Việc này **đóng góp được cho mục G** của backlog (báo cáo chươ
 | Refactor `useradmin` để scope theo vendor | Không cần nữa nếu chấp nhận [ADR-0003](DECISIONS.md) |
 | Chuyển giỏ hàng từ session sang model | Session hoạt động tốt, cho phép khách vãng lai mua hàng; đổi sẽ phá nhiều sequence diagram |
 | Commit thư mục `.claude/` vào repo | [ADR-0004](DECISIONS.md) |
+| Điều kiện "đã mua mới được đánh giá" (mục E cũ) | [ADR-0005](DECISIONS.md) — `CartOrderItem` không có FK tới `Product` nên không trả lời tin cậy được câu "người này đã mua sản phẩm kia chưa". Chuyển sang *Hướng phát triển* của báo cáo |
