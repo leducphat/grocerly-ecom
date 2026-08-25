@@ -1,12 +1,16 @@
 # Khoảng cách giữa báo cáo và code
 
-> Đối chiếu ngày 2026-08-20 với commit `42f6fdb`, cập nhật 2026-08-24.
+> Đối chiếu ngày 2026-08-20, cập nhật 2026-08-25 sau khi **đọc trực tiếp bản gốc**.
 > Nguồn: `CLC_CNPM_1_LEDUCPHAT.pdf` — *"Xây dựng website bán thực phẩm tích hợp trợ lý AI
 > tự động đặt hàng"*, tiểu luận chuyên ngành CNPM, HCMUTE.
+>
+> ⚠️ **Tiểu luận đã nộp và có điểm.** File này giờ phục vụ **Khóa luận tốt nghiệp** —
+> cùng đề tài, cùng GVHD. Xem [PLAN.md](PLAN.md).
 
 ## Vì sao cần file này
 
-Báo cáo đặc tả 26 use case và 43 sequence diagram. Một số mô tả **chức năng chưa được
+Báo cáo đặc tả **26 use case** (Bảng 1–26) và **39 lược đồ tuần tự** (Hình 5–43),
+tổng cộng 75 hình và 75 bảng. Một số mô tả **chức năng chưa được
 cài đặt**. Với đồ án sắp bảo vệ, đây là rủi ro cụ thể: giảng viên phản biện chỉ cần mở
 đúng sequence diagram và yêu cầu demo.
 
@@ -18,7 +22,7 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 | # | Báo cáo | Thực tế | Kiểm chứng |
 |---|---|---|---|
 | A1 | ~~**Sửa & Xóa đánh giá** — UC 3.2.14, Hình 22–23~~ | ✅ **Đã đóng 2026-08-25** — `ajax_edit_review` và `ajax_delete_review` đúng tên báo cáo ghi, kèm nút Sửa/Xóa ở trang chi tiết. Chỉ chủ đánh giá đụng được; của người khác trả 404 | `EditDeleteReviewTests` |
-| A2 | Đánh giá yêu cầu **đã mua hàng (đơn Shipped)** — UC 3.2.14 Pre-Conditions | ⛔ **Cố ý không cài** — [ADR-0005](DECISIONS.md). Ai đăng nhập cũng đánh giá được, mỗi người một lần (kiểm ở server từ [S-08](SECURITY.md#s-08--chốt-chặn-đánh-giá-chỉ-nằm-ở-template)). **Đóng bằng cách sửa báo cáo**, xem [PLAN](PLAN.md) bước 4.7 | `ajax_add_review` |
+| A2 | Đánh giá yêu cầu **đã mua hàng (đơn Shipped)** — UC 3.2.14 Pre-Conditions **và Hình 21** | 🔜 **Sẽ cài** — [ADR-0006](DECISIONS.md) đảo ngược ADR-0005. Hiện ai đăng nhập cũng đánh giá được, mỗi người một lần (kiểm ở server từ [S-08](SECURITY.md#s-08--chốt-chặn-đánh-giá-chỉ-nằm-ở-template)). Cần thêm khóa ngoại cho `CartOrderItem` trước — [PLAN](PLAN.md) bước 2.11–2.12. **Báo cáo giữ nguyên** | `ajax_add_review` |
 | A3 | **Phân trang** — UC 3.2.3 Alternate Flow | Không có `Paginator` ở đâu | `grep -rn "Paginator\|paginate"` → rỗng |
 | A4 | **"Làm sạch giỏ hàng"** — UC 3.2.6 Alternate Flow | Không có view/URL | `grep -rn "clear_cart"` → rỗng |
 | A5 | ~~Cập nhật SL **vượt tồn kho → báo lỗi** — UC 3.2.6 Exception Flow~~ | ✅ **Đã đóng 2026-08-24** — `add_to_cart` và `update_cart` đều kiểm `stock_count`, trả `400` kèm số lượng còn lại | Sửa cùng [S-02](SECURITY.md#s-02--giả-mạo-giá-sản-phẩm) |
@@ -43,7 +47,12 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 | B3 | **Hình 30** — Xóa sản phẩm: có nhánh kiểm tra đơn hàng liên quan rồi mới xóa mềm/cứng | `delete_product` gọi thẳng `product.delete()` — mà `SoftDeleteModel` không override `delete()` ở tầng instance nên **xóa cứng vô điều kiện** |
 | B4 | **ERD (Hình 45)** — `core_product.tags` là cột `VARCHAR` | `django-taggit` lưu ở bảng riêng (`taggit_tag`, `taggit_taggeditem`). ERD cũng thiếu bảng nối M2M `cartorder ↔ coupon` |
 | B5 | **Bảng 28** mô tả `core_tag` như một bảng thật | `core.models.Tag` là `class Tag(models.Model): pass` — model rỗng không dùng |
-| B6 | Định vị **multi-vendor**, "Người bán" có gian hàng riêng | `Vendor` thực chất là thương hiệu/nhà cung cấp — xem [ADR-0003](DECISIONS.md) |
+| B6 | Định vị **multi-vendor**, "Người bán" có gian hàng riêng | `Vendor` thực chất là thương hiệu/nhà cung cấp. [ADR-0003](DECISIONS.md) **đã chốt 2026-08-25** → sửa báo cáo, xem [PLAN](PLAN.md) bước 3.9–3.11 |
+| B7 | **Hình 10** (Thêm vào giỏ) vẽ 4 lifeline, **không có Product Model / Database**; ghi *"Cộng thêm số lượng"* và dùng POST | Sau [S-02](SECURITY.md), `add_to_cart` **bắt buộc** truy vấn database để lấy giá; code **ghi đè** số lượng và dùng GET |
+| B8 | **Hình 11** (Cập nhật giỏ) có nhánh `[Số lượng mới = 0] Xóa sản phẩm khỏi Session` | Code ép tối thiểu là 1, không xóa; và nay có thêm bước kiểm tồn kho mà hình chưa vẽ |
+| B9 | **Không có lược đồ tuần tự nào cho `vnpay_ipn`** | IPN là chỗ kiểm chữ ký, kiểm số tiền và chống xác nhận trùng — phần đáng trình bày nhất của tích hợp VNPay lại không có hình |
+| B10 | **Bảng 30** mô tả `product_status` là *"Trạng thái xử lý"* | Giống hệt mô tả ở Bảng 32 và 33 dù nghĩa hoàn toàn khác (đăng bán vs giao hàng) — báo cáo đang che mất bẫy #1 |
+| B11 | **ERD Hình 45 và Bảng 32 không có `cartorder.stripe_payment_intent`** | Cột **có thật** trên production (tàn dư template Stripe). Ở đây báo cáo đúng còn code sai → drop cột sẽ làm hai bên khớp, xem [PLAN](PLAN.md) bước 2.4 |
 
 ## C. Lỗi trình bày trong báo cáo
 

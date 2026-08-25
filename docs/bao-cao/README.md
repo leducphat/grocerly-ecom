@@ -1,8 +1,23 @@
 # Nội dung cần sửa trong báo cáo
 
+> ⚠️ **ĐANG VIẾT LẠI — 2026-08-25.** Thư mục này được soạn với giả định sai: rằng đang
+> sửa bản **Tiểu luận chuyên ngành** trước khi bảo vệ. Thực tế tiểu luận **đã nộp và có
+> điểm**; công việc hiện tại là **Khóa luận tốt nghiệp**, cùng đề tài, cùng GVHD.
+>
+> Ba chỗ đã biết là sai trong các file bên dưới:
+>
+> 1. **Bước 4.6 sai hoàn toàn.** Hình 4 **không có** use case "Duyệt sản phẩm" — chức
+>    năng duyệt nằm gộp trong *"Quản lý toàn bộ sản phẩm"*. Không có gì để bỏ ở Hình 4.
+> 2. **Generalization Quản trị viên ─▷ Người bán có vẻ ĐÃ CÓ** trong Hình 4. Cần xác nhận.
+> 3. **Sót Hình 21** (Đăng bài đánh giá) — hình này cũng vẽ nhánh kiểm tra đã mua hàng.
+>
+> Ngoài ra mục **02** nay đã lỗi thời: [ADR-0006](../DECISIONS.md) đảo ngược ADR-0005,
+> nên UC 3.2.14 và Hình 21 **giữ nguyên**, không sửa.
+>
+> Danh sách công việc đúng và đầy đủ nằm ở **[PLAN.md](../PLAN.md) giai đoạn 3 và 4**.
+
 Thư mục này chứa **nội dung soạn sẵn để copy-paste vào file Word**, tách theo từng nhóm
-thay đổi. Đây là phần "Giai đoạn 4" của [PLAN.md](../PLAN.md) cộng các mục F, G, H của
-backlog và nhóm C trong [SPEC-GAPS.md](../SPEC-GAPS.md).
+thay đổi.
 
 ## ⚠️ Đọc trước khi dùng
 

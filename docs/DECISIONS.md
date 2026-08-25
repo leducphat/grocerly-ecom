@@ -112,7 +112,8 @@ Chuỗi `in_review → rejected` nhiều khả năng được kế thừa từ t
 
 ## ADR-0003 — `Vendor` là thương hiệu, không phải người bán có tài khoản
 
-**Trạng thái:** Đề xuất · 2026-08-20
+**Trạng thái:** **Đã chốt · 2026-08-25** (đề xuất 2026-08-20) · Hệ quả: báo cáo KLTN —
+[PLAN.md](PLAN.md) giai đoạn 3
 
 ### Bối cảnh
 
@@ -140,10 +141,18 @@ thương hiệu**. Đổi thuật ngữ trong báo cáo: "Người bán" → **"
   Co.opmart (bán lẻ một chủ), không phải Shopee (sàn).
 - Cần sửa mục 1.2.1, các use case của "Người bán", và Bảng 41 danh sách giao diện.
 
-### Vì sao còn ở trạng thái Đề xuất
+### Vì sao chốt (2026-08-25)
 
-Thay đổi này chạm vào định vị đề tài, cần người thực hiện đồ án cân nhắc xem có ảnh
-hưởng tới phần đã trao đổi với giảng viên hướng dẫn hay không.
+Đề xuất này treo ở trạng thái *Đề xuất* vì chạm tới định vị đề tài. Khi chuyển sang làm
+Khóa luận tốt nghiệp, người thực hiện đồ án đã quyết định chốt.
+
+Yếu tố quyết định: **chính báo cáo đã tự mâu thuẫn.** Chương 1 khảo sát Bách Hóa Xanh và
+Co.opmart — hai chuỗi bán lẻ một chủ — rồi định vị Grocerly cạnh chúng; nhưng mục 1.2.1
+lại mô tả "Người bán" có *"gian hàng mình"* kiểu sàn nhiều người bán. Giữ nguyên thì mâu
+thuẫn đó nằm ngay trong cùng một chương.
+
+Ngoài ra dữ liệu thật của bảng `core_vendor` (*Vinamilk, Coca-Cola, Masan, Acecook, CP,
+TH True Milk*) là bằng chứng không chối được nếu bị hỏi.
 
 ---
 
@@ -178,8 +187,12 @@ Sửa chỉ dẫn ở một chỗ duy nhất. Ba công cụ AI khác nhau đọc
 
 ## ADR-0005 — Không cài điều kiện "đã mua mới được đánh giá"
 
-**Trạng thái:** Đã chốt · 2026-08-25 · Hệ quả: [SPEC-GAPS](SPEC-GAPS.md) A2,
-[PLAN.md](PLAN.md) bước 4.7
+**Trạng thái:** ~~Đã chốt · 2026-08-25~~ · **Thay thế bởi [ADR-0006](#adr-0006--thêm-khóa-ngoại-product-cho-cartorderitem)
+cùng ngày**
+
+> ⚠️ ADR này bị thay thế **vài giờ sau khi chốt**, do bối cảnh thay đổi chứ không phải do
+> lập luận sai. Giữ lại nguyên văn vì phần phân tích hạn chế của mô hình dữ liệu vẫn đúng
+> và chính là tiền đề của ADR-0006.
 
 ### Bối cảnh
 
@@ -232,3 +245,62 @@ thêm ma sát cho đúng buổi bảo vệ.
   viết thêm điều kiện ở view.
 - Báo cáo phải sửa UC 3.2.14 Pre-Conditions — [PLAN.md](PLAN.md) bước 4.7. Phần *Sửa &
   Xóa đánh giá* của cùng use case thì giữ nguyên, đã cài xong 2026-08-25.
+
+---
+
+## ADR-0006 — Thêm khóa ngoại `Product` cho `CartOrderItem`
+
+**Trạng thái:** Đã chốt · 2026-08-25 · Thay thế [ADR-0005](#adr-0005--không-cài-điều-kiện-đã-mua-mới-được-đánh-giá)
+
+### Bối cảnh
+
+[ADR-0005](#adr-0005--không-cài-điều-kiện-đã-mua-mới-được-đánh-giá) quyết định **không**
+cài điều kiện "đã mua mới được đánh giá", vì `CartOrderItem` chỉ lưu tên sản phẩm dạng
+chuỗi nên không trả lời tin cậy được câu *"người này đã mua sản phẩm kia chưa"*.
+
+Phần phân tích đó **vẫn đúng**. Cái thay đổi là **lý do loại phương án thêm khóa ngoại**.
+ADR-0005 loại nó vì:
+
+> *"phải sửa `save_checkout_info` — luồng rủi ro nhất, lại có sequence diagram trong báo
+> cáo — cộng một migration nữa lên production ngay trước bảo vệ"*
+
+Cả ba vế đều là **ràng buộc thời gian của kỳ bảo vệ Tiểu luận chuyên ngành**. Tiểu luận
+đã nộp và có điểm; công việc hiện tại là Khóa luận tốt nghiệp với thời hạn trên ba tháng.
+Ràng buộc đã biến mất, nên quyết định phải được xét lại thay vì kế thừa quán tính.
+
+### Quyết định
+
+**Thêm `product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)` vào
+`CartOrderItem`**, song song với bản sao tĩnh (`item`, `image`, `price`) đang có.
+
+Không bỏ bản sao tĩnh: nó phục vụ hóa đơn, phải giữ nguyên khi sản phẩm bị sửa hoặc xóa.
+Khóa ngoại là **thông tin truy vết bổ sung**, không phải vật thay thế.
+
+### Lý do
+
+1. **Mở đường cho A2.** Điều kiện "đã mua mới được đánh giá" (UC 3.2.14) khi đó kiểm tra
+   được chính xác, thay vì so khớp theo tên và chặn nhầm người mua thật khi sản phẩm đổi
+   tên.
+2. **Vá nợ kỹ thuật #6.** `change_order_status` đang trừ tồn kho bằng
+   `Product.objects.filter(title=item.item)` — trừ nhầm sản phẩm khi hai sản phẩm trùng
+   tên. Đây là lỗi **đang tồn tại**, không phải lỗi giả định.
+3. **Báo cáo giữ nguyên được.** Bảng 14 và Hình 21 đã mô tả sẵn điều kiện đã mua. Làm
+   theo hướng này thì không phải sửa hai chỗ đó — ngược hẳn với ADR-0005.
+
+### Hệ quả
+
+- `save_checkout_info` phải gán `product` khi tạo `CartOrderItem`. Giỏ hàng đã lưu `pid`
+  trong session nên tra ngược được, không cần đổi cấu trúc giỏ.
+- Migration có **backfill theo tên** cho các dòng đã tồn tại — chấp nhận được vì đây là
+  nỗ lực tốt nhất trên dữ liệu cũ, không phải cơ chế chạy thường xuyên. Dòng nào không
+  khớp thì để `NULL`.
+- ERD (Hình 45) và Bảng 33 phải bổ sung khóa ngoại này.
+- **SPEC-GAPS A2 chuyển từ "cố ý không cài" sang "sẽ cài"**, và bước 4.7 trong kế hoạch
+  cũ (sửa UC 3.2.14 Pre-Conditions) bị hủy.
+
+### Ghi chú cho báo cáo
+
+Cặp ADR-0005 → ADR-0006 là ví dụ tốt cho mục *Quyết định kiến trúc* của KLTN: cùng một
+dữ kiện kỹ thuật, hai kết luận khác nhau vì ràng buộc dự án khác nhau — và quyết định
+được xét lại khi ràng buộc mất đi, thay vì kế thừa theo quán tính.
+
