@@ -51,6 +51,9 @@ msgstr "Tất cả khuyến mãi"
 msgid "All Vendors"
 msgstr "Tất cả nhà bán"
 
+msgid "All statuses"
+msgstr "Tất cả trạng thái"
+
 msgid "Apply Price"
 msgstr "Áp dụng giá"
 
@@ -236,6 +239,9 @@ msgstr "Hiện tại không có khuyến mãi nào."
 
 msgid "No orders yet."
 msgstr "Chưa có đơn hàng nào."
+
+msgid "No products match this filter."
+msgstr "Không có sản phẩm nào khớp bộ lọc này."
 
 msgid "No tags yet"
 msgstr "Chưa có thẻ"

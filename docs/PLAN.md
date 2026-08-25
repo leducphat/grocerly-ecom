@@ -106,7 +106,7 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
 | F | Actor generalization + đổi thuật ngữ Vendor | 🟡 | [ADR-0001](DECISIONS.md), [ADR-0003](DECISIONS.md) |
 | G | Bổ sung test case AI Chatbot + VNPay vào chương 4 | 🟡 | Hiện chỉ có 5 TC, không TC nào cho 2 điểm nhấn của đề tài |
 | H | Sửa lỗi đánh số mục/hình trong báo cáo | 🟡 | Trùng số mục 3.5; Hình trang 92 ghi sai "Hình 3.5.23" |
-| I | Nối dây filter "Status" ở trang sản phẩm | 🔵 | [products.html:22](../grocerly/templates/useradmin/products.html#L22) là UI chết — `<select>` không có `name`, không nằm trong form |
+| ~~I~~ | ~~Nối dây filter "Status" ở trang sản phẩm~~ | ✅ | Xong 2026-08-25. Ba lựa chọn cũ (*Active / Disabled / Show all*) còn **không khớp** giá trị model, nên có nối dây nguyên trạng cũng sai — đã thay bằng đúng `draft`/`published`/`disabled` kèm số lượng |
 | J | Phân trang danh sách sản phẩm | 🔵 | Báo cáo UC 3.2.3 có nhắc, code không có |
 | K | Đổi mật khẩu 3 tài khoản mẫu in ở trang 108 báo cáo | 🔴 | Sau khi bảo vệ xong — repo public + site đang chạy thật |
 | L | Quyết định về cột `cartorder.stripe_payment_intent` | 🟡 | Field đã bị bỏ khỏi model từ commit `0925f27` nhưng **chưa từng có migration**, nên cột vẫn còn trên production. `makemigrations` sẽ luôn đòi tạo `RemoveField`. Cố ý **không** gộp vào migration 0005: đó là lệnh `DROP COLUMN` trên dữ liệu thật, phải là quyết định riêng |

@@ -4,7 +4,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 
-from core.models import CartOrder, CartOrderItem, Product, Category, ProductReview, ProductImage, Vendor
+from django.db.models import Count
+
+from core.models import STATUS, CartOrder, CartOrderItem, Product, Category, ProductReview, ProductImage, Vendor
 from userauths.models import Profile, User
 from useradmin.forms import AddProductForm
 from useradmin.decorators import admin_required
@@ -68,12 +70,32 @@ def dashboard(request):
 
 @admin_required
 def products(request):
-    all_products = Product.objects.all()
-    all_categories = Category.objects.all()
-    
+    # Filter "Status" trước đây là UI chết: `<select>` không có `name` và không nằm trong
+    # form nào. Vô hại khi mọi sản phẩm đều `published`, nhưng từ khi `draft` là trạng
+    # thái thật (ADR-0002) thì nhân viên nhìn cả ba trạng thái lẫn lộn mà không lọc được.
+    valid_statuses = {value for value, _label in STATUS}
+    selected_status = request.GET.get('status', '')
+
+    all_products = Product.objects.all().order_by('-id')
+    if selected_status in valid_statuses:
+        all_products = all_products.filter(product_status=selected_status)
+
+    # Đếm trên toàn bộ sản phẩm, không theo bộ lọc đang chọn — nếu không thì chọn xong
+    # một trạng thái là các trạng thái khác về 0 và không quay lại được.
+    counts = {
+        row['product_status']: row['n']
+        for row in Product.objects.values('product_status').annotate(n=Count('id'))
+    }
+
     context = {
         "all_products": all_products,
-        "all_categories": all_categories,
+        "all_categories": Category.objects.all(),
+        "status_options": [
+            {'value': value, 'label': label, 'count': counts.get(value, 0)}
+            for value, label in STATUS
+        ],
+        "selected_status": selected_status if selected_status in valid_statuses else '',
+        "total_count": sum(counts.values()),
     }
     return render(request, "useradmin/products.html", context)
 

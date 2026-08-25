@@ -16,17 +16,18 @@
     </div>
     <div class="card mb-4">
         <header class="card-header">
-            <div class="row align-items-center">
-                
-                <div class="col-md-2 col-6">
-                    <select class="form-select">
-                        <option selected>{% trans "Status" %}</option>
-                        <option>Active</option>
-                        <option>Disabled</option>
-                        <option>Show all</option>
+            <form method="get" class="row align-items-center">
+                <div class="col-md-3 col-6">
+                    <label class="form-label mb-1 small text-muted" for="status-filter">{% trans "Status" %}</label>
+                    <select class="form-select" name="status" id="status-filter" onchange="this.form.submit()">
+                        <option value="">{% trans "All statuses" %} ({{ total_count }})</option>
+                        {% for opt in status_options %}
+                        <option value="{{ opt.value }}" {% if opt.value == selected_status %}selected{% endif %}>{{ opt.label }} ({{ opt.count }})</option>
+                        {% endfor %}
                     </select>
+                    <noscript><button class="btn btn-sm btn-primary mt-2" type="submit">{% trans "Filter" %}</button></noscript>
                 </div>
-            </div>
+            </form>
         </header>
         <div class="card-body">
             {% for p in all_products %}
@@ -57,6 +58,8 @@
                     </div>
                 </div>
             </article>
+            {% empty %}
+            <p class="text-muted mb-0 py-4 text-center">{% trans "No products match this filter." %}</p>
             {% endfor %}
         </div>
     </div>

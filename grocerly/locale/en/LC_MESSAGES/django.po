@@ -50,6 +50,9 @@ msgstr ""
 msgid "All Vendors"
 msgstr ""
 
+msgid "All statuses"
+msgstr ""
+
 msgid "Apply Price"
 msgstr ""
 
@@ -234,6 +237,9 @@ msgid "No deals available right now."
 msgstr ""
 
 msgid "No orders yet."
+msgstr ""
+
+msgid "No products match this filter."
 msgstr ""
 
 msgid "No tags yet"
