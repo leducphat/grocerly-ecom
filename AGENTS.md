@@ -167,3 +167,4 @@ Chi tiết kiến trúc và luồng xử lý: [docs/ARCHITECTURE.md](docs/ARCHIT
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Nhật ký quyết định kiến trúc (ADR) |
 | [docs/SPEC-GAPS.md](docs/SPEC-GAPS.md) | Khoảng cách giữa báo cáo và code thực tế |
 | [docs/SECURITY.md](docs/SECURITY.md) | Lỗ hổng đã phát hiện, mức độ và hướng khắc phục |
+| [docs/bao-cao/](docs/bao-cao/) | Nội dung soạn sẵn để sửa file báo cáo (copy-paste vào Word) |

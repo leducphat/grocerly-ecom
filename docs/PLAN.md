@@ -70,6 +70,9 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
 
 ### Giai đoạn 4 — Cập nhật báo cáo
 
+> 📄 **Nội dung soạn sẵn để copy-paste vào Word: [docs/bao-cao/](bao-cao/)** — tách theo
+> từng nhóm thay đổi, gồm cả các mục F, G, H của backlog và nhóm C của SPEC-GAPS.
+
 - [ ] **4.1** UC 3.2.19 (tr.27): *"Lưu dạng In Review"* → *"Lưu nháp hoặc đăng bán ngay"*
 - [ ] **4.2** UC 3.2.24 (tr.31): bỏ vế *"Duyệt bài"* và *"thay đổi Status (Duyệt thành
       Published / Khóa thành Rejected)"*; giữ quyền gỡ sản phẩm vi phạm
