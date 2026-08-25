@@ -222,6 +222,20 @@ else:
 
 WHITENOISE_MANIFEST_STRICT = False
 
+
+# Django REST Framework — xem store_api/throttling.py và SECURITY.md S-03.
+#
+# Hạn mức chọn rộng tay có chủ ý: lúc bảo vệ, nhiều người xem cùng ngồi sau một địa chỉ
+# IP (NAT), đặt quá chặt là tự khóa buổi demo. Mục tiêu ở đây là chặn script quét hàng
+# nghìn lượt, không phải bóp người dùng thật.
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'store_api.throttling.chat_exception_handler',
+    'DEFAULT_THROTTLE_RATES': {
+        'ai_chat_anon': '60/hour',
+        'ai_chat_user': '120/hour',
+    },
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

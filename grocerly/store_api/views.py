@@ -1,12 +1,19 @@
 import os
 import google.generativeai as genai
 from rest_framework import generics
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from django.utils.translation import gettext_lazy as _
 
 from core.models import Product, Category
 from store_api.serializers import ProductSerializer, CategorySerializer
+from store_api.throttling import ChatAnonThrottle, ChatUserThrottle
+
+
+# Mỗi lượt chat tốn hạn ngạch Gemini, và `history` do client gửi được nạp thẳng vào ngữ
+# cảnh hội thoại — chặn cả hai đầu (SECURITY.md S-03).
+MAX_MESSAGE_LENGTH = 1000
+MAX_HISTORY_TURNS = 20
 
 class ProductListAPI(generics.ListAPIView):
     # `published()` la dieu kien dang ban; `status`/`in_stock` la hai co cu con lai
@@ -93,6 +100,7 @@ except Exception as e:
     print(f"Failed to initialize Gemini Model: {e}")
 
 @api_view(['POST'])
+@throttle_classes([ChatAnonThrottle, ChatUserThrottle])
 def ai_chat(request):
     if not model or not api_key:
         return Response({
@@ -101,9 +109,22 @@ def ai_chat(request):
         
     user_message = request.data.get('message', '')
     history_data = request.data.get('history', [])
-    
-    if not user_message:
-        return Response({"error": "Empty message"}, status=400)
+
+    if not isinstance(user_message, str) or not user_message.strip():
+        return Response({"error": str(_("Tin nhắn trống."))}, status=400)
+
+    if len(user_message) > MAX_MESSAGE_LENGTH:
+        return Response({
+            "reply": str(_("Tin nhắn của bạn dài quá. Vui lòng rút gọn dưới %(limit)s ký tự nhé!"))
+                     % {'limit': MAX_MESSAGE_LENGTH},
+        }, status=400)
+
+    # `history` đến từ client nên có thể bị dựng giả để lái hành vi mô hình. Cắt bớt
+    # không chặn được hẳn prompt injection — muốn chặn hẳn phải lưu hội thoại ở server —
+    # nhưng giới hạn được lượng ngữ cảnh giả nhét vào và giữ chi phí mỗi lượt gọi ổn định.
+    if not isinstance(history_data, list):
+        history_data = []
+    history_data = history_data[-MAX_HISTORY_TURNS:]
 
     try:
         # Convert frontend history to gemini history format

@@ -412,6 +412,12 @@ msgstr "Đơn hàng này chưa được thanh toán. Vui lòng hoàn tất thanh
 msgid "This product is no longer on sale."
 msgstr "Sản phẩm này đã ngừng bán."
 
+msgid "Tin nhắn của bạn dài quá. Vui lòng rút gọn dưới %(limit)s ký tự nhé!"
+msgstr "Tin nhắn của bạn dài quá. Vui lòng rút gọn dưới %(limit)s ký tự nhé!"
+
+msgid "Tin nhắn trống."
+msgstr "Tin nhắn trống."
+
 msgid "Title"
 msgstr "Tên sản phẩm"
 
@@ -935,3 +941,7 @@ msgstr "Nhà cung cấp"
 
 msgid "Customer questions &amp; answers"
 msgstr "Câu hỏi & trả lời của khách hàng"
+
+
+msgid "⏳ Bạn đang nhắn quá nhanh. Vui lòng đợi khoảng %(wait_seconds)s giây rồi thử lại nhé!"
+msgstr "⏳ Bạn đang nhắn quá nhanh. Vui lòng đợi khoảng %(wait_seconds)s giây rồi thử lại nhé!"

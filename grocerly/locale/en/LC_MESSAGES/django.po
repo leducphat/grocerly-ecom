@@ -410,6 +410,12 @@ msgstr ""
 msgid "This product is no longer on sale."
 msgstr ""
 
+msgid "Tin nhắn của bạn dài quá. Vui lòng rút gọn dưới %(limit)s ký tự nhé!"
+msgstr ""
+
+msgid "Tin nhắn trống."
+msgstr ""
+
 msgid "Title"
 msgstr ""
 
@@ -504,6 +510,9 @@ msgid "Đường link bạn truy cập có thể đã bị xóa, đổi tên, ho
 msgstr ""
 
 msgid "← Quay về Trang Chủ"
+msgstr ""
+
+msgid "⏳ Bạn đang nhắn quá nhanh. Vui lòng đợi khoảng %(wait_seconds)s giây rồi thử lại nhé!"
 msgstr ""
 
 msgid "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi **%(wait_seconds)s giây** rồi thử lại nhé!"
