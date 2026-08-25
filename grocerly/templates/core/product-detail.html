@@ -294,7 +294,26 @@
                                                                                     {% endfor %}
                                                                                 </div>
                                                                             </div>
-                                                                            <p class="mb-10">{{ r.review }}</p>
+                                                                            <p class="mb-10 review-text-{{ r.id }}">{{ r.review }}</p>
+
+                                                                            {% if user.is_authenticated and r.user_id == user.id %}
+                                                                            <div class="review-actions-{{ r.id }}">
+                                                                                <button type="button" class="btn btn-sm btn-link p-0 edit-review-btn" data-review="{{ r.id }}" data-rating="{{ r.rating }}">{% trans "Edit" %}</button>
+                                                                                <span class="text-muted">·</span>
+                                                                                <button type="button" class="btn btn-sm btn-link p-0 text-danger delete-review-btn" data-review="{{ r.id }}">{% trans "Delete" %}</button>
+                                                                            </div>
+
+                                                                            <form class="edit-review-form-{{ r.id }} mt-2" style="display:none;" data-review="{{ r.id }}">
+                                                                                <textarea class="form-control mb-2" name="review" rows="3">{{ r.review }}</textarea>
+                                                                                <select class="form-select mb-2" name="rating">
+                                                                                    {% for value, label in review_form.fields.rating.choices %}
+                                                                                    {% if value %}<option value="{{ value }}" {% if value == r.rating %}selected{% endif %}>{{ label }}</option>{% endif %}
+                                                                                    {% endfor %}
+                                                                                </select>
+                                                                                <button type="submit" class="btn btn-sm btn-brand">{% trans "Save changes" %}</button>
+                                                                                <button type="button" class="btn btn-sm btn-light cancel-edit-btn" data-review="{{ r.id }}">{% trans "Cancel" %}</button>
+                                                                            </form>
+                                                                            {% endif %}
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -605,6 +624,88 @@
     </main>
 
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+    // Sửa & xóa đánh giá — UC 3.2.14, Hình 22-23. Server chỉ cho đụng vào đánh giá của
+    // chính mình; phần này chỉ lo giao diện.
+    $(function () {
+        function reviewError(xhr, fallback) {
+            var message = fallback;
+            if (xhr && xhr.responseJSON && xhr.responseJSON.error) {
+                message = xhr.responseJSON.error;
+            }
+            alert(message);
+        }
+
+        function refreshAverage(response) {
+            if (response.average_reviews && response.average_reviews.rating !== null) {
+                $(".average-rating-value").text(Number(response.average_reviews.rating).toFixed(1));
+            }
+        }
+
+        $(document).on("click", ".edit-review-btn", function () {
+            var id = $(this).data("review");
+            $(".edit-review-form-" + id).show();
+            $(".review-actions-" + id).hide();
+            $(".review-text-" + id).hide();
+        });
+
+        $(document).on("click", ".cancel-edit-btn", function () {
+            var id = $(this).data("review");
+            $(".edit-review-form-" + id).hide();
+            $(".review-actions-" + id).show();
+            $(".review-text-" + id).show();
+        });
+
+        $(document).on("submit", "[class^='edit-review-form-']", function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var id = form.data("review");
+
+            $.ajax({
+                url: "/ajax-edit-review/" + id + "/",
+                method: "POST",
+                data: {
+                    review: form.find("[name=review]").val(),
+                    rating: form.find("[name=rating]").val(),
+                    csrfmiddlewaretoken: getCookie("csrftoken")
+                },
+                success: function (response) {
+                    $(".review-text-" + id).text(response.context.review).show();
+                    form.hide();
+                    $(".review-actions-" + id).show().find(".edit-review-btn").data("rating", response.context.rating);
+                    refreshAverage(response);
+                },
+                error: function (xhr) {
+                    reviewError(xhr, "{% trans 'Could not save your review. Please try again.' %}");
+                }
+            });
+        });
+
+        $(document).on("click", ".delete-review-btn", function () {
+            var id = $(this).data("review");
+            if (!confirm("{% trans 'Delete this review?' %}")) {
+                return;
+            }
+
+            $.ajax({
+                url: "/ajax-delete-review/" + id + "/",
+                method: "POST",
+                data: { csrfmiddlewaretoken: getCookie("csrftoken") },
+                success: function (response) {
+                    // Xóa xong thì được đánh giá lại, mà form thêm chỉ render ở server —
+                    // nạp lại trang là cách rẻ nhất để giao diện về đúng trạng thái.
+                    location.reload();
+                },
+                error: function (xhr) {
+                    reviewError(xhr, "{% trans 'Could not delete your review. Please try again.' %}");
+                }
+            });
+        });
+    });
+</script>
+{% endblock extra_js %}
 
 
 

@@ -218,6 +218,83 @@ def tag_list(request, tag_slug=None):
 
 
 @login_required
+def validated_review_payload(request):
+    """Đọc `review`/`rating` từ POST. Trả `(payload, None)` hoặc `(None, JsonResponse lỗi)`.
+
+    Dùng chung cho thêm và sửa đánh giá để hai đường không lệch quy tắc kiểm tra.
+    """
+    review_text = (request.POST.get('review') or '').strip()
+    if not review_text:
+        return None, JsonResponse({'bool': False, 'error': _("Please write a review.")}, status=400)
+
+    valid_ratings = [str(value) for value, _label in RATING]
+    rating = request.POST.get('rating')
+    if rating not in valid_ratings:
+        return None, JsonResponse({'bool': False, 'error': _("Please choose a rating.")}, status=400)
+
+    return {'review': review_text, 'rating': rating}, None
+
+
+def average_rating_for(product):
+    return ProductReview.objects.filter(product=product).aggregate(rating=Avg('rating'))
+
+
+def own_review_or_none(request, review_id):
+    """Đánh giá của **chính** người đang đăng nhập, hoặc None.
+
+    Lọc `user` ngay trong truy vấn thay vì kiểm sau: đánh giá của người khác trả 404 y
+    như đánh giá không tồn tại, không lộ ra là nó có thật.
+    """
+    return ProductReview.objects.filter(pk=review_id, user=request.user).first()
+
+
+@login_required
+def ajax_edit_review(request, review_id):
+    if request.method != "POST":
+        return JsonResponse({'bool': False, 'error': _("Invalid request.")}, status=405)
+
+    review = own_review_or_none(request, review_id)
+    if review is None:
+        return JsonResponse({'bool': False, 'error': _("Review not found.")}, status=404)
+
+    payload, error = validated_review_payload(request)
+    if error is not None:
+        return error
+
+    review.review = payload['review']
+    review.rating = payload['rating']
+    review.save(update_fields=['review', 'rating'])
+
+    return JsonResponse({
+        'bool': True,
+        'context': {
+            'user': review.user.username,
+            'review': review.review,
+            'rating': review.rating,
+        },
+        'average_reviews': average_rating_for(review.product),
+    })
+
+
+@login_required
+def ajax_delete_review(request, review_id):
+    if request.method != "POST":
+        return JsonResponse({'bool': False, 'error': _("Invalid request.")}, status=405)
+
+    review = own_review_or_none(request, review_id)
+    if review is None:
+        return JsonResponse({'bool': False, 'error': _("Review not found.")}, status=404)
+
+    product = review.product
+    review.delete()
+
+    return JsonResponse({
+        'bool': True,
+        'average_reviews': average_rating_for(product),
+    })
+
+
+@login_required
 def ajax_add_review(request, p_id):
     # Chốt chặn cũ chỉ nằm ở context 'make_review' của template nên POST thẳng vào đây
     # là bỏ qua được: khách chưa đăng nhập gây 500, user đã đăng nhập spam review vô hạn.
@@ -233,14 +310,12 @@ def ajax_add_review(request, p_id):
             'error': _("You have already reviewed this product."),
         }, status=400)
 
-    review_text = (request.POST.get('review') or '').strip()
-    if not review_text:
-        return JsonResponse({'bool': False, 'error': _("Please write a review.")}, status=400)
+    payload, error = validated_review_payload(request)
+    if error is not None:
+        return error
 
-    valid_ratings = [str(value) for value, _label in RATING]
-    rating = request.POST.get('rating')
-    if rating not in valid_ratings:
-        return JsonResponse({'bool': False, 'error': _("Please choose a rating.")}, status=400)
+    review_text = payload['review']
+    rating = payload['rating']
 
     ProductReview.objects.create(
         user=user,
@@ -255,12 +330,10 @@ def ajax_add_review(request, p_id):
         'rating': rating,
     }
 
-    average_reviews = ProductReview.objects.filter(product=product).aggregate(rating=Avg('rating'))
-
     return JsonResponse({
         'bool': True,
         'context': context,
-        'average_reviews': average_reviews,
+        'average_reviews': average_rating_for(product),
     })
 
 

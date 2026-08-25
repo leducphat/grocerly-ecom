@@ -22,6 +22,8 @@ urlpatterns = [
 
     # Add Review (AJAX)
     path('ajax-add-review/<int:p_id>/', views.ajax_add_review, name='ajax-add-review'),
+    path('ajax-edit-review/<int:review_id>/', views.ajax_edit_review, name='ajax-edit-review'),
+    path('ajax-delete-review/<int:review_id>/', views.ajax_delete_review, name='ajax-delete-review'),
 
     # Search
     path('search/', views.search_view, name='search'),

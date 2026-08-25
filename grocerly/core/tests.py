@@ -238,3 +238,104 @@ class ProductStatusMigrationTests(TestCase):
         ]:
             product.refresh_from_db()
             self.assertEqual(product.product_status, expected, product.title)
+
+
+class EditDeleteReviewTests(TestCase):
+    """UC 3.2.14 / Hình 22–23 — báo cáo ghi đích danh `ajax_edit_review`,
+    `ajax_delete_review`; trước 2026-08-25 hai hàm này không tồn tại (SPEC-GAPS A1)."""
+
+    def setUp(self):
+        self.product = Product.objects.create(title="Sữa tươi", product_status='published')
+        self.author = User.objects.create_user(
+            username="chu", email="chu@example.com", password="matkhau-kho-doan",
+        )
+        self.other = User.objects.create_user(
+            username="nguoikhac", email="khac@example.com", password="matkhau-kho-doan",
+        )
+        self.review = ProductReview.objects.create(
+            user=self.author, product=self.product, review="Tạm được", rating=3,
+        )
+        self.edit_url = reverse("core:ajax-edit-review", args=[self.review.id])
+        self.delete_url = reverse("core:ajax-delete-review", args=[self.review.id])
+
+    def test_author_can_edit_own_review(self):
+        self.client.force_login(self.author)
+
+        response = self.client.post(self.edit_url, {'review': "Ngon lắm", 'rating': '5'})
+
+        self.assertEqual(response.status_code, 200)
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.review, "Ngon lắm")
+        self.assertEqual(self.review.rating, 5)
+
+    def test_other_user_cannot_edit(self):
+        self.client.force_login(self.other)
+
+        response = self.client.post(self.edit_url, {'review': "Bị sửa trộm", 'rating': '1'})
+
+        self.assertEqual(response.status_code, 404)
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.review, "Tạm được")
+
+    def test_anonymous_cannot_edit(self):
+        response = self.client.post(self.edit_url, {'review': "Hack", 'rating': '1'})
+
+        self.assertEqual(response.status_code, 302)
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.review, "Tạm được")
+
+    def test_edit_rejects_invalid_rating(self):
+        self.client.force_login(self.author)
+
+        response = self.client.post(self.edit_url, {'review': "Ngon", 'rating': '99'})
+
+        self.assertEqual(response.status_code, 400)
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.rating, 3)
+
+    def test_edit_rejects_get(self):
+        self.client.force_login(self.author)
+
+        self.assertEqual(self.client.get(self.edit_url).status_code, 405)
+
+    def test_author_can_delete_own_review(self):
+        self.client.force_login(self.author)
+
+        response = self.client.post(self.delete_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ProductReview.objects.count(), 0)
+
+    def test_other_user_cannot_delete(self):
+        self.client.force_login(self.other)
+
+        response = self.client.post(self.delete_url)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(ProductReview.objects.count(), 1)
+
+    def test_can_review_again_after_deleting(self):
+        self.client.force_login(self.author)
+        self.client.post(self.delete_url)
+
+        response = self.client.post(
+            reverse("core:ajax-add-review", args=[self.product.id]),
+            {'review': "Đánh giá lại", 'rating': '4'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ProductReview.objects.count(), 1)
+
+    def test_product_page_shows_controls_only_to_the_author(self):
+        self.client.force_login(self.author)
+        own = self.client.get(
+            reverse("core:product-detail", args=[self.product.p_id])
+        ).content.decode()
+
+        self.client.force_login(self.other)
+        other = self.client.get(
+            reverse("core:product-detail", args=[self.product.p_id])
+        ).content.decode()
+
+        self.assertIn('class="edit-review-form-%d' % self.review.id, own)
+        self.assertNotIn('class="edit-review-form-%d' % self.review.id, other)

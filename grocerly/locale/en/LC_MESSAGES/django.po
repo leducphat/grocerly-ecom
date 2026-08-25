@@ -80,6 +80,9 @@ msgstr ""
 msgid "By Vendors"
 msgstr ""
 
+msgid "Cancel"
+msgstr ""
+
 msgid "Careers"
 msgstr ""
 
@@ -110,6 +113,12 @@ msgstr ""
 msgid "Contact Us"
 msgstr ""
 
+msgid "Could not delete your review. Please try again."
+msgstr ""
+
+msgid "Could not save your review. Please try again."
+msgstr ""
+
 msgid "Could not update your cart. Please try again."
 msgstr ""
 
@@ -131,6 +140,12 @@ msgstr ""
 msgid "Deals Of The Day"
 msgstr ""
 
+msgid "Delete"
+msgstr ""
+
+msgid "Delete this review?"
+msgstr ""
+
 msgid "Delivery Information"
 msgstr ""
 
@@ -138,6 +153,9 @@ msgid "Discount"
 msgstr ""
 
 msgid "Don’t miss amazing<br /> grocery deals"
+msgstr ""
+
+msgid "Edit"
 msgstr ""
 
 msgid "Edit Profile"
@@ -321,6 +339,9 @@ msgid "Release Date"
 msgstr ""
 
 msgid "Remove"
+msgstr ""
+
+msgid "Review not found."
 msgstr ""
 
 msgid "Save Address"
