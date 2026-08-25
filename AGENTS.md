@@ -21,10 +21,22 @@ Mô hình nghiệp vụ: **một siêu thị, nhiều nhân viên** (kiểu Bác
 > ⚠️ Mã nguồn nằm trong thư mục con `grocerly/`, **không** phải ở gốc repo.
 > Mọi lệnh `manage.py` phải chạy từ `grocerly/`.
 
+⚠️ **Chạy dev server ở local phải dùng `--settings=grocerly.settings_local`:**
+
+```bash
+cd grocerly
+python manage.py migrate   --settings=grocerly.settings_local   # lần đầu
+python manage.py runserver --settings=grocerly.settings_local
+```
+
+`runserver` với settings mặc định đọc **và ghi** thẳng vào Neon production (bẫy #5).
+Thử luồng "Lưu nháp / Đăng bán / Ngừng bán" mà quên đổi settings là sửa sản phẩm thật.
+`settings_local` ép SQLite (`db.sqlite3`) và tắt Cloudinary. Cả hai đã gitignore.
+
 ```bash
 cd grocerly
 
-python manage.py runserver          # chạy dev server
+python manage.py runserver          # ⚠️ DB PRODUCTION — xem cảnh báo trên
 python manage.py makemigrations     # sinh migration
 python manage.py migrate            # áp migration
 python manage.py createsuperuser    # tạo tài khoản Admin
