@@ -1,6 +1,6 @@
 # 04 — Bổ sung test case cho chương 4
 
-**Vấn đề (backlog G):** chương 4 hiện có **5 test case**, và **không test case nào cho AI
+**Vấn đề** ([PLAN.md](../PLAN.md) bước **2.6** và **4.2**): chương 4 hiện có **5 test case**, và **không test case nào cho AI
 Chatbot lẫn VNPay** — đúng hai điểm nhấn của đề tài. Phản biện hỏi *"em kiểm thử hai chức
 năng chính thế nào?"* là không có gì để trả lời.
 

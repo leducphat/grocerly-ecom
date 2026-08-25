@@ -35,8 +35,9 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 
 > A11 được xử lý bằng cách **sửa báo cáo cho khớp code**, không cài luồng duyệt — xem
 > [ADR-0002](DECISIONS.md). Phần code đã xong; phần báo cáo là
-> [PLAN.md](PLAN.md) giai đoạn 4 (UC 3.2.19, UC 3.2.24, Hình 28, Hình 29, bỏ Hình 40,
-> Bảng 30, Hình 4) — **chưa làm**. Các mục còn lại chờ quyết định.
+> [PLAN.md](PLAN.md) bước 3.3 (UC 3.2.19, UC 3.2.24, Hình 28, Hình 29, bỏ Hình 40,
+> Bảng 30) — **chưa làm**. Lưu ý: Hình 4 **không** có use case "Duyệt sản phẩm" nên
+> không phải sửa ở đó. Các mục còn lại chờ quyết định.
 
 ## B. Code làm khác mô tả trong báo cáo
 

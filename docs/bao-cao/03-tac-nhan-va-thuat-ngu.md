@@ -1,7 +1,7 @@
 # 03 — Tác nhân và thuật ngữ
 
-Gộp hai việc vì cùng đụng vào Hình 4 và chương 1: mục **F** của backlog —
-[ADR-0001](../DECISIONS.md) và [ADR-0003](../DECISIONS.md).
+Gộp hai việc vì cùng đụng vào Hình 4 và chương 1: [PLAN.md](../PLAN.md) bước
+**3.9–3.12** — [ADR-0001](../DECISIONS.md) và [ADR-0003](../DECISIONS.md).
 
 ---
 

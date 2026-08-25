@@ -56,7 +56,7 @@ thiết kế. Ranh giới nằm ở **phạm vi thẩm quyền**, không ở kh�
 
 **Trạng thái:** Đã chốt · 2026-08-20 · **Đã triển khai 2026-08-24** — code và
 migration `0005_product_status_drop_review_flow` (đã áp lên production); phần sửa báo
-cáo — [PLAN.md](PLAN.md) giai đoạn 4 — chưa làm
+cáo — [PLAN.md](PLAN.md) bước 3.3 — chưa làm
 
 ### Bối cảnh
 
@@ -243,8 +243,11 @@ thêm ma sát cho đúng buổi bảo vệ.
 - Ai đăng nhập cũng đánh giá được, mỗi người một lần cho mỗi sản phẩm.
 - Nếu sau này muốn cài, **việc cần làm trước là thêm FK** cho `CartOrderItem`, không phải
   viết thêm điều kiện ở view.
-- Báo cáo phải sửa UC 3.2.14 Pre-Conditions — [PLAN.md](PLAN.md) bước 4.7. Phần *Sửa &
-  Xóa đánh giá* của cùng use case thì giữ nguyên, đã cài xong 2026-08-25.
+- Báo cáo phải sửa UC 3.2.14 Pre-Conditions. Phần *Sửa & Xóa đánh giá* của cùng use
+  case thì giữ nguyên, đã cài xong 2026-08-25.
+
+> Hệ quả này **không còn hiệu lực** sau [ADR-0006](#adr-0006--thêm-khóa-ngoại-product-cho-cartorderitem):
+> báo cáo giữ nguyên cả Bảng 14 lẫn Hình 21.
 
 ---
 
@@ -295,8 +298,9 @@ Khóa ngoại là **thông tin truy vết bổ sung**, không phải vật thay 
   nỗ lực tốt nhất trên dữ liệu cũ, không phải cơ chế chạy thường xuyên. Dòng nào không
   khớp thì để `NULL`.
 - ERD (Hình 45) và Bảng 33 phải bổ sung khóa ngoại này.
-- **SPEC-GAPS A2 chuyển từ "cố ý không cài" sang "sẽ cài"**, và bước 4.7 trong kế hoạch
-  cũ (sửa UC 3.2.14 Pre-Conditions) bị hủy.
+- **SPEC-GAPS A2 chuyển từ "cố ý không cài" sang "sẽ cài"** — [PLAN.md](PLAN.md) bước
+  2.11–2.12. Việc sửa UC 3.2.14 Pre-Conditions trong kế hoạch cũ bị hủy: báo cáo đã mô
+  tả đúng ngay từ đầu.
 
 ### Ghi chú cho báo cáo
 

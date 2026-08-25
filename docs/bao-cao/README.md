@@ -6,7 +6,7 @@
 >
 > Ba chỗ đã biết là sai trong các file bên dưới:
 >
-> 1. **Bước 4.6 sai hoàn toàn.** Hình 4 **không có** use case "Duyệt sản phẩm" — chức
+> 1. **Bước 4.6 trong file 01 sai hoàn toàn.** Hình 4 **không có** use case "Duyệt sản phẩm" — chức
 >    năng duyệt nằm gộp trong *"Quản lý toàn bộ sản phẩm"*. Không có gì để bỏ ở Hình 4.
 > 2. **Generalization Quản trị viên ─▷ Người bán có vẻ ĐÃ CÓ** trong Hình 4. Cần xác nhận.
 > 3. **Sót Hình 21** (Đăng bài đánh giá) — hình này cũng vẽ nhánh kiểm tra đã mua hàng.
@@ -15,6 +15,10 @@
 > nên UC 3.2.14 và Hình 21 **giữ nguyên**, không sửa.
 >
 > Danh sách công việc đúng và đầy đủ nằm ở **[PLAN.md](../PLAN.md) giai đoạn 3 và 4**.
+>
+> ⚠️ **Cách đánh số bên trong các file 01–06 là của kế hoạch CŨ** (bước 4.1–4.7), không
+> khớp với `PLAN.md` hiện tại. Khi đối chiếu phải theo `PLAN.md`, không theo số trong
+> các file này.
 
 Thư mục này chứa **nội dung soạn sẵn để copy-paste vào file Word**, tách theo từng nhóm
 thay đổi.
@@ -41,8 +45,8 @@ Phần trong khối ```` ``` ```` là nội dung để copy. Phần ngoài là c
 | [01-bo-luong-duyet-san-pham.md](01-bo-luong-duyet-san-pham.md) | Bỏ quy trình duyệt sản phẩm khỏi báo cáo | [ADR-0002](../DECISIONS.md) |
 | [02-danh-gia-san-pham.md](02-danh-gia-san-pham.md) | Sửa/xóa đánh giá đã cài; bỏ điều kiện "đã mua" | [ADR-0005](../DECISIONS.md) |
 | [03-tac-nhan-va-thuat-ngu.md](03-tac-nhan-va-thuat-ngu.md) | Generalization tác nhân; "Người bán" → "Nhân viên" | [ADR-0001](../DECISIONS.md), [ADR-0003](../DECISIONS.md) |
-| [04-chuong-4-test-case.md](04-chuong-4-test-case.md) | Bổ sung test case AI Chatbot + VNPay | backlog G |
-| [05-loi-trinh-bay.md](05-loi-trinh-bay.md) | Lỗi đánh số, lỗi câu chữ | backlog H, [SPEC-GAPS](../SPEC-GAPS.md) nhóm C |
+| [04-chuong-4-test-case.md](04-chuong-4-test-case.md) | Bổ sung test case AI Chatbot + VNPay | [PLAN](../PLAN.md) 2.6 + 4.2 |
+| [05-loi-trinh-bay.md](05-loi-trinh-bay.md) | Lỗi đánh số, lỗi câu chữ | [PLAN](../PLAN.md) 3.13–3.20, [SPEC-GAPS](../SPEC-GAPS.md) nhóm C |
 | [06-huong-phat-trien.md](06-huong-phat-trien.md) | Các chức năng chưa cài → chuyển xuống Hướng phát triển | [SPEC-GAPS](../SPEC-GAPS.md) nhóm A |
 
 ## Thứ tự nên làm

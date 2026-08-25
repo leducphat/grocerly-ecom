@@ -163,8 +163,32 @@ Chi tiết kiến trúc và luồng xử lý: [docs/ARCHITECTURE.md](docs/ARCHIT
 | File | Nội dung |
 |---|---|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Kiến trúc hệ thống, mô hình dữ liệu, các luồng chính |
-| [docs/PLAN.md](docs/PLAN.md) | Kế hoạch công việc đang triển khai và backlog ưu tiên |
+| [docs/PLAN.md](docs/PLAN.md) | Kế hoạch công việc, chia theo giai đoạn 0–4 |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Nhật ký quyết định kiến trúc (ADR) |
 | [docs/SPEC-GAPS.md](docs/SPEC-GAPS.md) | Khoảng cách giữa báo cáo và code thực tế |
 | [docs/SECURITY.md](docs/SECURITY.md) | Lỗ hổng đã phát hiện, mức độ và hướng khắc phục |
 | [docs/bao-cao/](docs/bao-cao/) | Nội dung soạn sẵn để sửa file báo cáo (copy-paste vào Word) |
+
+### Quy ước đánh mã
+
+Mỗi tài liệu có hệ mã riêng. **Luôn viết kèm tên hệ mã**, đừng nói trống không "lỗi #6".
+
+| Mã | Ở đâu | Trả lời câu hỏi |
+|---|---|---|
+| `ADR-000N` | DECISIONS.md | *Tại sao lại quyết như vậy?* |
+| `S-0N` | SECURITY.md | *Lỗ hổng nào, mức nào, vá chưa?* |
+| `A1`–`A11` · `B1`–`B11` · `C1`–`C8` | SPEC-GAPS.md | *Báo cáo và code lệch chỗ nào?* |
+| `Bẫy #N` | AGENTS.md (file này) | *Cái gì dễ làm sai khi sửa code?* |
+| `Nợ kỹ thuật #N` | ARCHITECTURE.md | *Chỗ nào biết là chưa tốt?* |
+| `Giai đoạn N` · `bước N.M` | PLAN.md | *Làm gì, theo thứ tự nào?* |
+| `UC 3.2.x` · `Hình N` · `Bảng N` | file báo cáo (**ngoài repo**) | neo vào tài liệu nộp |
+
+Ba chỗ dễ nhầm:
+
+1. **`Bẫy #N` và `Nợ kỹ thuật #N` là hai danh sách khác nhau, cùng đánh 1–8.**
+   Ví dụ `#5`: bẫy = `.env` trỏ production; nợ kỹ thuật = ba cờ trạng thái Product.
+2. **Chữ cái A/B/C trong SPEC-GAPS là *nhóm*, không phải mã công việc.** PLAN.md từng
+   dùng chữ cái A–L cho backlog nhưng **đã bỏ 2026-08-25**, thay bằng `bước N.M`.
+3. **Số ADR không bao giờ dùng lại**, và ADR bị thay thế thì **giữ nguyên văn** chứ không
+   xóa — phần phân tích trong đó thường là tiền đề của ADR thay thế nó
+   (xem ADR-0005 → ADR-0006).

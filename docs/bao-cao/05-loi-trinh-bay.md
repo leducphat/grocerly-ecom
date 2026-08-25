@@ -1,6 +1,7 @@
 # 05 — Lỗi trình bày và đánh số
 
-Backlog **H** cộng nhóm **C** trong [SPEC-GAPS.md](../SPEC-GAPS.md). Toàn bộ là lỗi soạn
+[PLAN.md](../PLAN.md) bước **3.13–3.20**, tương ứng nhóm **C** trong
+[SPEC-GAPS.md](../SPEC-GAPS.md). Toàn bộ là lỗi soạn
 thảo, không liên quan tới code — nhưng là loại lỗi phản biện dễ chỉ ra nhất vì không cần
 đọc code cũng thấy.
 
@@ -132,7 +133,7 @@ viên, Khách hàng), ngay cạnh link tới repo GitHub **công khai**.
 Việc in tài khoản demo để giảng viên tiện chấm là hợp lý. Vấn đề là **đúng ba tài khoản
 đó đang sống trên site production**.
 
-**Xử lý sau khi bảo vệ xong** — đây là backlog K:
+**Xử lý sau khi bảo vệ xong** — [PLAN.md](../PLAN.md) bước **3.20**:
 
 1. Đổi mật khẩu cả ba tài khoản.
 2. Nếu muốn giữ tài khoản demo cho người xem repo, tạo tài khoản riêng **quyền hạn chế**,
