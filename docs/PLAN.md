@@ -100,7 +100,7 @@ thật, đây thành lỗi thấy được. Chi tiết: [SECURITY.md](SECURITY.m
 |---|---|---|---|
 | ~~A~~ | ~~Vá lỗ hổng `payment_completed_view` tự set `paid_status=True`~~ | ✅ | Xong 2026-08-24 — [S-01](SECURITY.md) |
 | ~~B~~ | ~~`add_to_cart` đọc giá từ DB thay vì query string~~ | ✅ | Xong 2026-08-24 — [S-02](SECURITY.md), đóng luôn A5 của [SPEC-GAPS](SPEC-GAPS.md) |
-| C | Giới hạn truy cập `/api/v1/chat/` | 🟠 | [S-03](SECURITY.md) — hiện ai cũng đốt được quota Gemini |
+| ~~C~~ | ~~Giới hạn truy cập `/api/v1/chat/`~~ | ✅ | Xong 2026-08-25 — [S-03](SECURITY.md). Còn thiếu trần theo ngày toàn hệ thống, xem ghi chú ở S-03 |
 | D | Sửa/Xóa đánh giá sản phẩm | 🟠 | Báo cáo có (UC 3.2.14, Hình 22–23), code không — [SPEC-GAPS](SPEC-GAPS.md) |
 | E | Điều kiện "đã mua mới được đánh giá" | 🟠 | Báo cáo yêu cầu ([A2](SPEC-GAPS.md)); chốt chặn trùng lặp đã chuyển về server ở [S-08](SECURITY.md) nhưng điều kiện đã mua thì chưa có |
 | F | Actor generalization + đổi thuật ngữ Vendor | 🟡 | [ADR-0001](DECISIONS.md), [ADR-0003](DECISIONS.md) |

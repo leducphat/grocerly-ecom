@@ -12,7 +12,7 @@ mục dưới đây là **lỗi logic nghiệp vụ** mà framework không đỡ
 |---|---|---|---|
 | S-01 | Bỏ qua thanh toán bằng cách truy cập URL | 🔴 Nghiêm trọng | ✅ Đã sửa 2026-08-24 |
 | S-02 | Giả mạo giá sản phẩm qua query string | 🔴 Nghiêm trọng | ✅ Đã sửa 2026-08-24 |
-| S-03 | Endpoint AI không xác thực, không giới hạn tần suất | 🟠 Cao | Chưa sửa |
+| S-03 | Endpoint AI không xác thực, không giới hạn tần suất | 🟠 Cao | ✅ Đã sửa 2026-08-25 |
 | S-04 | Rò rỉ sản phẩm chưa đăng bán qua API và chatbot | 🟠 Cao | ✅ Đã sửa 2026-08-24 |
 | S-05 | `SECRET_KEY` có giá trị mặc định | 🟡 Trung bình | Chưa sửa |
 | S-06 | Lộ thông tin đăng nhập production trong báo cáo | 🔴 Nghiêm trọng | Cần đổi mật khẩu sau bảo vệ |
@@ -105,7 +105,10 @@ Server bỏ qua nên **không cần sửa template** — nhưng đây là rác n
 
 ## S-03 — Endpoint AI không xác thực, không giới hạn tần suất
 
-**Vị trí:** [store_api/views.py:93](../grocerly/store_api/views.py#L93) — `ai_chat`
+> ✅ **Đã sửa 2026-08-25.** Test hồi quy: `ChatThrottleTests`, `ChatInputLimitTests`
+> trong [store_api/tests.py](../grocerly/store_api/tests.py).
+
+**Vị trí:** `store_api/views.py` — `ai_chat`
 
 **Vấn đề:** `@api_view(['POST'])` không kèm `permission_classes` hay throttle. Bất kỳ ai
 biết URL đều gọi được `/api/v1/chat/` không giới hạn, mỗi lần gọi tiêu tốn hạn ngạch
@@ -118,9 +121,31 @@ script đơn giản làm cạn trong vài phút, khiến chatbot ngừng hoạt 
 Ngoài ra `history` do client gửi lên được nạp thẳng vào ngữ cảnh hội thoại, cho phép
 người dùng tự dựng lịch sử giả để lái hành vi mô hình.
 
-**Hướng sửa:** Thêm DRF throttling (`AnonRateThrottle`, ví dụ `20/hour` cho khách vãng
-lai), giới hạn độ dài `message` và số lượt `history`. Không nhất thiết phải bắt đăng nhập
-— khách vãng lai vẫn cần dùng chatbot theo đặc tả UC 3.2.15.
+**Đã sửa:** Thêm throttle theo scope trong
+[store_api/throttling.py](../grocerly/store_api/throttling.py) —
+`ChatAnonThrottle` (đếm theo IP) và `ChatUserThrottle` (đếm theo tài khoản) — cùng giới
+hạn `message` ≤ 1000 ký tự và cắt `history` còn 20 lượt gần nhất.
+**Không** bắt đăng nhập: khách vãng lai vẫn phải dùng được chatbot theo UC 3.2.15.
+
+Hạn mức đặt ở `settings.REST_FRAMEWORK`: **60/giờ** cho khách vãng lai, **120/giờ** cho
+người đã đăng nhập — rộng hơn mức `20/hour` từng đề xuất, có chủ ý: lúc bảo vệ nhiều
+người xem cùng ngồi sau một IP (NAT), đặt quá chặt là tự khóa buổi demo.
+
+Response 429 mặc định của DRF là `{"detail": ...}`, mà widget chat chỉ đọc `reply` và
+`error` — để nguyên thì người dùng gõ mà **không thấy gì phản hồi**. `chat_exception_handler`
+giữ mã 429 (đúng ngữ nghĩa, còn thấy được trong log) nhưng đổi thân response sang
+`reply` + `retry_after`, khớp cách view này đã báo lỗi hết quota Gemini.
+
+**Còn lại — hai giới hạn cần biết:**
+
+1. **Không có trần theo ngày trên toàn hệ thống.** Throttle đếm theo từng IP / từng tài
+   khoản, nên nhiều IP khác nhau cộng lại vẫn có thể làm cạn 500 tin/ngày. Chặn được
+   script một máy — đúng kịch bản khai thác nêu trên — nhưng không chặn được tấn công
+   phân tán. Muốn chặn hẳn phải có bộ đếm toàn cục, và nó lại có rủi ro tự khóa demo.
+2. **Cắt `history` không phải là chống prompt injection.** Nó giới hạn *lượng* ngữ cảnh
+   giả nhét được vào và giữ chi phí mỗi lượt ổn định, nhưng client vẫn tự dựng được lịch
+   sử. Chặn hẳn thì phải lưu hội thoại ở server thay vì tin client — thay đổi lớn hơn
+   nhiều so với phạm vi mục này.
 
 ---
 
