@@ -164,10 +164,15 @@
                             </div>
                         </div>
                     </div>
+                    {# Vùng này bị JS ghi đè nguyên khối khi khách lọc:            #}
+                    {# $("#filtered-product-grid").html(response.data). Trước đây thẻ #}
+                    {# div này KHÔNG được đóng, nên vùng ghi đè kéo dài tới tận hết   #}
+                    {# mục "Deals Of The Day" — tick một checkbox là mất luôn mục đó. #}
+                    {# Đừng đặt gì vào đây ngoài lưới sản phẩm.                       #}
                     <div class="row product-grid" id="filtered-product-grid">
                         {% include 'core/async/product-list.html' with products=products %}
                         <!--end product card-->
-                        
+                    </div>
                     <!--product grid-->
                     {% comment %} <div class="pagination-area mt-20 mb-20">
                         <nav aria-label="Page navigation example">
