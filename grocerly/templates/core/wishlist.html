@@ -83,7 +83,9 @@
 
             $.ajax({
                 url: "{% url 'core:remove-from-wishlist' %}",
-                data: { "id": wishlist_id },
+                // POST + token — SECURITY.md S-10.
+                type: "POST",
+                data: { "id": wishlist_id, "csrfmiddlewaretoken": getCookie("csrftoken") },
                 dataType: "json",
                 success: function(response){
                     if (response.bool === true) {

@@ -902,6 +902,10 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+# POST chứ không GET — S-10. Dòng `payment_method = 'online'` bên dưới đổi dữ liệu, và
+# `SameSite=Lax` vẫn gửi cookie phiên trên một điều hướng cả trang bằng GET: nạn nhân bấm
+# một link là đơn của họ bị lật sang thanh toán online và nhảy sang `processing`.
+@require_POST
 @login_required
 def vnpay_payment(request, oid):
     order = _get_checkout_order_or_none(request, oid)
@@ -1288,9 +1292,12 @@ def cancel_order(request, oid):
 
 # ======================== Address ========================
 
+# POST chứ không GET — S-10. Đây là endpoint đổi **địa chỉ giao hàng** của nạn nhân:
+# hậu quả cụ thể nhất trong cả nhóm, vì đơn hàng tiếp theo đi tới nơi kẻ tấn công chọn.
+@require_POST
 @login_required
 def make_address_default(request):
-    id = request.GET['id']
+    id = request.POST.get('id')
     Address.objects.filter(user=request.user).update(status=False)
     Address.objects.filter(id=id, user=request.user).update(status=True)
     return JsonResponse({"boolean": True})
@@ -1306,11 +1313,17 @@ def wishlist_view(request):
     }
     return render(request, "core/wishlist.html", context)
 
+# POST chứ không GET — S-10.
+#
+# Không dùng `@login_required`: hai endpoint wishlist trả JSON cho JS, mà `login_required`
+# trả 302 sang trang đăng nhập nên `$.ajax` nhận về HTML và im lặng. Chốt đăng nhập vì
+# vậy nằm trong thân hàm và trả JSON có khóa `error` — đúng thứ widget đang đọc.
+@require_POST
 def add_to_wishlist(request):
     if not request.user.is_authenticated:
         return JsonResponse({"bool": False, "error": "Vui lòng đăng nhập để thêm vào Wishlist!"})
 
-    product_id = request.GET.get('id')
+    product_id = request.POST.get('id')
     product = Product.objects.get(id=product_id)
 
     wishlist_qs = Wishlist.objects.filter(product=product, user=request.user)
@@ -1331,11 +1344,14 @@ def add_to_wishlist(request):
     return JsonResponse(context)
 
 
+# POST chứ không GET — S-10. Xem ghi chú ở `add_to_wishlist` về việc không dùng
+# `@login_required`.
+@require_POST
 def remove_wishlist(request):
     if not request.user.is_authenticated:
         return JsonResponse({"bool": False, "error": "Vui lòng đăng nhập để sử dụng Wishlist!"})
 
-    pid = request.GET.get('id')
+    pid = request.POST.get('id')
     try:
         wishlist_d = Wishlist.objects.get(id=pid, user=request.user)
         wishlist_d.delete()

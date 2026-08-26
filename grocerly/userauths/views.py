@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from userauths.models import Profile
 
 # User = settings.AUTH_USER_MODEL
@@ -82,6 +83,10 @@ def login_view(request):
     return render(request, 'userauths/sign-in.html', context)
 
 
+# POST chứ không GET — S-10. Django bỏ hỗ trợ GET cho `LogoutView` từ 4.1 vì đúng lý do
+# này: một link là đá được nạn nhân khỏi phiên, và mất phiên nghĩa là mất luôn giỏ hàng —
+# giỏ nằm trong session, không có model Cart (bẫy #7).
+@require_POST
 def logout_view(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully.')

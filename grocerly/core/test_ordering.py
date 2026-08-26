@@ -131,7 +131,8 @@ class WishlistOrderingTests(TestCase):
         page_order = [w.pk for w in self.client.get(
             reverse("core:wishlist")).context['w']]
         # Xóa một mục bất kỳ KHÔNG nằm ở hai đầu để thứ tự còn lại vẫn có ý nghĩa.
-        response = self.client.get(
+        # POST từ 2026-08-26 — S-10, PLAN bước 2.14.
+        response = self.client.post(
             reverse("core:remove-from-wishlist"),
             {'id': Wishlist.objects.order_by('id')[1].pk},
         )

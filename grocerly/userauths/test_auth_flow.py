@@ -290,7 +290,12 @@ class AlreadySignedInTests(TestCase):
 
 
 class LogoutTests(TestCase):
-    """Đăng xuất."""
+    """Đăng xuất.
+
+    POST, không GET — [S-10](../../docs/SECURITY.md), PLAN bước 2.14. Phần khẳng định
+    rằng GET **không** còn đăng xuất được nằm ở `core/test_state_changing_methods.py`;
+    ở đây chỉ kiểm hành vi bình thường.
+    """
 
     URL = reverse('userauths:sign-out')
 
@@ -301,17 +306,17 @@ class LogoutTests(TestCase):
 
     def test_it_ends_the_session(self):
         self.client.force_login(self.customer)
-        self.client.get(self.URL)
+        self.client.post(self.URL)
         self.assertNotIn('_auth_user_id', self.client.session)
 
     def test_it_sends_the_visitor_back_to_the_sign_in_page(self):
         self.client.force_login(self.customer)
-        response = self.client.get(self.URL)
+        response = self.client.post(self.URL)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('userauths:sign-in'))
 
     def test_signing_out_while_already_signed_out_is_harmless(self):
-        response = self.client.get(self.URL)
+        response = self.client.post(self.URL)
         self.assertEqual(response.status_code, 302)
 
     def test_staff_can_reach_the_sign_out_url(self):
@@ -321,7 +326,7 @@ class LogoutTests(TestCase):
         self.customer.is_staff = True
         self.customer.save()
         self.client.force_login(self.customer)
-        self.client.get(self.URL)
+        self.client.post(self.URL)
         self.assertNotIn('_auth_user_id', self.client.session)
 
 

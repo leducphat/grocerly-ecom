@@ -29,7 +29,11 @@
                                             <a class="nav-link" href="{% url 'core:wishlist' %}"><i class="fi-rs-heart mr-10"></i>{% trans "Wishlist" %}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="{% url 'userauths:sign-out' %}"><i class="fi-rs-sign-out mr-10"></i>{% trans "Logout" %}</a>
+                                            <!-- Form chứ không phải link: `logout_view` nay chỉ nhận POST — SECURITY.md S-10. -->
+                                            <form action="{% url 'userauths:sign-out' %}" method="post" class="sign-out-form">
+                                                {% csrf_token %}
+                                                <button type="submit" class="nav-link"><i class="fi-rs-sign-out mr-10"></i>{% trans "Logout" %}</button>
+                                            </form>
                                         </li>
                                     </ul>
                                 </div>

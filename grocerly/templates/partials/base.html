@@ -268,7 +268,13 @@
                                             <li><a href="{% url 'userauths:profile-update' %}"><i class="fi fi-rs-settings-sliders mr-10"></i>{% trans "Setting" %}</a></li>
                                             <li><a href="{% url 'useradmin:dashboard' %}"><i class="fi fi-rs-settings mr-10"></i>{% trans "Vendor Dashboard" %}</a></li>
                                             {% if user.is_authenticated %}
-                                            <li><a href="{% url 'userauths:sign-out' %}"><i class="fi fi-rs-sign-out mr-10"></i>{% trans "Sign out" %}</a></li>
+                                            <!-- Form chứ không phải link: `logout_view` nay chỉ nhận POST — SECURITY.md S-10. -->
+                                            <li>
+                                                <form action="{% url 'userauths:sign-out' %}" method="post" class="sign-out-form">
+                                                    {% csrf_token %}
+                                                    <button type="submit"><i class="fi fi-rs-sign-out mr-10"></i>{% trans "Sign out" %}</button>
+                                                </form>
+                                            </li>
                                             {% else %}
                                             <li><a href="{% url 'userauths:sign-in' %}"><i class="fi fi-rs-sign-in mr-10"></i>{% trans "Sign in" %}</a></li>
                                             {% endif %}
@@ -919,7 +925,9 @@
 
             $.ajax({
                 url: "{% url 'core:add-to-wishlist' %}",
-                data: { "id": product_id },
+                // POST + token — SECURITY.md S-10.
+                type: "POST",
+                data: { "id": product_id, "csrfmiddlewaretoken": getCookie("csrftoken") },
                 dataType: "json",
                 success: function(response){
                     if(response.bool === true){
@@ -1007,6 +1015,22 @@
         </div>
     </div>
     
+    <style>
+        /* Nút đăng xuất phải trông y hệt link cũ nó thay thế — SECURITY.md S-10 đổi
+           `logout_view` sang POST-only nên `<a href>` không dùng được nữa.
+           `display: contents` để form không chen thêm một hộp vào layout của <li>. */
+        .sign-out-form { display: contents; }
+        .sign-out-form button {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font: inherit;
+            color: inherit;
+            text-align: inherit;
+            cursor: pointer;
+        }
+    </style>
     <style>
         .chatbot-container { position: fixed; bottom: 20px; right: 20px; width: 350px; background: #fff; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 9999; overflow: hidden; border: 1px solid #e2e9e1; transition: all 0.3s ease; }
         .chatbot-header { background: #3BB77E; padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }

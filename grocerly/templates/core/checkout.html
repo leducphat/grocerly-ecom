@@ -91,7 +91,13 @@
                         </div>
                     </div>
 
-                    <a href="{% url 'core:vnpay_payment' order.oid %}" class="btn w-100 mb-3" style="background-color: #005A9C; color: white;"><i class="fi-rs-credit-card mr-10"></i>{% trans "Thanh toán qua VNPay" %}</a>
+                    <!-- Form chứ không phải link: `vnpay_payment` ghi `payment_method` và
+                         `product_status` nên nay chỉ nhận POST — SECURITY.md S-10.
+                         Giống hệt form COD ngay bên dưới. -->
+                    <form action="{% url 'core:vnpay_payment' order.oid %}" method="POST" class="mb-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn w-100" style="background-color: #005A9C; color: white;"><i class="fi-rs-credit-card mr-10"></i>{% trans "Thanh toán qua VNPay" %}</button>
+                    </form>
                     <form action="{% url 'core:place-cod-order' order.oid %}" method="POST" class="mb-3">
                         {% csrf_token %}
                         <button type="submit" class="btn w-100" style="background-color: #3bb77e; color: white;"><i class="fi-rs-box mr-10"></i>{% trans "Thanh toán khi nhận hàng (COD)" %}</button>

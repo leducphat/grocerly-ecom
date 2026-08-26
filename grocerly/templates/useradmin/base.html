@@ -18,7 +18,23 @@
         <link href="{% static 'assets2/css/main.css' %}" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
-    </head>
+        <style>
+        /* Nút đăng xuất phải trông y hệt link cũ nó thay thế — SECURITY.md S-10 đổi
+           `logout_view` sang POST-only nên `<a href>` không dùng được nữa.
+           `display: contents` để form không chen thêm một hộp vào layout của <li>. */
+        .sign-out-form { display: contents; }
+        .sign-out-form button {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font: inherit;
+            color: inherit;
+            text-align: inherit;
+            cursor: pointer;
+        }
+    </style>
+</head>
 
     <body>
         <div class="screen-overlay"></div>
@@ -88,10 +104,14 @@
                     </li>
 
                     <li class="menu-item">
-                        <a class="menu-link" href="{% url 'userauths:sign-out' %}">
-                            <i class="icon material-icons md-arrow_forward"></i>
-                            <span class="text">Đăng xuất</span>
-                        </a>
+                        <!-- Form chứ không phải link: `logout_view` nay chỉ nhận POST — SECURITY.md S-10. -->
+                        <form action="{% url 'userauths:sign-out' %}" method="post" class="sign-out-form">
+                            {% csrf_token %}
+                            <button type="submit" class="menu-link">
+                                <i class="icon material-icons md-arrow_forward"></i>
+                                <span class="text">Đăng xuất</span>
+                            </button>
+                        </form>
                     </li>
                 </ul>
                 <br />
@@ -130,7 +150,11 @@
                                 <a class="dropdown-item text-primary" href="/admin/"><i class="material-icons md-admin_panel_settings"></i>Về trang Admin</a>
                                 {% endif %}
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="{% url 'userauths:sign-out' %}"><i class="material-icons md-exit_to_app"></i>Đăng xuất</a>
+                                <!-- Form chứ không phải link: `logout_view` nay chỉ nhận POST — SECURITY.md S-10. -->
+                                <form action="{% url 'userauths:sign-out' %}" method="post" class="sign-out-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger"><i class="material-icons md-exit_to_app"></i>Đăng xuất</button>
+                                </form>
                             </div>
                         </li>
                     </ul>
