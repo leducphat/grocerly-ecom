@@ -37,7 +37,7 @@ def dashboard(request):
     all_products = Product.objects.all()
     all_categories = Category.objects.all()
     new_customers = User.objects.all().order_by("-id")[:6]
-    latest_orders = CartOrder.objects.all()
+    latest_orders = CartOrder.objects.all().order_by('-id')[:10]
 
     this_month = datetime.datetime.now().month
     monthly_revenue = CartOrder.objects.filter(paid_status=True, order_date__month=this_month).aggregate(price=Sum("price"))
@@ -245,7 +245,7 @@ def delete_product(request, pid):
 
 @admin_required
 def orders(request):
-    orders = CartOrder.objects.all()
+    orders = CartOrder.objects.all().order_by('-id')
     context = {
         'orders':orders,
     }
@@ -396,7 +396,7 @@ def change_order_status(request, oid):
 
 @admin_required
 def shop_page(request):
-    products = Product.objects.filter(user=request.user)
+    products = Product.objects.filter(user=request.user).order_by('-id')
     revenue = CartOrder.objects.filter(paid_status=True).aggregate(price=Sum("price"))
     total_sales = CartOrderItem.objects.filter(order__paid_status=True).aggregate(qty=Sum("quantity"))
 
@@ -409,7 +409,7 @@ def shop_page(request):
 
 @admin_required
 def reviews(request):
-    reviews = ProductReview.objects.all()
+    reviews = ProductReview.objects.all().order_by('-date', '-id')
     context = {
         'reviews':reviews,
     }

@@ -94,7 +94,7 @@ def index(request):
 
 
 def category_list_view(request):
-    categories = Category.objects.all()
+    categories = Category.objects.all().order_by('title')
 
     context = {
         'categories': categories
@@ -139,7 +139,7 @@ def category_product_list_view(request, c_id):
 
 
 def vendor_list_view(request):
-    vendors = Vendor.objects.all()
+    vendors = Vendor.objects.all().order_by('name')
 
     context = {
         'vendors': vendors
@@ -387,7 +387,7 @@ def ajax_add_review(request, p_id):
 
 def search_view(request):
     query = request.GET.get("q")
-    products = Product.objects.published().filter(title__icontains=query).order_by('-date')
+    products = Product.objects.published().filter(title__icontains=query).order_by('-date', '-id')
 
     context = {
         'products': products,
@@ -1087,7 +1087,7 @@ def make_address_default(request):
 
 @login_required
 def wishlist_view(request):
-    wishlist = Wishlist.objects.filter(user=request.user)
+    wishlist = Wishlist.objects.filter(user=request.user).order_by('-id')
     context = {
         "w": wishlist,
     }
@@ -1129,7 +1129,7 @@ def remove_wishlist(request):
     except Wishlist.DoesNotExist:
         pass
 
-    wishlist = Wishlist.objects.filter(user=request.user)
+    wishlist = Wishlist.objects.filter(user=request.user).order_by('-id')
     total_wishlist = wishlist.count()
 
     context = {
