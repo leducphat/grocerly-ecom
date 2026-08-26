@@ -576,9 +576,6 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-msgid "This order was delivered. Its status is final."
-msgstr ""
-
 msgid "Please fill in every field."
 msgstr ""
 
@@ -608,4 +605,47 @@ msgstr ""
 
 #: core/views.py templates/core/product-detail.html
 msgid "Only customers who bought this product can review it."
+msgstr ""
+
+#: PLAN 2.7 + 2.10
+msgid "This order was cancelled and can no longer be paid."
+msgstr ""
+
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s can no longer be cancelled."
+msgstr ""
+
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s has been cancelled."
+msgstr ""
+
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s is already %(status)s. Its status can no longer be changed."
+msgstr ""
+
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s has already left the warehouse and can no longer be cancelled."
+msgstr ""
+
+
+
+
+#: PLAN 2.7 + 2.10
+msgid "Order status"
+msgstr ""
+
+
+
+#: PLAN 2.7 + 2.10
+msgid "Cancel this order? This cannot be undone."
+msgstr ""
+
+#: PLAN 2.7 + 2.10
+msgid "Cancel this order"
+msgstr ""
+
+
+
+#: templates/useradmin/order_detail.html
+msgid "This order is %(order_status_label)s. Its status is final."
 msgstr ""

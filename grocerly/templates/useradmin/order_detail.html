@@ -30,8 +30,10 @@
                     </select>
                     <button class="btn btn-primary" type="submit" {% if order_is_final %}disabled{% endif %}>{% trans "Save" %}</button>
                     {% if order_is_final %}
-                    <div><small class="text-muted">{% trans "This order was delivered. Its status is final." %}</small></div>
+                    {# Đúng cho cả `delivered` lẫn `cancelled` — hai trạng thái cuối (PLAN 2.10). #}
+                    <div><small class="text-muted">{% blocktrans %}This order is {{ order_status_label }}. Its status is final.{% endblocktrans %}</small></div>
                     {% endif %}
+                </form>
                 </form>
             </div>
         </header>

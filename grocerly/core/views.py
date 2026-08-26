@@ -622,6 +622,15 @@ def update_cart(request):
 # ======================== Checkout + Payment ========================
 
 
+# Đơn đã hủy là trạng thái cuối — UC 3.2.25, SPEC-GAPS A7 (PLAN bước 2.10).
+CANCELLED_ORDER_STATUS = 'cancelled'
+
+# Chỉ hủy được đơn chưa rời kho. Xem ghi chú ở `STATUS_CHOICES` trong core/models.py:
+# kho chỉ bị trừ lúc chuyển sang `shipped`, nên giới hạn này khiến việc hủy **không bao
+# giờ cần hoàn kho**.
+CANCELLABLE_ORDER_STATUSES = ('processing',)
+
+
 def _get_pending_order_from_session(request):
     pending_oid = request.session.get('pending_order_oid')
     if not pending_oid:
@@ -632,6 +641,10 @@ def _get_pending_order_from_session(request):
             oid=pending_oid,
             user=request.user,
             paid_status=False,
+        ).exclude(
+            # Khách hủy đơn rồi quay lại thanh toán thì không được tái sử dụng chính đơn
+            # vừa hủy — nếu không, nút Hủy trở thành vô nghĩa.
+            product_status=CANCELLED_ORDER_STATUS,
         ).first()
 
     return None
@@ -745,7 +758,11 @@ def vnpay_payment(request, oid):
     if order.paid_status:
         messages.info(request, "This order has already been paid.")
         return redirect("core:payment-completed", order.oid)
-        
+
+    if order.product_status == CANCELLED_ORDER_STATUS:
+        messages.warning(request, _("This order was cancelled and can no longer be paid."))
+        return redirect("core:dashboard")
+
     order.payment_method = 'online' # vnpay is an online method
     order.product_status = 'processing'
     order.save(update_fields=['payment_method', 'product_status'])
@@ -859,6 +876,13 @@ def place_cod_order(request, oid):
     if order.paid_status:
         messages.info(request, "This order has already been paid.")
         return redirect("core:payment-completed", order.oid)
+
+    # Không hồi sinh đơn đã hủy: cả hai đường thanh toán bên dưới đều gán thẳng
+    # `product_status = 'processing'`, nên thiếu chốt này là mở URL thanh toán sẽ lật
+    # ngược một đơn đã hủy về đang xử lý.
+    if order.product_status == CANCELLED_ORDER_STATUS:
+        messages.warning(request, _("This order was cancelled and can no longer be paid."))
+        return redirect("core:dashboard")
 
     order.payment_method = 'cod'
     order.product_status = 'processing'
@@ -991,13 +1015,62 @@ def customer_dashboard(request):
 
 @login_required
 def order_detail(request, id):
-    order = CartOrder.objects.get(user=request.user, id=id)
+    order = get_object_or_404(CartOrder, user=request.user, id=id)
     order_items = CartOrderItem.objects.filter(order=order)
 
     context = {
+        "order": order,
         "order_items": order_items,
+        "can_cancel": order_is_cancellable(order),
     }
     return render(request, 'core/order-detail.html', context)
+
+
+def order_is_cancellable(order):
+    """Đơn này khách còn hủy được không? — UC 3.2.25, SPEC-GAPS A7.
+
+    Hai điều kiện, và điều kiện thứ hai là chỗ dễ bỏ sót:
+
+    1. Đơn còn ở `processing`. Đã giao cho đơn vị vận chuyển thì hàng đã rời kho.
+    2. Đơn **chưa thanh toán**. Hủy một đơn đã trả tiền có nghĩa là phải hoàn tiền, mà
+       hệ thống không có luồng hoàn tiền nào — VNPay chỉ được tích hợp chiều thu. Cho
+       bấm Hủy ở đó là hứa với khách một thứ không tồn tại.
+
+    Đơn COD vẫn hủy được bình thường: `paid_status` của COD chỉ bật khi giao tới tay
+    khách, nên đơn COD đang xử lý luôn thỏa cả hai điều kiện.
+    """
+    return (
+        order.product_status in CANCELLABLE_ORDER_STATUSES
+        and not order.paid_status
+    )
+
+
+@login_required
+@require_POST
+def cancel_order(request, oid):
+    """Khách tự hủy đơn của mình — UC 3.2.25 (PLAN bước 2.10).
+
+    POST + CSRF, không phải `<a href>`: đây là thao tác đổi dữ liệu. Cùng lý do đã đưa
+    `delete_product` và `change_order_status` sang POST (xem S-09/S-10).
+    """
+    order = get_object_or_404(CartOrder, oid=oid, user=request.user)
+
+    if not order_is_cancellable(order):
+        messages.error(request, _(
+            "Order %(oid)s can no longer be cancelled."
+        ) % {'oid': order.oid})
+        return redirect("core:order-detail", order.id)
+
+    order.product_status = CANCELLED_ORDER_STATUS
+    order.save(update_fields=['product_status'])
+
+    # Đơn đang treo trong session mà bị hủy thì phải quên đi, không thì lần thanh toán
+    # sau lại rơi vào đúng đơn vừa hủy.
+    if request.session.get('pending_order_oid') == str(order.oid):
+        del request.session['pending_order_oid']
+
+    messages.success(request, _("Order %(oid)s has been cancelled.") % {'oid': order.oid})
+    return redirect("core:order-detail", order.id)
 
 
 # ======================== Address ========================

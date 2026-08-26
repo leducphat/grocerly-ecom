@@ -227,6 +227,62 @@ class ChangeOrderStatusTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.order.product_status, 'shipped')
 
+    # ---------- 2.10: hủy đơn phía nhân viên ----------
+
+    def test_staff_can_cancel_an_order_that_is_still_processing(self):
+        self._set('cancelled')
+        self._reload()
+
+        self.assertEqual(self.order.product_status, 'cancelled')
+
+    def test_staff_cannot_cancel_an_order_that_already_shipped(self):
+        """Hàng đã rời kho và tồn kho đã bị trừ.
+
+        `cancelled` là giá trị hợp lệ của model nên nó đi qua whitelist chung; chốt chặn
+        này là **riêng** cho bước chuyển đó, không phải kiểm giá trị.
+        """
+        self.order.product_status = 'shipped'
+        self.order.save()
+
+        self._set('cancelled')
+        self._reload()
+
+        self.assertEqual(self.order.product_status, 'shipped')
+
+    def test_cancelling_does_not_give_stock_back(self):
+        """Không có nhánh hoàn kho, và đó là chủ ý: chỉ hủy được đơn chưa trừ kho."""
+        self._set('cancelled')
+        self._reload()
+
+        self.assertEqual(self.product.stock_count, 10)
+
+    def test_a_cancelled_order_is_final(self):
+        self._set('cancelled')
+
+        self._set('processing')
+        self._reload()
+
+        self.assertEqual(self.order.product_status, 'cancelled')
+
+    def test_a_cancelled_order_cannot_be_shipped(self):
+        """Nếu lọt được thì đơn đã hủy sẽ trừ kho — chốt riêng vì hậu quả khác hẳn."""
+        self._set('cancelled')
+
+        self._set('shipped')
+        self._reload()
+
+        self.assertEqual(self.order.product_status, 'cancelled')
+        self.assertEqual(self.product.stock_count, 10)
+
+    def test_cancelling_a_cod_order_does_not_mark_it_paid(self):
+        self.order.payment_method = 'cod'
+        self.order.save()
+
+        self._set('cancelled')
+        self._reload()
+
+        self.assertFalse(self.order.paid_status)
+
     # ---------- trạng thái không hợp lệ ----------
 
     def test_the_pending_placeholder_no_longer_corrupts_the_order(self):

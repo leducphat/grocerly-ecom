@@ -262,10 +262,11 @@ def order_detail(request, id):
         # cách trang sản phẩm đã làm. Trước đây danh sách viết tay và option đầu gửi
         # value="pending", một giá trị không tồn tại trong STATUS_CHOICES.
         'order_status_options': STATUS_CHOICES,
-        'order_is_final': order.product_status == FINAL_ORDER_STATUS,
+        # `cancelled` cũng là trạng thái cuối từ PLAN bước 2.10, không riêng `delivered`.
+        'order_is_final': order.product_status in FINAL_ORDER_STATUSES,
+        'order_status_label': ORDER_STATUS_LABELS.get(order.product_status, order.product_status),
     }
     return render(request, "useradmin/order_detail.html", context)
-
 # Lấy thẳng từ model để danh sách hợp lệ không lệch được — cùng cách `products()` đã làm
 # với `STATUS`. Lưu ý STATUS_CHOICES là trạng thái GIAO HÀNG, khác hẳn `STATUS` của
 # Product dù hai field cùng tên `product_status` (Bẫy #1).
@@ -274,6 +275,15 @@ ORDER_STATUS_LABELS = dict(STATUS_CHOICES)
 
 # Đơn đã giao là trạng thái cuối — UC 3.2.20 Exception Flow, SPEC-GAPS A8.
 FINAL_ORDER_STATUS = 'delivered'
+
+# Đơn đã hủy cũng là trạng thái cuối — UC 3.2.25, SPEC-GAPS A7 (PLAN bước 2.10).
+CANCELLED_ORDER_STATUS = 'cancelled'
+FINAL_ORDER_STATUSES = (FINAL_ORDER_STATUS, CANCELLED_ORDER_STATUS)
+
+# Chỉ hủy được đơn CHƯA rời kho. `shipped` đã trừ tồn kho, nên cho hủy từ đó là phải viết
+# nhánh hoàn kho — mà hoàn kho sai thì âm thầm làm lệch số liệu. Giới hạn ở `processing`
+# khiến nhánh đó không cần tồn tại. Xem ghi chú ở `STATUS_CHOICES` (core/models.py).
+CANCELLABLE_FROM_STATUSES = ('processing',)
 
 
 @admin_required
@@ -287,10 +297,10 @@ def change_order_status(request, oid):
     # A8 — đơn đã giao thì không đổi trạng thái được nữa. Trước đây chuyển ngược
     # delivered → processing là chuyện bình thường, và nó còn kéo theo lỗi trừ kho hai
     # lần ở đoạn dưới.
-    if order.product_status == FINAL_ORDER_STATUS:
+    if order.product_status in FINAL_ORDER_STATUSES:
         messages.error(request, _(
-            "Order %(oid)s was already delivered. Its status can no longer be changed."
-        ) % {'oid': order.oid})
+            "Order %(oid)s is already %(status)s. Its status can no longer be changed."
+        ) % {'oid': order.oid, 'status': ORDER_STATUS_LABELS[order.product_status]})
         return redirect("useradmin:order_detail", order.id)
 
     # Giá trị đến từ client nên phải qua whitelist, không gán thẳng vào model —
@@ -301,6 +311,15 @@ def change_order_status(request, oid):
     # chọn gì là đơn rơi vào trạng thái không hợp lệ.
     if status not in ORDER_STATUS_VALUES:
         messages.error(request, _("Please choose a valid order status."))
+        return redirect("useradmin:order_detail", order.id)
+
+    # Hủy chỉ đi được từ `processing`. Không dùng chung whitelist ở trên vì `cancelled` là
+    # giá trị hợp lệ của model nhưng **không** phải bước chuyển hợp lệ từ mọi trạng thái:
+    # đơn đã `shipped` là hàng đã rời kho và tồn kho đã bị trừ (PLAN 2.10).
+    if status == CANCELLED_ORDER_STATUS and order.product_status not in CANCELLABLE_FROM_STATUSES:
+        messages.error(request, _(
+            "Order %(oid)s has already left the warehouse and can no longer be cancelled."
+        ) % {'oid': order.oid})
         return redirect("useradmin:order_detail", order.id)
 
     # Trừ kho đúng MỘT lần: chỉ khi đơn chuyển sang `shipped` từ một trạng thái **chưa

@@ -322,3 +322,79 @@ xử lý **ba cách khác nhau** tùy hướng của rủi ro. `product_has_orde
 kho người khác); `has_purchased` từ chối (đoán sai → mở quyền đánh giá cho người chưa
 mua). Không có một quy tắc chung nào đúng cho cả ba.
 
+---
+
+## ADR-0007 — Hủy đơn chỉ áp dụng cho đơn chưa thanh toán và chưa xuất kho
+
+**Trạng thái:** Đã chốt · 2026-08-26
+
+### Bối cảnh
+
+UC 3.2.25 mô tả chức năng "Hủy đơn" nhưng `STATUS_CHOICES` chỉ có ba giá trị
+`processing`/`shipped`/`delivered`, nên không có gì để demo ([SPEC-GAPS A7](SPEC-GAPS.md)).
+Bản Tiểu luận xử lý bằng cách đề xuất **bỏ use case** khỏi báo cáo — xem
+[bao-cao/06](bao-cao/06-huong-phat-trien.md). KLTN đảo nguyên tắc đó và cài cho xong.
+
+Câu hỏi thật không phải *"thêm trạng thái `cancelled`"* — việc đó là một dòng. Câu hỏi là
+**hủy được từ đâu tới đâu**, vì mỗi câu trả lời kéo theo một luồng nghiệp vụ khác nhau.
+
+Bản báo cáo không nói rõ ai hủy và hủy lúc nào, nên đây là chỗ **phải tự quyết**.
+
+### Quyết định
+
+Hủy được khi và chỉ khi đơn thỏa **cả hai**:
+
+1. `product_status == 'processing'` — chưa xuất kho.
+2. `paid_status == False` — chưa thu tiền.
+
+`cancelled` là trạng thái **cuối**, ngang hàng `delivered`. Cả khách lẫn nhân viên đều
+hủy được, cùng một bộ điều kiện.
+
+### Lý do
+
+**Điều kiện 1 làm biến mất nhánh hoàn kho.** Tồn kho chỉ bị trừ đúng một chỗ:
+`change_order_status` khi đơn chuyển sang `shipped`. Giới hạn việc hủy ở trước mốc đó
+nghĩa là **không có gì để hoàn** — không phải "hoàn kho đúng", mà là *không tồn tại nhánh
+hoàn kho nào để viết sai*. Đây là cách rẻ nhất để tránh một lớp lỗi số liệu âm thầm, và
+là bài học rút từ chính nợ kỹ thuật #6: chỗ trừ kho cũ đã sai suốt mà không ai biết.
+
+**Điều kiện 2 tránh hứa một chức năng không có.** Hủy đơn đã trả tiền hàm ý hoàn tiền.
+VNPay ở đây chỉ tích hợp **chiều thu** — không có API hoàn, không có luồng đối soát, không
+có trạng thái "đang hoàn tiền". Cho khách bấm Hủy trên một đơn đã trả là tạo ra một đơn
+vừa hủy vừa đã thu tiền, và không có màn hình nào xử lý được tình trạng đó.
+
+Đơn COD **không** bị điều kiện 2 chặn: `paid_status` của COD chỉ bật khi giao tới tay
+khách, nên đơn COD đang xử lý luôn hủy được. Đây là phần lớn đơn thực tế.
+
+### Phương án đã cân nhắc
+
+| Phương án | Đánh giá |
+|---|---|
+| **Chỉ hủy `processing` + chưa trả tiền** ✔ | Không cần hoàn kho, không cần hoàn tiền. Đánh đổi: khách trả VNPay xong đổi ý thì phải liên hệ nhân viên |
+| Cho hủy cả `shipped`, kèm hoàn kho | Đúng nghiệp vụ hơn nhưng phải viết nhánh cộng lại tồn kho — mà hàng đã rời kho thật, cộng lại là sai số liệu theo chiều ngược |
+| Cho hủy đơn đã trả, đánh dấu "chờ hoàn tiền" | Thêm một trạng thái nữa cho một luồng **không có ai xử lý**. Trạng thái treo vĩnh viễn còn tệ hơn là không cho hủy |
+| Chỉ nhân viên được hủy | Giảm được điều kiện 2, nhưng UC 3.2.25 nằm ở nhóm chức năng của khách và đây là thao tác khách mong đợi nhất |
+
+### Hệ quả
+
+- Ba đường có thể hồi sinh một đơn đã hủy, và **cả ba đều phải chặn**: `place_cod_order`
+  và `vnpay_payment` gán thẳng `product_status = 'processing'`;
+  `_get_pending_order_from_session` tái sử dụng đơn treo cho lần thanh toán sau. Chốt thứ
+  ba là chỗ dễ sót nhất vì nó chỉ lộ ra khi **nhân viên** hủy (khách tự hủy thì session
+  đã được dọn) — [core/test_cancel_order.py](../grocerly/core/test_cancel_order.py) có
+  test riêng cho đúng kịch bản đó.
+- `cancelled` vào `STATUS_CHOICES` nên nó **tự động** xuất hiện trong dropdown của nhân
+  viên (dropdown dựng từ model). Đó là điều mong muốn, nhưng nghĩa là whitelist giá trị
+  hợp lệ **không đủ** — phải có thêm chốt riêng cho *bước chuyển*, vì `cancelled` là giá
+  trị hợp lệ mà không phải bước chuyển hợp lệ từ mọi trạng thái.
+- Migration `0008` là `AlterField` trên `choices`, `sqlmigrate` xác nhận **no-op DDL** —
+  an toàn với dữ liệu production, giống migration `0005`.
+- Báo cáo: UC 3.2.25 giữ nguyên được phần lớn, nhưng **phải bổ sung hai tiền điều kiện**
+  này vào Pre-Conditions. Đây là chỗ code hẹp hơn báo cáo, ngược với A2.
+
+### Ghi chú cho báo cáo
+
+Đáng đưa vào mục *Quyết định kiến trúc*: cả hai điều kiện đều được chọn không phải vì
+chúng đúng về nghiệp vụ hơn, mà vì chúng **xóa bỏ một lớp lỗi** thay vì phải phòng thủ
+trước lớp lỗi đó. Không có nhánh hoàn kho thì không hoàn kho sai được; không có đơn vừa
+hủy vừa đã thu tiền thì không cần màn hình xử lý nó.

@@ -6,10 +6,20 @@ from taggit.managers import TaggableManager
 from django.utils import timezone
 
 
+# Trạng thái GIAO HÀNG của đơn (khác hẳn `STATUS` của Product bên dưới — Bẫy #1).
+#
+# `cancelled` thêm ở PLAN bước 2.10 (UC 3.2.25, SPEC-GAPS A7). Nó là trạng thái **cuối**,
+# giống `delivered`: đơn đã hủy không quay lại được.
+#
+# Chỉ hủy được đơn còn ở `processing`, không hủy đơn đã `shipped`. Đây không phải quy tắc
+# tùy tiện mà là ràng buộc của tồn kho: kho chỉ bị trừ khi đơn chuyển sang `shipped`
+# (`change_order_status`), nên hủy trước mốc đó **không cần hoàn kho** — không có nhánh
+# hoàn kho nào để viết sai.
 STATUS_CHOICES = (
     ('processing', 'Processing'),
     ('shipped', 'Shipped'),
     ('delivered', 'Delivered'),
+    ('cancelled', 'Cancelled'),
 )
 
 PAYMENT_METHOD_CHOICES = (

@@ -1001,9 +1001,6 @@ msgstr "Vui lòng chọn một trạng thái đơn hàng hợp lệ."
 msgid "Save"
 msgstr "Lưu"
 
-msgid "This order was delivered. Its status is final."
-msgstr "Đơn hàng này đã giao xong, trạng thái là cuối cùng."
-
 msgid "Please fill in every field."
 msgstr "Vui lòng điền đầy đủ các trường."
 
@@ -1034,3 +1031,46 @@ msgstr "Xóa sạch giỏ hàng"
 #: core/views.py templates/core/product-detail.html
 msgid "Only customers who bought this product can review it."
 msgstr "Chỉ khách đã mua sản phẩm này mới có thể đánh giá."
+
+#: PLAN 2.7 + 2.10
+msgid "This order was cancelled and can no longer be paid."
+msgstr "Đơn hàng này đã hủy, không thanh toán được nữa."
+
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s can no longer be cancelled."
+msgstr "Đơn hàng %(oid)s không còn hủy được nữa."
+
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s has been cancelled."
+msgstr "Đã hủy đơn hàng %(oid)s."
+
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s is already %(status)s. Its status can no longer be changed."
+msgstr "Đơn hàng %(oid)s đang ở trạng thái %(status)s. Không đổi trạng thái được nữa."
+
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s has already left the warehouse and can no longer be cancelled."
+msgstr "Đơn hàng %(oid)s đã xuất kho, không hủy được nữa."
+
+
+
+
+#: PLAN 2.7 + 2.10
+msgid "Order status"
+msgstr "Trạng thái đơn hàng"
+
+
+
+#: PLAN 2.7 + 2.10
+msgid "Cancel this order? This cannot be undone."
+msgstr "Hủy đơn hàng này? Thao tác này không hoàn tác được."
+
+#: PLAN 2.7 + 2.10
+msgid "Cancel this order"
+msgstr "Hủy đơn hàng này"
+
+
+
+#: templates/useradmin/order_detail.html
+msgid "This order is %(order_status_label)s. Its status is final."
+msgstr "Đơn hàng này đang ở trạng thái %(order_status_label)s. Trạng thái là cuối cùng."

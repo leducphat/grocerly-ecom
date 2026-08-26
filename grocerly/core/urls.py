@@ -50,6 +50,8 @@ urlpatterns = [
     # Dashboard
     path('dashboard/', views.customer_dashboard, name='dashboard'),
     path('dashboard/order/<int:id>/', views.order_detail, name='order-detail'),
+    # UC 3.2.25 — khách tự hủy đơn (PLAN 2.10). POST vì đây là thao tác đổi dữ liệu.
+    path('dashboard/order/<oid>/cancel/', views.cancel_order, name='cancel-order'),
 
     # Address
     path('make-default-address/', views.make_address_default, name='make-default-address'),
