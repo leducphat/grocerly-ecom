@@ -981,6 +981,22 @@ def checkout(request, oid):
         messages.info(request, "This order has already been paid.")
         return redirect("core:payment-completed", order.oid)
 
+    # Sót của PLAN bước 2.10: `place_cod_order` và `vnpay_payment` đều đã từ chối đơn đã
+    # hủy, nhưng trang checkout thì chưa — mà chính trang này mới là chỗ áp mã giảm giá.
+    # Khách hủy đơn xong quay lại URL cũ vẫn hạ giá được một đơn không còn tồn tại.
+    if order.product_status == CANCELLED_ORDER_STATUS:
+        messages.warning(request, _("This order was cancelled and can no longer be paid."))
+        return redirect("core:dashboard")
+
+    # Đơn COD đã đặt thì hàng đang được xử lý, nhưng `paid_status` vẫn `False` cho tới
+    # lúc giao (xem `change_order_status`) — nên chốt `paid_status` ở trên không đỡ được.
+    # Thiếu chốt này là khách đặt COD xong quay lại áp mã, hạ giá một đơn đang giao.
+    # `payment_method` mặc định của model là `'online'`; chỉ `place_cod_order` mới đặt
+    # `'cod'`, nên giá trị đó là dấu hiệu tin cậy của "đơn COD đã đặt".
+    if order.payment_method == 'cod':
+        messages.info(request, _("This order has already been placed."))
+        return redirect("core:payment-completed", order.oid)
+
     if request.method == "POST":
         code = request.POST.get("code")
         coupon = Coupon.objects.filter(code=code, active=True).first()

@@ -1107,3 +1107,7 @@ msgstr "Trang trước"
 #: templates/partials/pagination.html
 msgid "Next page"
 msgstr "Trang sau"
+
+#: core/views.py
+msgid "This order has already been placed."
+msgstr "Đơn hàng này đã được đặt."
