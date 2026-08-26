@@ -34,32 +34,107 @@ from userauths.models import Profile
 
 
 import re
+from decimal import Decimal
+
+# Ký hiệu tiền tệ được phép bám quanh con số.
+_CURRENCY_MARKS = ('₫', 'VND', '$')
+
+# Chuỗi số hợp lệ sau khi đã bỏ ký hiệu tiền và khoảng trắng: dấu tùy chọn, rồi các nhóm
+# chữ số ngăn cách bởi `.` hoặc `,`.
+#
+# Khớp-hoặc-bỏ, chứ **không** lọc bỏ ký tự lạ rồi tính trên phần còn lại. Cách lọc cũ
+# biến mọi thứ thành một con số trông hợp lệ: `'[1]'` ra 1.0, `'1e+16'` ra 116.0.
+_NUMBER_RE = re.compile(r'^([+-]?)(\d+(?:[.,]\d+)*)$')
+
+
+def _ungroup(text, mark):
+    """Bỏ dấu phân nhóm nghìn khỏi `text`, trả `None` nếu các nhóm không hợp lệ.
+
+    Nhóm đầu 1–3 chữ số, mọi nhóm sau đúng 3. `'1.5.5'` không phải một triệu năm trăm
+    năm mươi lăm nghìn — nó không phải con số nào cả, nên phải rơi về `default`.
+    """
+    if mark is None or mark not in text:
+        return text if text.isdigit() else None
+
+    groups = text.split(mark)
+    if not 1 <= len(groups[0]) <= 3:
+        return None
+    if any(len(group) != 3 for group in groups[1:]):
+        return None
+
+    joined = ''.join(groups)
+    return joined if joined.isdigit() else None
+
 
 def safe_float(val, default=0.0):
-    try:
-        if val is None:
-            return default
-        val_str = str(val).replace('₫', '').replace('VND', '').replace('$', '').strip()
-        
-        if re.match(r'^\d{1,3}(\.\d{3})+$', val_str):
-            val_str = val_str.replace('.', '')
-            
-        if re.match(r'^\d{1,3}(,\d{3})+$', val_str):
-            val_str = val_str.replace(',', '')
-            
-        val_str = re.sub(r'[^\d.,]', '', val_str)
-        if not val_str:
-            return default
-            
-        val_str = val_str.replace(',', '.')
-        return float(val_str)
-    except (ValueError, TypeError):
+    """Đọc một số tiền ra `float`, chấp nhận cả định dạng Việt lẫn Anh–Mỹ.
+
+    Test: [core/test_money_helpers.py](test_money_helpers.py) — PLAN bước 2.6b.
+
+    Nằm trên đường tiền: `save_checkout_info` đọc giá từ session qua hàm này, và kết quả
+    đi thẳng vào `CartOrder.price`. Ba quy tắc đáng nhớ:
+
+    - **Số thì không đi qua `str()`.** Giá trong session luôn là `float(product.price)`
+      (bản vá [S-02](../../docs/SECURITY.md)), mà `Product.price` là
+      `DecimalField(max_digits=20)`. Với giá ≥ 1e16 — vẫn nằm trong tầm hợp lệ của model —
+      `str()` cho `'1e+16'`, và bản cũ đọc chuỗi đó thành 116.
+    - **Dấu đứng sau là dấu thập phân.** `1.000.000,50` và `1,234.56` chỉ khác nhau ở thứ
+      tự hai dấu. Nhập nhằng (`50.000` — một dấu, đúng ba chữ số đuôi) hiểu là nhóm nghìn.
+    - **Đọc không được thì trả `default`**, không đoán.
+    """
+    if val is None:
         return default
 
+    if isinstance(val, (int, float, Decimal)):
+        try:
+            return float(val)
+        except (ValueError, OverflowError):
+            return default
+
+    text = str(val)
+    for mark in _CURRENCY_MARKS:
+        text = text.replace(mark, '')
+    text = re.sub(r'\s+', '', text)
+
+    match = _NUMBER_RE.match(text)
+    if match is None:
+        return default
+    sign, body = match.groups()
+
+    last_index = max(body.rfind('.'), body.rfind(','))
+    if last_index == -1:
+        whole, fraction, group_mark = body, '', None
+    else:
+        last_mark = body[last_index]
+        other_mark = ',' if last_mark == '.' else '.'
+        head, tail = body[:last_index], body[last_index + 1:]
+
+        # Dấu cuối là dấu thập phân khi hai loại dấu cùng có mặt (`1.000.000,50`), hoặc
+        # khi phần đuôi không dài đúng ba chữ số (`12,5`). Còn lại hiểu là nhóm nghìn.
+        if other_mark in head or len(tail) != 3:
+            whole, fraction, group_mark = head, tail, other_mark
+        else:
+            whole, fraction, group_mark = body, '', last_mark
+
+    digits = _ungroup(whole, group_mark)
+    if digits is None:
+        return default
+
+    try:
+        return float(f'{sign}{digits}.{fraction}' if fraction else f'{sign}{digits}')
+    except (ValueError, OverflowError):
+        return default
+
+
 def safe_int(val, default=1):
+    """Đọc một **số lượng** ra `int`, nên `default` là 1 chứ không phải 0.
+
+    Cắt phần thập phân về phía 0, không làm tròn. Việc kẹp cận dưới là của view gọi nó
+    (`add_to_cart` và `update_cart` đều bọc trong `max(1, ...)`), không phải của hàm này.
+    """
     try:
         return int(safe_float(val, default))
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):
         return default
 
 
