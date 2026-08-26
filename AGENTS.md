@@ -69,7 +69,7 @@ python manage.py test --settings=grocerly.settings_test
 `manage.py test` sẽ tạo database `test_<tên-db>` **trên máy chủ production Neon** (bẫy #5).
 Module này ép SQLite in-memory.
 
-**174 test** tính đến 2026-08-26, chia hai tầng:
+**207 test** tính đến 2026-08-26, chia hai tầng:
 
 | File | Nội dung |
 |---|---|
@@ -78,6 +78,8 @@ Module này ép SQLite in-memory.
 | [core/test_softdelete.py](grocerly/core/test_softdelete.py) | Hạ tầng xóa mềm ở mức model, chốt bẫy #3 |
 | [core/test_checkout.py](grocerly/core/test_checkout.py) | Luồng tạo đơn — **đọc trước khi đụng `save_checkout_info`** |
 | [core/test_missing_relations.py](grocerly/core/test_missing_relations.py) | Sản phẩm thiếu `category`/`vendor` không được làm sập storefront |
+| [core/test_migration_0007.py](grocerly/core/test_migration_0007.py) | **Backfill của migration** — chạy migration thật bằng `MigrationExecutor` |
+| [core/test_review_purchase.py](grocerly/core/test_review_purchase.py) | Điều kiện đã mua mới được đánh giá (A2) |
 | [core/test_contact_form.py](grocerly/core/test_contact_form.py) · [core/test_clear_cart.py](grocerly/core/test_clear_cart.py) · [useradmin/test_delete_product.py](grocerly/useradmin/test_delete_product.py) · [useradmin/test_order_status.py](grocerly/useradmin/test_order_status.py) | Theo chức năng |
 
 **Còn trống:** [userauths/tests.py](grocerly/userauths/tests.py) vẫn là stub rỗng, và
@@ -172,6 +174,16 @@ Chi tiết kiến trúc và luồng xử lý: [docs/ARCHITECTURE.md](docs/ARCHIT
 8. **URL có tiền tố ngôn ngữ** (`/vi/...`, `/en/...`) do `i18n_patterns`, trừ `/api/v1/`
    được đặt ngoài. Hardcode URL không tiền tố sẽ 404.
 
+9. **`CartOrderItem` có CẢ bản sao tĩnh lẫn khóa ngoại** (migration `0007`,
+   [ADR-0006](docs/DECISIONS.md)). `item`/`image`/`price` là ảnh chụp lúc đặt hàng, **không
+   được** đồng bộ lại theo sản phẩm; `product` là đường tra ngược. Cần biết *"khách đã trả
+   bao nhiêu, tên gì"* thì đọc bản sao; cần biết *"đây vốn là sản phẩm nào"* thì đọc khóa
+   ngoại.
+
+   `product IS NULL` có **hai** nghĩa: sản phẩm đã bị xóa cứng, hoặc dòng có từ trước
+   migration `0007` mà backfill không dò ra (tên trùng hai sản phẩm). **Đừng đọc `NULL`
+   thành "sản phẩm này chưa từng bán".**
+
 ## Trước khi báo hoàn thành
 
 - [ ] Đã chạy `python manage.py check` không lỗi
@@ -218,7 +230,8 @@ Mỗi tài liệu có hệ mã riêng. **Luôn viết kèm tên hệ mã**, đ�
 
 Ba chỗ dễ nhầm:
 
-1. **`Bẫy #N` và `Nợ kỹ thuật #N` là hai danh sách khác nhau, cùng đánh 1–8.**
+1. **`Bẫy #N` và `Nợ kỹ thuật #N` là hai danh sách khác nhau, đánh số gần trùng nhau**
+   (bẫy 1–9, nợ kỹ thuật 1–8).
    Ví dụ `#5`: bẫy = `.env` trỏ production; nợ kỹ thuật = ba cờ trạng thái Product.
 2. **Chữ cái A/B/C trong SPEC-GAPS là *nhóm*, không phải mã công việc.** PLAN.md từng
    dùng chữ cái A–L cho backlog nhưng **đã bỏ 2026-08-25**, thay bằng `bước N.M`.

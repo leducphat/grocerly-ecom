@@ -180,12 +180,15 @@ def product_detail_view(request, p_id):
     # Product Review form
     review_form = ProductReviewForm()
 
-    make_review = True
-
-    if request.user.is_authenticated:
-        user_review_count = ProductReview.objects.filter(user=request.user, product=product).count()
-        if user_review_count > 0:
-            make_review = False
+    # Form đánh giá chỉ hiện khi khách **đã mua** và **chưa đánh giá** sản phẩm này.
+    # Hai điều kiện tách riêng để template nói được lý do — ẩn form không kèm giải thích
+    # thì khách tưởng chức năng hỏng (A2 / UC 3.2.14).
+    has_bought = has_purchased(request.user, product)
+    already_reviewed = (
+        request.user.is_authenticated
+        and ProductReview.objects.filter(user=request.user, product=product).exists()
+    )
+    make_review = has_bought and not already_reviewed
 
     context = {
         'p': product,
@@ -195,6 +198,8 @@ def product_detail_view(request, p_id):
         'average_rating': average_rating,
         'review_form': review_form,
         'make_review': make_review,
+        'has_bought': has_bought,
+        'already_reviewed': already_reviewed,
         'rating_5': rating_5,
         'rating_4': rating_4,
         'rating_3': rating_3,
@@ -242,6 +247,33 @@ def validated_review_payload(request):
 def average_rating_for(product):
     return ProductReview.objects.filter(product=product).aggregate(rating=Avg('rating'))
 
+
+# Đơn phải đi khỏi kho thì mới tính là "đã mua" — UC 3.2.14 Pre-Conditions, SPEC-GAPS A2.
+#
+# Báo cáo viết điều kiện là đơn **Shipped**. Ở đây nhận cả `delivered` vì `delivered` nằm
+# SAU `shipped` trong vòng đời đơn: hiểu chữ "Shipped" theo nghĩa hẹp thì khách nhận được
+# hàng rồi lại **mất** quyền đánh giá, chắc chắn không phải ý của use case. `processing`
+# thì không: đơn còn có thể bị hủy trước khi rời kho.
+PURCHASED_ORDER_STATUSES = ('shipped', 'delivered')
+
+
+def has_purchased(user, product):
+    """Người này đã thực sự mua sản phẩm kia chưa?
+
+    Trả lời được là nhờ khóa ngoại thêm ở PLAN bước 2.11 ([ADR-0006](../../docs/DECISIONS.md)).
+    Trước đó `CartOrderItem` chỉ lưu tên sản phẩm, nên câu hỏi này chỉ so được theo chuỗi
+    — và [ADR-0005](../../docs/DECISIONS.md) đã lấy đúng lý do đó để hoãn A2: nhân viên
+    đổi tên sản phẩm là người mua thật mất quyền đánh giá mà không hiểu vì sao.
+
+    Khách vãng lai (`AnonymousUser`) trả `False` — không có đơn nào gắn với họ.
+    """
+    if not user.is_authenticated:
+        return False
+    return CartOrderItem.objects.filter(
+        order__user=user,
+        product=product,
+        order__product_status__in=PURCHASED_ORDER_STATUSES,
+    ).exists()
 
 
 def own_review_or_none(request, review_id):
@@ -308,6 +340,15 @@ def ajax_add_review(request, p_id):
 
     product = get_object_or_404(Product, pk=p_id)
     user = request.user
+
+    # A2 / UC 3.2.14 Pre-Conditions — chỉ người đã mua mới được đánh giá (PLAN 2.12).
+    # Kiểm ở server chứ không chỉ ẩn form: S-08 đã cho thấy chốt chặn nằm mỗi ở template
+    # thì POST thẳng vào endpoint là đi qua được.
+    if not has_purchased(user, product):
+        return JsonResponse({
+            'bool': False,
+            'error': _("Only customers who bought this product can review it."),
+        }, status=403)
 
     if ProductReview.objects.filter(user=user, product=product).exists():
         return JsonResponse({

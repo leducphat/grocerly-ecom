@@ -7,7 +7,13 @@
 > ⚠️ **Tiểu luận đã nộp và có điểm.** File này giờ phục vụ **Khóa luận tốt nghiệp** —
 > cùng đề tài, cùng GVHD. Xem [PLAN.md](PLAN.md).
 >
-> Cập nhật 2026-08-26: đóng **A8** và **B3**; **B11** xong phần code, chờ deploy.
+> Cập nhật 2026-08-26: đóng **A2**, **A8** và **B3**; **B11** xong phần code, chờ deploy.
+
+> **Ghi chú A2 — "Shipped" hiểu theo nghĩa nào.** UC 3.2.14 viết điều kiện là đơn
+> *Shipped*. Code nhận **cả `shipped` lẫn `delivered`**, vì `delivered` nằm sau `shipped`
+> trong vòng đời đơn: hiểu chữ đó theo nghĩa hẹp thì khách nhận được hàng rồi lại *mất*
+> quyền đánh giá. `processing` không được tính — đơn còn có thể bị hủy trước khi rời kho.
+> Đây là chỗ code **rộng hơn** báo cáo một cách có chủ ý, không phải lệch.
 
 ## Vì sao cần file này
 
@@ -24,7 +30,7 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 | # | Báo cáo | Thực tế | Kiểm chứng |
 |---|---|---|---|
 | A1 | ~~**Sửa & Xóa đánh giá** — UC 3.2.14, Hình 22–23~~ | ✅ **Đã đóng 2026-08-25** — `ajax_edit_review` và `ajax_delete_review` đúng tên báo cáo ghi, kèm nút Sửa/Xóa ở trang chi tiết. Chỉ chủ đánh giá đụng được; của người khác trả 404 | `EditDeleteReviewTests` |
-| A2 | Đánh giá yêu cầu **đã mua hàng (đơn Shipped)** — UC 3.2.14 Pre-Conditions **và Hình 21** | 🔜 **Sẽ cài** — [ADR-0006](DECISIONS.md) đảo ngược ADR-0005. Hiện ai đăng nhập cũng đánh giá được, mỗi người một lần (kiểm ở server từ [S-08](SECURITY.md#s-08--chốt-chặn-đánh-giá-chỉ-nằm-ở-template)). Cần thêm khóa ngoại cho `CartOrderItem` trước — [PLAN](PLAN.md) bước 2.11–2.12. **Báo cáo giữ nguyên** | `ajax_add_review` |
+| A2 | ~~Đánh giá yêu cầu **đã mua hàng (đơn Shipped)** — UC 3.2.14 Pre-Conditions **và Hình 21**~~ | ✅ **Đã đóng 2026-08-26** — `has_purchased` tra theo khóa ngoại mới của `CartOrderItem` ([ADR-0006](DECISIONS.md), bước 2.11). Chưa mua mà POST thẳng vào endpoint thì `403`; trang chi tiết ẩn form **kèm lý do**. Nhận cả `shipped` lẫn `delivered` — xem ghi chú dưới bảng. **Báo cáo giữ nguyên**, không phải sửa chữ nào | `core/test_review_purchase.py` |
 | A3 | **Phân trang** — UC 3.2.3 Alternate Flow | Không có `Paginator` ở đâu | `grep -rn "Paginator\|paginate"` → rỗng |
 | A4 | ~~**"Làm sạch giỏ hàng"** — UC 3.2.6 Alternate Flow~~ | ✅ **Đã đóng 2026-08-26** — `clear_cart` (POST + CSRF), nút ở trang giỏ hàng. Đừng nhầm với `delete_item_from_cart` (xóa **một** sản phẩm) vốn đã có sẵn từ trước và vẫn chạy đúng | `ClearCartTests` |
 | A5 | ~~Cập nhật SL **vượt tồn kho → báo lỗi** — UC 3.2.6 Exception Flow~~ | ✅ **Đã đóng 2026-08-24** — `add_to_cart` và `update_cart` đều kiểm `stock_count`, trả `400` kèm số lượng còn lại | Sửa cùng [S-02](SECURITY.md#s-02--giả-mạo-giá-sản-phẩm) |
@@ -47,7 +53,7 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 |---|---|---|
 | B1 | Nhân viên chỉ thấy dữ liệu **"thuộc gian hàng mình"** (mục 1.2.1) | `useradmin` trả `Product.objects.all()`, doanh thu toàn hệ thống. Chỉ `shop_page` lọc theo user |
 | B2 | **Hình 26** — Nhờ AI thêm vào giỏ: server gọi hàm và tự ghi Django Session | Server trả cờ `action: confirm_add_cart`; **JS phía client** mới gọi `/add-to-cart/`. Đây là thiết kế **có chủ ý** (giữ vòng xác nhận của người dùng) — nên sửa sơ đồ theo code, xem [ARCHITECTURE.md](ARCHITECTURE.md) mục 4.3 |
-| B3 | ~~**Hình 30** — Xóa sản phẩm: có nhánh kiểm tra đơn hàng liên quan rồi mới xóa mềm/cứng~~ | ✅ **Đã đóng 2026-08-26** — code nay khớp hình. Sản phẩm đã có đơn thì xóa mềm, chưa có đơn thì xóa cứng. Việc dò "đã có đơn chưa" tạm khớp **theo tên** (`CartOrderItem` chưa có khóa ngoại) — sẽ thành tra theo khóa ngoại sau bước 2.11 |
+| B3 | ~~**Hình 30** — Xóa sản phẩm: có nhánh kiểm tra đơn hàng liên quan rồi mới xóa mềm/cứng~~ | ✅ **Đã đóng 2026-08-26** — code nay khớp hình. Sản phẩm đã có đơn thì xóa mềm, chưa có đơn thì xóa cứng. Việc dò "đã có đơn chưa" nay tra theo **khóa ngoại** (bước 2.11); riêng dòng hóa đơn cũ chưa có khóa ngoại thì vẫn so tên, cố ý — xem `product_has_order_history` |
 | B4 | **ERD (Hình 45)** — `core_product.tags` là cột `VARCHAR` | `django-taggit` lưu ở bảng riêng (`taggit_tag`, `taggit_taggeditem`). ERD cũng thiếu bảng nối M2M `cartorder ↔ coupon` |
 | B5 | **Bảng 28** mô tả `core_tag` như một bảng thật | `core.models.Tag` là `class Tag(models.Model): pass` — model rỗng không dùng |
 | B6 | Định vị **multi-vendor**, "Người bán" có gian hàng riêng | `Vendor` thực chất là thương hiệu/nhà cung cấp. [ADR-0003](DECISIONS.md) **đã chốt 2026-08-25** → sửa báo cáo, xem [PLAN](PLAN.md) bước 3.9–3.11 |

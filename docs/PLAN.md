@@ -42,7 +42,7 @@ quyết định nghiệp vụ, không phải cắt giảm vì thiếu thời gia
 
 - [ ] **1.1** Merge `develop` → `main`, Render tự deploy — **hoãn có chủ ý, 2026-08-26**
 
-`main` đang chậm **24 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
+`main` đang chậm **28 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
 mọi bản vá đã làm **chưa bảo vệ được gì**.
 
 **Quyết định 2026-08-26: hoãn.** Production đang chạy ổn định và chưa cần demo cho GVHD,
@@ -54,6 +54,10 @@ Hệ quả cần nhớ khi deploy:
 - `build.sh` chạy `compilemessages` nên `django.mo` được biên dịch lại — mọi chuỗi tiếng
   Việt thêm từ 2026-08-25 tới nay **chỉ hiện đúng sau bước này** (xem *Bẫy i18n* bên dưới)
 - Migration `0006_drop_stripe_payment_intent` sẽ chạy và drop cột thật trên Neon
+- Migration `0007_cartorderitem_product` sẽ chạy kèm **backfill dữ liệu**: nó dò lại sản
+  phẩm gốc cho từng dòng `CartOrderItem` theo tên. Chỉ ghi vào cột `product`, không đụng
+  bản sao tĩnh của hóa đơn — nhưng đây là migration **có ghi dữ liệu** đầu tiên của dự án
+  nên đáng soát log sau khi deploy: dòng nào để `NULL` là dòng backfill không dò ra
 - Trước khi deploy nên soát đơn hàng mắc kẹt ở trạng thái rác:
   `CartOrder.objects.exclude(product_status__in=['processing','shipped','delivered'])`
   — xem bước 2.2
@@ -91,8 +95,8 @@ là đóng gap mà không phải sửa báo cáo.
 | **2.8** | Phân trang ([A3](SPEC-GAPS.md)) | UC 3.2.3 Alternate Flow | trung bình |
 | **2.9** | Coupon hạn dùng + số lượt ([A6](SPEC-GAPS.md)) | UC 3.2.21 | trung bình, có migration |
 | **2.10** | Hủy đơn ([A7](SPEC-GAPS.md)) | UC 3.2.25 | trung bình-cao, có migration |
-| **2.11** | **Khóa ngoại `CartOrderItem` → `Product`** | [ADR-0006](DECISIONS.md); vá nợ kỹ thuật #6 | cao, đụng checkout |
-| **2.12** | Điều kiện đã mua mới đánh giá ([A2](SPEC-GAPS.md)) | UC 3.2.14 + **Hình 21** | phụ thuộc 2.11 |
+| ✅ **2.11** | ~~**Khóa ngoại `CartOrderItem` → `Product`**~~ **Xong 2026-08-26** | [ADR-0006](DECISIONS.md); vá nợ kỹ thuật #6 | cao, đụng checkout |
+| ✅ **2.12** | ~~Điều kiện đã mua mới đánh giá ([A2](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.14 + **Hình 21** | phụ thuộc 2.11 |
 | **2.13** | Gửi email hàng loạt ([A10](SPEC-GAPS.md)) | UC 3.2.22 Alternate Flow | cao, cần cấu hình SMTP |
 | **2.14** | Các endpoint đổi dữ liệu bằng GET còn lại ([S-10](SECURITY.md)) + cờ `Secure` cho cookie ([S-11](SECURITY.md)) | mục 1.2.2 Yêu cầu phi chức năng | thấp-trung bình |
 
@@ -101,9 +105,10 @@ không. Đã đọc bản gốc: **ERD Hình 45 và Bảng 32 đều không có*
 Nên drop cột làm code **khớp** báo cáo, không phải ngược lại. Đã kiểm production: 11 đơn
 hàng, **0 đơn có dữ liệu** ở cột này.
 
-**Ghi chú 2.11:** giỏ hàng đã lưu `pid` trong session nên `save_checkout_info` tra ngược
-được sản phẩm, không phải đổi cấu trúc giỏ. Migration cần **backfill theo tên** cho dữ
-liệu cũ; dòng nào không khớp để `NULL`.
+**Ghi chú 2.11 (sau khi làm xong):** hóa ra còn thẳng hơn dự tính — **khóa của giỏ hàng
+chính là khóa chính của sản phẩm** (`add_to_cart` ép `id` phải là chữ số), nên không cần
+đi vòng qua `pid`. Backfill dừng ở mức **chỉ nối khi tên ứng với đúng một sản phẩm**;
+tên trùng thì để `NULL` chứ không chọn bừa.
 
 ### 2.6 — Tầng unit test (mở rộng 2026-08-26)
 
@@ -200,7 +205,7 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
       phát hiện ban đầu bị bác bỏ** khi có bước phản biện độc lập. Thấy `@csrf_exempt`
       trong code **chưa đủ để kết luận có lỗ hổng** — còn phải trả lời được request của
       kẻ tấn công có mang được cookie phiên tới không, mà điều đó phụ thuộc `SameSite`
-- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **174 test tự động**
+- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **207 test tự động**
       (số tính tới 2026-08-26), cộng bảng test case cho AI Chatbot và VNPay.
       Điểm mạnh hơn con số: nay trình bày được thành **kim tự tháp test** — unit test
       thuần (`SimpleTestCase`, không DB) / test ở mức model / test hồi quy ở mức HTTP
@@ -213,6 +218,64 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
 ---
 
 ## Đã xong
+
+### 2026-08-26 — Bước 2.11 + 2.12: khóa ngoại `CartOrderItem` → `Product`
+
+**174 → 207 test.** Đây là hạng mục đầu tiên của KLTN đóng một gap **nhóm A** mà báo cáo
+đã đặc tả sẵn cả use case lẫn lược đồ tuần tự — **không phải sửa một chữ nào trong báo
+cáo**, chỉ phải bổ sung khóa ngoại vào ERD (bước 3.8, vốn đã nằm trong kế hoạch).
+
+- **2.11** — `CartOrderItem.product`, `on_delete=SET_NULL`, chạy **song song** với bản sao
+  tĩnh chứ không thay nó. Snapshot vẫn giữ hóa đơn không đổi khi sản phẩm bị sửa hay xóa;
+  khóa ngoại trả lời câu *"dòng này vốn là sản phẩm nào"*. Ba test
+  `test_the_snapshot_survives_*` viết từ bước 2.6f **xanh nguyên**, đúng như nhóm đó dự
+  liệu — bằng chứng là hai cơ chế không giẫm chân nhau. Đúng **một** test phải đổi kỳ
+  vọng (`test_there_is_no_link_back_to_the_product`), và đó chính là test mà 2.6f đã ghi
+  sẵn là sẽ phải đổi.
+
+  Đường tra ngược **thẳng hơn ghi chú kế hoạch cũ**: khóa của `cart_data_obj` chính là
+  khóa chính của sản phẩm (`add_to_cart` ép `id` phải là chữ số), nên không cần đi vòng
+  qua `pid`. `save_checkout_info` tra một truy vấn cho cả giỏ, dùng `all_objects` để sản
+  phẩm bị ngừng bán lúc còn nằm trong giỏ vẫn nối được.
+
+- **Nợ kỹ thuật #6 đã vá.** `change_order_status` trước đây trừ kho bằng
+  `Product.objects.filter(title=item.item).first()`. Ba test mới chốt lại lỗi đó, và
+  **cả ba đều đỏ khi thử khôi phục code cũ** — không phải test trang trí:
+  trùng tên thì `.first()` trừ kho của sản phẩm *không được mua*; đổi tên sau khi bán thì
+  không trừ được gì.
+
+- **Chỗ cố ý KHÔNG dùng khóa ngoại.** `product_has_order_history` vẫn so tên, nhưng chỉ
+  cho dòng `product IS NULL`. Lý do là hai chiều sai ở đó không nguy hiểm ngang nhau:
+  nhầm CÓ → xóa mềm (khôi phục được), nhầm KHÔNG → **xóa cứng** (mất hẳn). Ở
+  `change_order_status` và `has_purchased` thì ngược lại, nên hai chỗ đó không có lưới
+  hứng theo tên. **Cùng một dữ liệu thiếu, ba cách xử lý khác nhau tùy hướng của rủi ro**
+  — đáng đưa vào [bước 4.1](#giai-đoạn-4--nội-dung-mới-cho-kltn).
+
+- **Migration `0007` có backfill, và backfill đó được test.**
+  [core/test_migration_0007.py](../grocerly/core/test_migration_0007.py) chạy migration
+  thật bằng `MigrationExecutor` chứ không gọi hàm với model hiện tại — vì model lịch sử ở
+  trạng thái `0006` **chưa có** cột `product`, đúng điều kiện cần tái hiện. Backfill **cố
+  tình không đoán bừa**: tên ứng với hai sản phẩm thì để `NULL`. Ba test kỳ vọng nối được
+  đều đỏ khi thử vô hiệu hóa backfill.
+
+- **2.12** — `has_purchased`, kiểm ở **server** (`403`) chứ không chỉ ẩn form; S-08 đã cho
+  thấy chốt chặn nằm mỗi ở template thì POST thẳng vào endpoint là đi qua được. Trang chi
+  tiết ẩn form **kèm câu giải thích** — ẩn không nói lý do thì khách tưởng chức năng hỏng.
+
+  Nhận cả `shipped` lẫn `delivered` dù UC 3.2.14 chỉ viết *Shipped*: `delivered` nằm sau
+  `shipped` nên hiểu theo nghĩa hẹp là khách nhận hàng xong lại **mất** quyền đánh giá.
+  Ghi lại trong [SPEC-GAPS](SPEC-GAPS.md) như một chỗ code rộng hơn báo cáo **có chủ ý**.
+
+- **Cặp ADR-0005 → ADR-0006 nay có kết cục.** ADR-0005 loại A2 với lý do: chỉ so được
+  theo tên nên đổi tên sản phẩm là chặn nhầm người mua thật. Nhóm `RenameAndDeleteTests`
+  chốt lại rằng lý do đó đã hết hiệu lực — đúng thứ [bước 4.3](#giai-đoạn-4--nội-dung-mới-cho-kltn)
+  cần: một quyết định bị đảo ngược, và bằng chứng bằng test rằng việc đảo là đúng.
+
+**Còn nợ lại (không thuộc phạm vi 2.11/2.12):** form thêm đánh giá ở
+`templates/core/product-detail.html` submit bằng **POST thường** tới một endpoint trả
+JSON — không có handler AJAX nào, dù `<strong id="review-res">` cho thấy đã từng định
+làm. Khách bấm Gửi sẽ thấy JSON thô. Lỗi này có từ trước, và sửa/xóa đánh giá thì lại có
+AJAX đầy đủ. Chưa sửa vì nằm ngoài phạm vi hai bước này.
 
 ### 2026-08-26 — Bước 2.1, 2.2, 2.3, 2.4, 2.6a, 2.6d + rà soát endpoint
 

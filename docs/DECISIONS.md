@@ -253,7 +253,7 @@ thêm ma sát cho đúng buổi bảo vệ.
 
 ## ADR-0006 — Thêm khóa ngoại `Product` cho `CartOrderItem`
 
-**Trạng thái:** Đã chốt · 2026-08-25 · Thay thế [ADR-0005](#adr-0005--không-cài-điều-kiện-đã-mua-mới-được-đánh-giá)
+**Trạng thái:** Đã chốt · 2026-08-25 · **Đã cài xong 2026-08-26** · Thay thế [ADR-0005](#adr-0005--không-cài-điều-kiện-đã-mua-mới-được-đánh-giá)
 
 ### Bối cảnh
 
@@ -292,19 +292,33 @@ Khóa ngoại là **thông tin truy vết bổ sung**, không phải vật thay 
 
 ### Hệ quả
 
-- `save_checkout_info` phải gán `product` khi tạo `CartOrderItem`. Giỏ hàng đã lưu `pid`
-  trong session nên tra ngược được, không cần đổi cấu trúc giỏ.
-- Migration có **backfill theo tên** cho các dòng đã tồn tại — chấp nhận được vì đây là
-  nỗ lực tốt nhất trên dữ liệu cũ, không phải cơ chế chạy thường xuyên. Dòng nào không
-  khớp thì để `NULL`.
-- ERD (Hình 45) và Bảng 33 phải bổ sung khóa ngoại này.
-- **SPEC-GAPS A2 chuyển từ "cố ý không cài" sang "sẽ cài"** — [PLAN.md](PLAN.md) bước
-  2.11–2.12. Việc sửa UC 3.2.14 Pre-Conditions trong kế hoạch cũ bị hủy: báo cáo đã mô
-  tả đúng ngay từ đầu.
+- ✅ `save_checkout_info` gán `product` khi tạo `CartOrderItem`. Hóa ra tra ngược còn
+  thẳng hơn dự tính: **khóa của giỏ hàng chính là khóa chính của sản phẩm**, không cần đi
+  vòng qua `pid`.
+- ✅ Migration `0007` có **backfill theo tên** — nhưng chốt chặt hơn mô tả ban đầu: chỉ
+  nối khi tên ứng với **đúng một** sản phẩm. Tên trùng hai sản phẩm thì để `NULL` chứ
+  không chọn bừa, vì nối sai một dòng hóa đơn về nhầm sản phẩm là cái sai im lặng mà các
+  bước sau sẽ tin là đúng.
+- ⏳ ERD (Hình 45) và Bảng 33 phải bổ sung khóa ngoại này — [PLAN.md](PLAN.md) bước 3.8,
+  **chưa làm**.
+- ✅ **SPEC-GAPS A2 đã đóng** (2026-08-26). Việc sửa UC 3.2.14 Pre-Conditions trong kế
+  hoạch cũ bị hủy: báo cáo đã mô tả đúng ngay từ đầu.
 
 ### Ghi chú cho báo cáo
 
 Cặp ADR-0005 → ADR-0006 là ví dụ tốt cho mục *Quyết định kiến trúc* của KLTN: cùng một
 dữ kiện kỹ thuật, hai kết luận khác nhau vì ràng buộc dự án khác nhau — và quyết định
 được xét lại khi ràng buộc mất đi, thay vì kế thừa theo quán tính.
+
+Sau khi cài xong (2026-08-26) cặp ADR này còn có thêm một kết cục kiểm chứng được. Lý do
+ADR-0005 loại phương án — *"đổi tên sản phẩm là chặn nhầm người mua thật"* — nay là một
+test chạy được: `RenameAndDeleteTests` trong
+[core/test_review_purchase.py](../grocerly/core/test_review_purchase.py). Không chỉ nói
+rằng quyết định cũ đã hết hiệu lực, mà chứng minh được.
+
+Một chi tiết nữa đáng đưa vào báo cáo: cùng một dữ liệu thiếu (`product IS NULL`), code
+xử lý **ba cách khác nhau** tùy hướng của rủi ro. `product_has_order_history` vẫn so tên
+(đoán sai → xóa mềm, khôi phục được); `change_order_status` bỏ qua (đoán sai → trừ nhầm
+kho người khác); `has_purchased` từ chối (đoán sai → mở quyền đánh giá cho người chưa
+mua). Không có một quy tắc chung nào đúng cho cả ba.
 

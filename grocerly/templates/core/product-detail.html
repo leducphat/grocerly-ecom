@@ -380,6 +380,11 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                {% elif not has_bought %}
+                                                {# A2 / UC 3.2.14 — nói rõ lý do thay vì để form biến mất không giải thích. #}
+                                                <div class="alert alert-info" role="alert">
+                                                    {% trans "Only customers who bought this product can review it." %}
+                                                </div>
                                                 {% endif %}
                                                 {% endif %}
                                             </div>

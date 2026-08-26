@@ -97,6 +97,7 @@ erDiagram
     Product ||--o{ ProductImage : "ảnh phụ"
     Product ||--o{ ProductReview : nhận
     CartOrder ||--o{ CartOrderItem : gồm
+    Product ||--o{ CartOrderItem : "đã bán (nullable)"
     CartOrder }o--o{ Coupon : "áp dụng (M2M)"
 ```
 
@@ -104,10 +105,15 @@ Ghi chú quan trọng:
 
 - **Định danh công khai** dùng ShortUUID: `Category.c_id`, `Vendor.v_id`,
   `Product.p_id`/`sku`, `CartOrder.oid`. URL không lộ khóa chính số.
-- **`CartOrderItem` lưu snapshot** (`item`, `image`, `price` dạng chuỗi/số), **không**
-  FK tới `Product`. Ưu điểm: hóa đơn không đổi khi sản phẩm bị sửa/xóa. Nhược điểm:
-  không truy vết được sản phẩm gốc — `change_order_status` phải khớp lại bằng
-  `Product.objects.filter(title=item.item)`, rất dễ sai khi trùng tên.
+- **`CartOrderItem` lưu snapshot** (`item`, `image`, `price` dạng chuỗi/số) **và** một
+  khóa ngoại `product` chạy song song (thêm ở migration `0007`, [ADR-0006](DECISIONS.md)).
+  Hai thứ trả lời hai câu khác nhau và **cả hai đều cần**: snapshot giữ hóa đơn không đổi
+  khi sản phẩm bị sửa hay xóa, khóa ngoại cho biết dòng này vốn là sản phẩm nào.
+  `on_delete=SET_NULL` — xóa cứng sản phẩm không được làm bốc hơi dòng hóa đơn.
+
+  `product` để `NULL` có **hai** nghĩa: sản phẩm đã bị xóa cứng, hoặc dòng có từ trước
+  migration `0007` mà backfill không dò ra (tên trùng hai sản phẩm). Không đọc `NULL`
+  thành *"sản phẩm này chưa từng bán"*.
 - **Tag** do `django-taggit` quản lý ở bảng riêng; `core.models.Tag` là stub rỗng không dùng.
 
 ### Ba cờ trạng thái của Product
@@ -269,11 +275,11 @@ khi `settings.py` hiện chỉ hiểu `USE_CLOUDINARY` — cấu hình này đã
 
 | # | Vấn đề | Ảnh hưởng |
 |---|---|---|
-| 1 | **174 test** tính đến 2026-08-26. Checkout nay đã có lưới ([core/test_checkout.py](../grocerly/core/test_checkout.py), bước 2.6f). Còn trống: `userauths/tests.py` là stub rỗng, và các helper `safe_float`/`vnd` vẫn chưa có test | Đăng ký/đăng nhập và các hàm xử lý số trên đường tiền vẫn phải kiểm thử tay. Xem [PLAN](PLAN.md) bước 2.6b, 2.6c, 2.6g |
+| 1 | **207 test** tính đến 2026-08-26. Checkout nay đã có lưới ([core/test_checkout.py](../grocerly/core/test_checkout.py), bước 2.6f). Còn trống: `userauths/tests.py` là stub rỗng, và các helper `safe_float`/`vnd` vẫn chưa có test | Đăng ký/đăng nhập và các hàm xử lý số trên đường tiền vẫn phải kiểm thử tay. Xem [PLAN](PLAN.md) bước 2.6b, 2.6c, 2.6g |
 | 2 | Truy vấn không `select_related` → N+1 | Chậm khi dữ liệu lớn |
 | 3 | Không phân trang ở mọi trang danh sách | Tải toàn bộ sản phẩm mỗi request |
 | 4 | `useradmin` không giới hạn phạm vi theo nhân viên | Mọi staff thấy toàn bộ dữ liệu |
 | 5 | Ba cờ trạng thái Product chồng chéo (`product_status` / `status` / `in_stock`) | S-04 đã vá, nhưng `status` và `in_stock` vẫn là cờ thừa chưa ai dọn |
-| 6 | `CartOrderItem` khớp sản phẩm bằng `title` | Nay có **hai** chỗ phụ thuộc: `change_order_status` trừ kho sai khi trùng tên, và `delete_product` dò "đã có đơn chưa" cũng theo tên (nhầm về phía an toàn — xóa mềm thay vì xóa cứng). [ADR-0006](DECISIONS.md) / [PLAN](PLAN.md) bước 2.11 dọn cả hai |
+| 6 | ~~`CartOrderItem` khớp sản phẩm bằng `title`~~ | ✅ **Đã vá 2026-08-26** ([ADR-0006](DECISIONS.md), [PLAN](PLAN.md) bước 2.11). `change_order_status` trừ kho theo khóa ngoại, `delete_product` dò lịch sử đơn theo khóa ngoại. Còn **một** chỗ cố ý giữ khớp theo tên: `product_has_order_history` vẫn so tên cho dòng `product IS NULL`, vì ở đó đoán sai chỉ dẫn tới xóa mềm (khôi phục được) còn không đoán là xóa cứng (mất hẳn) |
 | 7 | ~20 template mồ côi (`index2`, `product-lists`, `login`…) | Gây nhiễu khi tìm file |
 | 8 | `login_view` dùng `except:` trần | Nuốt lỗi thật, khó debug |

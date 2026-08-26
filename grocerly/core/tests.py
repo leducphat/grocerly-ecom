@@ -9,7 +9,7 @@ from decimal import Decimal
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import CartOrder, Category, Product, ProductReview, Vendor
+from core.models import CartOrder, CartOrderItem, Category, Product, ProductReview, Vendor
 from userauths.models import User
 
 
@@ -114,6 +114,28 @@ class PaymentCompletedTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+def deliver_order(user, product, status='delivered'):
+    """Dựng một đơn đã giao chứa `product` — tiền đề của điều kiện đánh giá (A2).
+
+    Dòng hóa đơn mang **khóa ngoại** tới sản phẩm, đúng cách `save_checkout_info` tạo ra
+    từ PLAN bước 2.11 (ADR-0006). Chính khóa ngoại này là thứ `has_purchased` tra.
+    """
+    order = CartOrder.objects.create(
+        user=user, price=product.price, product_status=status, paid_status=True,
+    )
+    CartOrderItem.objects.create(
+        order=order,
+        product=product,
+        invoice_no=f"INVOICE_NO-{order.id}",
+        item=product.title,
+        image="/media/products.jpg",
+        quantity=1,
+        price=product.price,
+        total=product.price,
+    )
+    return order
+
+
 class AddReviewTests(TestCase):
     """S-08 / A2 — chốt chặn đánh giá phải nằm ở server, không chỉ ở template."""
 
@@ -123,6 +145,10 @@ class AddReviewTests(TestCase):
             username="khach", email="khach@example.com", password="matkhau-kho-doan",
         )
         self.url = reverse("core:ajax-add-review", args=[self.product.id])
+        # Từ PLAN bước 2.12 (A2 / UC 3.2.14) đánh giá đòi hỏi đã mua hàng, nên nhóm test
+        # này phải dựng sẵn một đơn đã giao. Điều kiện đó có test riêng ở
+        # `core/test_review_purchase.py`; ở đây nó chỉ là tiền đề.
+        deliver_order(self.user, self.product)
 
     def test_anonymous_cannot_review(self):
         response = self.client.post(self.url, {'review': 'Ngon', 'rating': '5'})
@@ -252,6 +278,10 @@ class EditDeleteReviewTests(TestCase):
         self.other = User.objects.create_user(
             username="nguoikhac", email="khac@example.com", password="matkhau-kho-doan",
         )
+        # Chủ đánh giá phải là người đã mua — `test_can_review_again_after_deleting`
+        # gọi lại `ajax_add_review`, mà từ PLAN 2.12 đường đó đòi hỏi có đơn đã giao.
+        # Sửa/xóa thì không cần: đánh giá chỉ tồn tại nếu trước đó đã mua rồi.
+        deliver_order(self.author, self.product)
         self.review = ProductReview.objects.create(
             user=self.author, product=self.product, review="Tạm được", rating=3,
         )

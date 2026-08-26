@@ -1030,3 +1030,7 @@ msgstr "Xóa sạch giỏ hàng? Toàn bộ sản phẩm trong giỏ sẽ bị b
 
 msgid "Clear Cart"
 msgstr "Xóa sạch giỏ hàng"
+
+#: core/views.py templates/core/product-detail.html
+msgid "Only customers who bought this product can review it."
+msgstr "Chỉ khách đã mua sản phẩm này mới có thể đánh giá."

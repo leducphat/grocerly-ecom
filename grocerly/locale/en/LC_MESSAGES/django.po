@@ -605,3 +605,7 @@ msgstr ""
 
 msgid "Clear Cart"
 msgstr ""
+
+#: core/views.py templates/core/product-detail.html
+msgid "Only customers who bought this product can review it."
+msgstr ""
