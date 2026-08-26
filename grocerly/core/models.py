@@ -319,6 +319,27 @@ class CartOrder(models.Model):
 
 class CartOrderItem(models.Model):
     order = models.ForeignKey(CartOrder, on_delete=models.CASCADE)
+
+    # Khóa ngoại đặt SONG SONG với bản sao tĩnh bên dưới, không thay nó (ADR-0006).
+    #
+    # `item`/`image`/`price` vẫn là ảnh chụp tại thời điểm đặt hàng: hóa đơn của khách
+    # không được đổi khi nhân viên sửa giá hay đổi tên sản phẩm. Cái khóa ngoại thêm vào
+    # là **đường tra ngược** — trả lời được "người này đã mua sản phẩm kia chưa" mà không
+    # phải đoán theo tên (nợ kỹ thuật #6).
+    #
+    # SET_NULL chứ không CASCADE: xóa cứng một sản phẩm **không được** làm bốc hơi dòng
+    # hóa đơn của khách. Mất khóa ngoại thì bản sao tĩnh vẫn còn nguyên.
+    #
+    # NULL còn có nghĩa thứ hai: dòng cũ có từ trước migration 0007 mà backfill không
+    # dò ra sản phẩm gốc. Đừng đọc NULL thành "sản phẩm này chưa từng bán".
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='order_items',
+    )
+
     invoice_no = models.CharField(max_length=200)
     product_status = models.CharField(max_length=200)
     item = models.CharField(max_length=200)

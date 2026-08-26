@@ -144,16 +144,19 @@ class SaveCheckoutInfoTests(CheckoutTestCase):
 
 
 class CartOrderItemSnapshotTests(CheckoutTestCase):
-    """⚠️ Nhóm này là thứ **PLAN bước 2.11 sẽ động vào** — [ADR-0006](../../docs/DECISIONS.md).
+    """Bản sao tĩnh của hóa đơn — và khóa ngoại chạy song song với nó.
 
-    `CartOrderItem` hiện lưu **bản sao tĩnh** của sản phẩm (`item`, `image`, `price`) và
-    **không có khóa ngoại** tới `Product`. Bản sao tĩnh là thiết kế có chủ ý và **phải
-    giữ nguyên** sau 2.11: hóa đơn của khách không được đổi khi sản phẩm bị sửa hay xóa.
+    ✅ **PLAN bước 2.11 đã làm xong** ([ADR-0006](../../docs/DECISIONS.md)).
+    `CartOrderItem` giờ có **cả hai**:
 
-    Cái 2.11 thêm vào là một khóa ngoại **song song** với bản sao đó. Nên:
+    - bản sao tĩnh (`item`, `image`, `price`) — hóa đơn không đổi khi sản phẩm bị sửa
+      hay xóa. Các test `test_the_snapshot_survives_*` chốt điều đó và **vẫn xanh
+      nguyên** sau 2.11, đúng như nhóm này dự liệu lúc viết ở bước 2.6f
+    - khóa ngoại `product` — đường tra ngược về sản phẩm gốc, thay cho việc khớp theo tên
 
-    - `test_the_snapshot_survives_*` : phải **vẫn xanh** sau 2.11
-    - `test_there_is_no_link_back_*` : phải **đổi kỳ vọng** sau 2.11 — đó chính là mục tiêu
+    Hai thứ đó **không mâu thuẫn**: khóa ngoại trả lời *"đây vốn là sản phẩm nào"*, bản
+    sao trả lời *"khách đã mua với tên và giá nào"*. Đổi tên sản phẩm thì hai câu trả lời
+    khác nhau, và cả hai đều đúng.
     """
 
     def test_the_snapshot_survives_a_price_change(self):
@@ -187,20 +190,85 @@ class CartOrderItemSnapshotTests(CheckoutTestCase):
         self.assertEqual(item.item, "Dưa hấu")
         self.assertEqual(item.price, Decimal("50000.00"))
 
-    def test_there_is_no_link_back_to_the_product(self):
-        """Chốt tình trạng HIỆN TẠI. Sau bước 2.11 test này phải đổi.
+    def test_the_order_line_links_back_to_the_product(self):
+        """Bước 2.11 — thay cho `test_there_is_no_link_back_to_the_product` trước đây.
 
-        Không có khóa ngoại nghĩa là câu *"người này đã mua sản phẩm kia chưa"* chỉ trả
-        lời được bằng cách so tên — nguồn gốc của nợ kỹ thuật #6 và lý do A2 chưa cài.
+        Đây là điều kiện làm được A2 (*"đã mua mới được đánh giá"*): câu hỏi *"người này
+        đã mua sản phẩm kia chưa"* nay tra được bằng khóa ngoại thay vì so tên.
         """
         self.add_to_cart(self.watermelon)
         self.save_checkout()
 
-        field_names = {f.name for f in CartOrderItem._meta.get_fields()}
-        self.assertNotIn('product', field_names)
+        self.assertEqual(CartOrderItem.objects.get().product, self.watermelon)
 
-    def test_matching_by_name_is_ambiguous_when_two_products_share_a_title(self):
-        """Vì sao khớp theo tên là không đủ — bước 2.11 xóa hẳn vấn đề này."""
+    def test_every_line_links_to_its_own_product(self):
+        """Giỏ nhiều món thì mỗi dòng phải trỏ đúng món của nó, không lệch hàng."""
+        self.add_to_cart(self.watermelon)
+        self.add_to_cart(self.mango)
+        self.save_checkout()
+
+        linked = {item.item: item.product for item in CartOrderItem.objects.all()}
+        self.assertEqual(linked["Dưa hấu"], self.watermelon)
+        self.assertEqual(linked["Xoài cát"], self.mango)
+
+    def test_the_link_still_points_at_the_product_after_a_rename(self):
+        """Chỗ khớp-theo-tên gãy, còn khóa ngoại thì không.
+
+        Trước 2.11 đổi tên sản phẩm là mất dấu người mua ([ADR-0005](../../docs/DECISIONS.md)
+        lấy chính điều này làm lý do không cài A2).
+        """
+        self.add_to_cart(self.watermelon)
+        self.save_checkout()
+
+        self.watermelon.title = "Dưa hấu không hạt"
+        self.watermelon.save()
+
+        item = CartOrderItem.objects.get()
+        self.assertEqual(item.product, self.watermelon)   # đường tra ngược còn nguyên
+        self.assertEqual(item.item, "Dưa hấu")            # bản sao tĩnh cũng còn nguyên
+
+    def test_the_link_survives_the_product_being_hidden(self):
+        """Ngừng bán (xóa mềm) không được cắt đứt hóa đơn khỏi sản phẩm."""
+        self.add_to_cart(self.watermelon)
+        self.save_checkout()
+
+        self.watermelon.soft_delete()
+
+        self.assertEqual(CartOrderItem.objects.get().product, self.watermelon)
+
+    def test_a_product_can_still_be_bought_while_it_is_being_hidden(self):
+        """Sản phẩm bị xóa mềm lúc còn nằm trong giỏ vẫn phải nối được về nó.
+
+        Vì sao `save_checkout_info` tra bằng `all_objects` chứ không `objects`.
+        """
+        self.add_to_cart(self.watermelon)
+        self.watermelon.soft_delete()
+
+        self.save_checkout()
+
+        self.assertEqual(CartOrderItem.objects.get().product, self.watermelon)
+
+    def test_the_link_goes_null_when_the_product_is_erased(self):
+        """Xóa cứng thì mất đường tra ngược — nhưng hóa đơn **không** được biến mất.
+
+        SET_NULL chứ không CASCADE. Đây là lý do bản sao tĩnh vẫn phải tồn tại song song.
+        """
+        self.add_to_cart(self.watermelon)
+        self.save_checkout()
+
+        self.watermelon.hard_delete()
+
+        item = CartOrderItem.objects.get()
+        self.assertIsNone(item.product)
+        self.assertEqual(item.item, "Dưa hấu")
+        self.assertEqual(item.price, Decimal("50000.00"))
+
+    def test_two_products_sharing_a_title_are_told_apart(self):
+        """Thay cho `test_matching_by_name_is_ambiguous_...` — 2.11 xóa hẳn chỗ nhập nhằng.
+
+        Test cũ chốt lại **vấn đề**: khớp theo tên ra hai kết quả, không biết chọn cái
+        nào. Test này chốt lại **lời giải**.
+        """
         twin = Product.objects.create(
             title="Dưa hấu", price=Decimal("50000.00"), stock_count=10,
             product_status='published', category=self.category, vendor=self.vendor,
@@ -208,9 +276,12 @@ class CartOrderItemSnapshotTests(CheckoutTestCase):
         self.add_to_cart(self.watermelon)
         self.save_checkout()
 
-        matches = Product.objects.filter(title=CartOrderItem.objects.get().item)
-        self.assertEqual(matches.count(), 2)
-        self.assertIn(twin, matches)
+        item = CartOrderItem.objects.get()
+        # Khớp theo tên vẫn nhập nhằng như cũ...
+        self.assertEqual(Product.objects.filter(title=item.item).count(), 2)
+        # ...nhưng khóa ngoại thì không.
+        self.assertEqual(item.product, self.watermelon)
+        self.assertNotEqual(item.product, twin)
 
     def test_the_price_comes_from_the_cart_not_from_the_product_row(self):
         """Giá chốt tại thời điểm **thêm vào giỏ**, không phải lúc bấm đặt hàng.

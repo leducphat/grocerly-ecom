@@ -35,6 +35,10 @@ class ChangeOrderStatusTests(TestCase):
         )
         CartOrderItem.objects.create(
             order=self.order,
+            # Khóa ngoại là thứ `change_order_status` trừ kho theo, từ PLAN bước 2.11
+            # (ADR-0006). `item` vẫn giữ để bản sao tĩnh của hóa đơn không đổi nghĩa —
+            # nhưng nó không còn là đường tra ngược nữa.
+            product=self.product,
             invoice_no=f"INVOICE_NO-{self.order.id}",
             item=self.product.title,
             image="/media/products.jpg",
@@ -147,6 +151,81 @@ class ChangeOrderStatusTests(TestCase):
 
         self.assertEqual(self.order.product_status, 'shipped')
         self.assertEqual(self.product.stock_count, 8)
+
+    # ---------- 2.11: trừ kho theo khóa ngoại, không theo tên ----------
+
+    def test_shipping_takes_stock_from_the_product_that_was_actually_bought(self):
+        """Nợ kỹ thuật #6 — chốt lại bằng test (PLAN bước 2.11, ADR-0006).
+
+        Trước đây chỗ này chạy `Product.objects.filter(title=item.item).first()`. Hai sản
+        phẩm trùng tên thì `.first()` trả về cái có `id` nhỏ hơn, **không phải** cái khách
+        mua — trừ kho của một sản phẩm chưa hề bán được món nào.
+
+        Ở đây `twin` được tạo TRƯỚC để nó đứng đầu theo `id`: có vậy test mới bắt được
+        lỗi cũ thay vì tình cờ đi qua.
+        """
+        twin = Product.objects.create(
+            title="Dưa hấu", price=Decimal("50000.00"), stock_count=100,
+            product_status='published',
+        )
+        bought = Product.objects.create(
+            title="Dưa hấu", price=Decimal("50000.00"), stock_count=10,
+            product_status='published',
+        )
+        order = CartOrder.objects.create(
+            user=self.staff, price=Decimal("100000.00"), product_status='processing',
+        )
+        CartOrderItem.objects.create(
+            order=order, product=bought, invoice_no=f"INVOICE_NO-{order.id}",
+            item=bought.title, image="/media/products.jpg",
+            quantity=2, price=bought.price, total=Decimal("100000.00"),
+        )
+
+        self.client.post(
+            reverse("useradmin:change_order_status", args=[order.oid]),
+            {'status': 'shipped'},
+        )
+
+        bought.refresh_from_db()
+        twin.refresh_from_db()
+        self.assertEqual(bought.stock_count, 8)
+        self.assertEqual(twin.stock_count, 100)   # không bị đụng tới
+
+    def test_renaming_a_product_after_the_sale_does_not_break_stock_deduction(self):
+        """Chiều còn lại của cùng một lỗi: đổi tên xong thì khớp theo tên hụt hoàn toàn."""
+        self.product.title = "Dưa hấu không hạt"
+        self.product.save()
+
+        self._set('shipped')
+        self._reload()
+
+        self.assertEqual(self.product.stock_count, 8)
+
+    def test_a_legacy_line_without_a_link_is_skipped_instead_of_guessing(self):
+        """Dòng có từ trước migration 0007 mà backfill không dò ra sản phẩm gốc.
+
+        Không trừ kho, và **không** quay lại đoán theo tên: ở đây đoán sai nghĩa là trừ
+        kho của một sản phẩm khác. Quan trọng nhất là đơn vẫn chuyển trạng thái bình
+        thường chứ không nổ.
+        """
+        CartOrderItem.objects.filter(order=self.order).update(product=None)
+
+        response = self._set('shipped')
+        self._reload()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.order.product_status, 'shipped')
+        self.assertEqual(self.product.stock_count, 10)
+
+    def test_shipping_still_works_when_the_product_was_erased(self):
+        """Sản phẩm bị xóa cứng sau khi bán → khóa ngoại về NULL. Không được làm sập."""
+        self.product.hard_delete()
+
+        response = self._set('shipped')
+        self.order.refresh_from_db()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.order.product_status, 'shipped')
 
     # ---------- trạng thái không hợp lệ ----------
 

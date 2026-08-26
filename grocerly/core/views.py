@@ -243,6 +243,7 @@ def average_rating_for(product):
     return ProductReview.objects.filter(product=product).aggregate(rating=Avg('rating'))
 
 
+
 def own_review_or_none(request, review_id):
     """Đánh giá của **chính** người đang đăng nhập, hoặc None.
 
@@ -649,9 +650,27 @@ def save_checkout_info(request):
                     country=country,
                 )
 
+            # Nối dòng hóa đơn về sản phẩm gốc (ADR-0006). Khóa của giỏ hàng chính là
+            # khóa chính của sản phẩm — `add_to_cart` ép `id` phải là chữ số rồi mới dựng
+            # `cart_data[product_id]` — nên tra ngược không phải đoán theo tên.
+            #
+            # `all_objects` chứ không `objects`: sản phẩm có thể bị ngừng bán (xóa mềm)
+            # trong lúc nó còn nằm trong giỏ của khách. Đơn vẫn phải nối được về nó.
+            #
+            # Một truy vấn cho cả giỏ, không tra từng dòng.
+            products_by_id = {
+                str(product.pk): product
+                for product in Product.all_objects.filter(
+                    pk__in=[key for key in request.session['cart_data_obj'] if str(key).isdigit()]
+                )
+            }
+
             for p_id, item in request.session['cart_data_obj'].items():
                 CartOrderItem.objects.create(
                     order=order,
+                    # None nếu sản phẩm đã bị xóa cứng khỏi database từ lúc bỏ vào giỏ.
+                    # Bản sao tĩnh bên dưới vẫn giữ nguyên hóa đơn cho khách.
+                    product=products_by_id.get(str(p_id)),
                     invoice_no="INVOICE_NO-" + str(order.id),
                     item=item['title'],
                     image=item['image'],

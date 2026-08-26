@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib import messages
@@ -191,21 +191,29 @@ def edit_product(request, pid):
 def product_has_order_history(product):
     """Sản phẩm này đã từng nằm trong đơn hàng nào chưa?
 
-    Khớp theo **tên** vì `CartOrderItem` chưa có khóa ngoại tới `Product` — nó lưu bản
-    sao tĩnh (`item`, `image`, `price`) để hóa đơn không đổi khi sản phẩm bị sửa. Xem
-    ADR-0006: khóa ngoại sẽ được thêm ở PLAN bước 2.11, và khi đó hàm này đổi thành tra
-    theo khóa ngoại, không còn phải đoán theo tên.
+    Từ PLAN bước 2.11, `CartOrderItem` **đã có khóa ngoại** tới `Product` (ADR-0006) nên
+    câu trả lời chính xác nằm ở `product=product`.
 
-    Khớp theo tên sai được hai chiều, nhưng **hai chiều không nguy hiểm ngang nhau**:
+    Nhánh thứ hai — khớp theo tên — **chỉ áp cho dòng chưa có khóa ngoại**, và đó là
+    toàn bộ điểm tinh tế của hàm này. Lý do: **hai kiểu sai ở đây không nguy hiểm ngang
+    nhau**.
 
-    - Nhầm CÓ (hai sản phẩm trùng tên) → xóa mềm thay vì xóa cứng → dữ liệu còn, khôi
-      phục được.
-    - Nhầm KHÔNG (sản phẩm đã đổi tên sau khi bán) → xóa cứng → mất bản ghi sản phẩm.
+    - Nhầm CÓ → xóa mềm thay vì xóa cứng → dữ liệu còn nguyên, khôi phục được từ admin.
+    - Nhầm KHÔNG → **xóa cứng** → mất hẳn bản ghi sản phẩm.
 
-    Hóa đơn của khách **không hỏng** trong cả hai trường hợp, vì `CartOrderItem` giữ bản
-    sao riêng. Cái mất là khả năng truy vết ngược từ đơn về sản phẩm gốc.
+    Dòng hóa đơn có từ trước migration `0007` mà tên nhập nhằng thì `product` để `NULL`.
+    Nếu chỉ tra theo khóa ngoại, những dòng đó trả lời "sản phẩm này chưa từng bán" —
+    rơi đúng vào chiều sai nguy hiểm. Nên chúng vẫn được so tên.
+
+    Nhưng dòng **đã có** khóa ngoại thì không so tên nữa: nó đã biết chính xác mình thuộc
+    sản phẩm nào, và hỏi thêm tên chỉ tổ kéo lại đúng chỗ nhập nhằng mà 2.11 vừa dẹp
+    (hai sản phẩm trùng tên, bán cái này lại chặn xóa cái kia).
+
+    Hóa đơn của khách không hỏng trong mọi trường hợp — `CartOrderItem` giữ bản sao riêng.
     """
-    return CartOrderItem.objects.filter(item=product.title).exists()
+    return CartOrderItem.objects.filter(
+        Q(product=product) | Q(product__isnull=True, item=product.title)
+    ).exists()
 
 
 @admin_required
@@ -304,10 +312,16 @@ def change_order_status(request, oid):
     # khi nhân viên cứu chúng về `shipped` thì vẫn phải trừ kho bình thường.
     already_fulfilled = ('shipped', FINAL_ORDER_STATUS)
     if status == 'shipped' and order.product_status not in already_fulfilled:
-        for item in CartOrderItem.objects.filter(order=order):
-            # Khớp theo tên vì CartOrderItem chưa có khóa ngoại — nợ kỹ thuật #6,
-            # sẽ hết sau PLAN bước 2.11 (ADR-0006).
-            product = Product.objects.filter(title=item.item).first()
+        for item in CartOrderItem.objects.filter(order=order).select_related('product'):
+            # Trừ kho theo khóa ngoại — vá nợ kỹ thuật #6 (PLAN 2.11, ADR-0006). Trước
+            # đây chỗ này khớp `Product.objects.filter(title=item.item).first()`: hai sản
+            # phẩm trùng tên thì `.first()` trừ kho của sản phẩm **không được mua**.
+            #
+            # `product` để NULL nghĩa là không biết đây vốn là sản phẩm nào — chỉ xảy ra
+            # với dòng có từ trước migration 0007 mà backfill không dò ra. Bỏ qua, KHÔNG
+            # quay lại khớp theo tên: ở đây đoán sai là trừ nhầm kho của một sản phẩm
+            # khác, tệ hơn hẳn so với việc không trừ.
+            product = item.product
             if product and product.stock_count is not None:
                 product.stock_count = max(0, product.stock_count - item.quantity)
                 product.save(update_fields=['stock_count'])

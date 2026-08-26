@@ -38,16 +38,40 @@ class DeleteProductTests(TestCase):
         )
 
     def _sell(self, product, title=None):
-        """Tạo một dòng đơn hàng trỏ tới sản phẩm, đúng cách `save_checkout_info` làm."""
+        """Tạo một dòng đơn hàng trỏ tới sản phẩm, đúng cách `save_checkout_info` làm.
+
+        Từ PLAN bước 2.11 dòng hóa đơn mang **khóa ngoại** tới sản phẩm (ADR-0006), nên
+        helper này phải gán nó — nếu không thì test đang dựng dữ liệu kiểu cũ rồi kết
+        luận về code mới.
+        """
         order = CartOrder.objects.create(user=self.staff, price=Decimal("50000.00"))
         return CartOrderItem.objects.create(
             order=order,
+            product=product,
             invoice_no=f"INVOICE_NO-{order.id}",
             item=title if title is not None else product.title,
             image="/media/products.jpg",
             quantity=1,
             price=product.price,
             total=product.price,
+        )
+
+    def _sell_legacy(self, title):
+        """Dòng hóa đơn kiểu **trước** migration 0007: chỉ có tên, không có khóa ngoại.
+
+        Đây là thứ backfill không dò ra được (tên nhập nhằng) và để `NULL`. Production
+        có dữ liệu như vậy, nên nó phải được test chứ không chỉ được chú thích.
+        """
+        order = CartOrder.objects.create(user=self.staff, price=Decimal("50000.00"))
+        return CartOrderItem.objects.create(
+            order=order,
+            product=None,
+            invoice_no=f"INVOICE_NO-{order.id}",
+            item=title,
+            image="/media/products.jpg",
+            quantity=1,
+            price=Decimal("50000.00"),
+            total=Decimal("50000.00"),
         )
 
     # ---------- sản phẩm chưa từng bán ----------
@@ -120,15 +144,13 @@ class DeleteProductTests(TestCase):
 
         self.assertFalse(Product.all_objects.filter(pk=pk).exists())
 
-    def test_a_same_named_product_protects_this_one_too(self):
-        """Nhầm về phía AN TOÀN, và chốt lại đây là hệ quả của việc khớp theo tên.
+    def test_a_same_named_product_no_longer_protects_this_one(self):
+        """PLAN bước 2.11 — đổi kỳ vọng đúng như bản trước của test này đã báo trước.
 
-        `CartOrderItem` chưa có khóa ngoại tới `Product` (ADR-0006, PLAN bước 2.11) nên
-        chỉ so được theo tên. Hai sản phẩm trùng tên thì bán cái này lại bảo vệ cái kia
-        — xóa mềm thay vì xóa cứng, tức là nhầm về phía giữ lại dữ liệu.
-
-        Khi bước 2.11 xong, test này phải đổi kỳ vọng: lúc đó phân biệt được đúng sản
-        phẩm nên bản chưa bán sẽ bị xóa cứng.
+        Trước khi có khóa ngoại, bán một sản phẩm sẽ chặn xóa **mọi** sản phẩm trùng tên,
+        vì `product_has_order_history` chỉ so được `item` với `title`. Nay dòng hóa đơn
+        của `twin` mang khóa ngoại trỏ đúng `twin`, nên bản chưa bán này xóa cứng bình
+        thường.
         """
         twin = Product.objects.create(title="Dưa hấu", price=Decimal("50000.00"))
         self._sell(twin)
@@ -136,7 +158,42 @@ class DeleteProductTests(TestCase):
 
         self._delete()
 
+        self.assertFalse(Product.all_objects.filter(pk=pk).exists())
+        # ...còn bản đã bán thì vẫn được giữ lại.
+        self._delete(twin)
+        self.assertTrue(Product.all_objects.filter(pk=twin.pk).exists())
+
+    def test_a_renamed_product_that_was_sold_is_still_protected(self):
+        """Chiều sai NGUY HIỂM mà khóa ngoại vá — mất dữ liệu, không phải chỉ bất tiện.
+
+        Bán hàng xong rồi đổi tên sản phẩm: khớp theo tên trả về "chưa từng bán" nên
+        `delete_product` **xóa cứng** một sản phẩm đã có hóa đơn. Khóa ngoại không quan
+        tâm tên đã đổi.
+        """
+        self._sell(self.product)
+        self.product.title = "Dưa hấu không hạt"
+        self.product.save()
+        pk = self.product.pk
+
+        self._delete()
+
         self.assertTrue(Product.all_objects.filter(pk=pk).exists())
+        self.assertTrue(Product.all_objects.get(pk=pk).is_deleted)
+
+    def test_a_legacy_order_line_without_a_link_still_protects_by_name(self):
+        """Lưới hứng cho dữ liệu trước migration 0007.
+
+        Dòng `product=NULL` là dòng backfill không dò ra sản phẩm gốc. Với nhóm đó, so
+        tên vẫn còn hiệu lực — vì ở đây nhầm CÓ chỉ dẫn tới xóa mềm (khôi phục được),
+        còn nhầm KHÔNG là xóa cứng (mất hẳn).
+        """
+        self._sell_legacy("Dưa hấu")
+        pk = self.product.pk
+
+        self._delete()
+
+        self.assertTrue(Product.all_objects.filter(pk=pk).exists())
+        self.assertTrue(Product.all_objects.get(pk=pk).is_deleted)
 
     # ---------- phân quyền và đầu vào hỏng ----------
 
