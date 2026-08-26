@@ -1,6 +1,6 @@
 # Kiến trúc hệ thống Grocerly
 
-> Cập nhật: 2026-08-24 · Đối chiếu với commit `42f6fdb` + bản vá S-01/S-02/S-08
+> Cập nhật: 2026-08-26 · Đối chiếu với commit `a5682a7`
 
 ## 1. Bối cảnh nghiệp vụ
 
@@ -69,6 +69,19 @@ flowchart TB
   `restore()` khôi phục đúng nhóm sản phẩm bị xóa cùng thời điểm (khớp `deleted_at`)
 
 ⚠️ `instance.delete()` **vẫn xóa cứng** — chỉ `QuerySet.delete()` mới xóa mềm.
+Đây là **Bẫy #3** trong AGENTS.md, nay đã có test chốt lại ở
+[core/test_softdelete.py](../grocerly/core/test_softdelete.py).
+
+⚠️ `dead()` / `alive()` là phương thức của **QuerySet**, không được proxy lên manager.
+Phải viết `Model.all_objects.all().dead()`; gọi tắt `all_objects.dead()` ném
+`AttributeError`.
+
+> **Ghi chú 2026-08-26:** vế `restore()` ở trên **mô tả đúng ý định nhưng sai thực tế**
+> cho tới ngày này. `soft_delete()` gọi `timezone.now()` **hai lần** — một cho vendor,
+> một cho nhóm sản phẩm — nên hai dấu thời gian lệch nhau vài trăm micro giây (đo được
+> 563µs) và bộ lọc `deleted_at` của `restore()` không khớp dòng nào. Kết quả: khôi phục
+> vendor thì vendor sống lại **một mình với gian hàng trống**, sản phẩm kẹt vĩnh viễn ở
+> trạng thái xóa mềm. Đã vá — sản phẩm nay dùng chính `self.deleted_at` của vendor.
 
 ### Các thực thể chính
 
@@ -241,11 +254,11 @@ khi `settings.py` hiện chỉ hiểu `USE_CLOUDINARY` — cấu hình này đã
 
 | # | Vấn đề | Ảnh hưởng |
 |---|---|---|
-| 1 | Test chỉ phủ 3 luồng đã vá ở `core` (12 test); `userauths`/`useradmin`/`store_api` vẫn rỗng | Phần lớn thay đổi vẫn phải kiểm thử tay |
+| 1 | **126 test** tính đến 2026-08-26, nhưng **checkout vẫn trống**: không test nào chạm `save_checkout_info`; `userauths/tests.py` còn là stub rỗng | Luồng tạo đơn — chỗ rủi ro nhất — chưa có lưới an toàn, mà bước 2.11 sẽ viết lại đúng hàm đó. Xem [PLAN](PLAN.md) bước 2.6f |
 | 2 | Truy vấn không `select_related` → N+1 | Chậm khi dữ liệu lớn |
 | 3 | Không phân trang ở mọi trang danh sách | Tải toàn bộ sản phẩm mỗi request |
 | 4 | `useradmin` không giới hạn phạm vi theo nhân viên | Mọi staff thấy toàn bộ dữ liệu |
 | 5 | Ba cờ trạng thái Product chồng chéo (`product_status` / `status` / `in_stock`) | S-04 đã vá, nhưng `status` và `in_stock` vẫn là cờ thừa chưa ai dọn |
-| 6 | `CartOrderItem` khớp sản phẩm bằng `title` | Trừ kho sai khi trùng tên |
+| 6 | `CartOrderItem` khớp sản phẩm bằng `title` | Nay có **hai** chỗ phụ thuộc: `change_order_status` trừ kho sai khi trùng tên, và `delete_product` dò "đã có đơn chưa" cũng theo tên (nhầm về phía an toàn — xóa mềm thay vì xóa cứng). [ADR-0006](DECISIONS.md) / [PLAN](PLAN.md) bước 2.11 dọn cả hai |
 | 7 | ~20 template mồ côi (`index2`, `product-lists`, `login`…) | Gây nhiễu khi tìm file |
 | 8 | `login_view` dùng `except:` trần | Nuốt lỗi thật, khó debug |

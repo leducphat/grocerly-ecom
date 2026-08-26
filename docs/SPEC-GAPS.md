@@ -6,6 +6,8 @@
 >
 > ⚠️ **Tiểu luận đã nộp và có điểm.** File này giờ phục vụ **Khóa luận tốt nghiệp** —
 > cùng đề tài, cùng GVHD. Xem [PLAN.md](PLAN.md).
+>
+> Cập nhật 2026-08-26: đóng **A8** và **B3**; **B11** xong phần code, chờ deploy.
 
 ## Vì sao cần file này
 
@@ -28,7 +30,7 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 | A5 | ~~Cập nhật SL **vượt tồn kho → báo lỗi** — UC 3.2.6 Exception Flow~~ | ✅ **Đã đóng 2026-08-24** — `add_to_cart` và `update_cart` đều kiểm `stock_count`, trả `400` kèm số lượng còn lại | Sửa cùng [S-02](SECURITY.md#s-02--giả-mạo-giá-sản-phẩm) |
 | A6 | Coupon có **ngày hết hạn** và **số lượt đã dùng** — UC 3.2.21 | Model `Coupon` chỉ có `code`, `discount`, `active` | [core/models.py](../grocerly/core/models.py) |
 | A7 | **Hủy đơn (Cancel)** — UC 3.2.25 | `STATUS_CHOICES` chỉ có `processing`/`shipped`/`delivered` | [core/models.py:9](../grocerly/core/models.py#L9) |
-| A8 | Không đổi được trạng thái khi đơn đã **Delivered** — UC 3.2.20 Exception Flow | `change_order_status` không kiểm tra gì | [useradmin/views.py](../grocerly/useradmin/views.py) |
+| A8 | ~~Không đổi được trạng thái khi đơn đã **Delivered** — UC 3.2.20 Exception Flow~~ | ✅ **Đã đóng 2026-08-26** — chặn ở view và khóa luôn form. Kèm theo: `change_order_status` trước đây nhận **mọi chuỗi** từ POST, mà option đầu của dropdown lại gửi `value="pending"` — giá trị không có trong `STATUS_CHOICES`. Nay option dựng từ model và view lọc qua whitelist | `ChangeOrderStatusTests` |
 | A9 | Cập nhật **mã vận đơn** ở dashboard nhân viên — UC 3.2.20 Alternate Flow | Field `tracking_id` có trong model nhưng `useradmin` không có giao diện nhập (chỉ sửa được qua Django Admin) | — |
 | A10 | **Gửi email hàng loạt** cho người dùng — UC 3.2.22 Alternate Flow | Không có | — |
 | A11 | **Quy trình duyệt sản phẩm** (`in_review`) — UC 3.2.19, Hình 28, Hình 40 | ⚠️ **Khoảng cách nay rộng hơn, có chủ ý.** `in_review`/`rejected` đã bị **xóa khỏi code** (2026-08-24); nhân viên tự bấm "Lưu nháp" / "Đăng bán" | [ADR-0002](DECISIONS.md) |
@@ -45,7 +47,7 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 |---|---|---|
 | B1 | Nhân viên chỉ thấy dữ liệu **"thuộc gian hàng mình"** (mục 1.2.1) | `useradmin` trả `Product.objects.all()`, doanh thu toàn hệ thống. Chỉ `shop_page` lọc theo user |
 | B2 | **Hình 26** — Nhờ AI thêm vào giỏ: server gọi hàm và tự ghi Django Session | Server trả cờ `action: confirm_add_cart`; **JS phía client** mới gọi `/add-to-cart/`. Đây là thiết kế **có chủ ý** (giữ vòng xác nhận của người dùng) — nên sửa sơ đồ theo code, xem [ARCHITECTURE.md](ARCHITECTURE.md) mục 4.3 |
-| B3 | **Hình 30** — Xóa sản phẩm: có nhánh kiểm tra đơn hàng liên quan rồi mới xóa mềm/cứng | `delete_product` gọi thẳng `product.delete()` — mà `SoftDeleteModel` không override `delete()` ở tầng instance nên **xóa cứng vô điều kiện** |
+| B3 | ~~**Hình 30** — Xóa sản phẩm: có nhánh kiểm tra đơn hàng liên quan rồi mới xóa mềm/cứng~~ | ✅ **Đã đóng 2026-08-26** — code nay khớp hình. Sản phẩm đã có đơn thì xóa mềm, chưa có đơn thì xóa cứng. Việc dò "đã có đơn chưa" tạm khớp **theo tên** (`CartOrderItem` chưa có khóa ngoại) — sẽ thành tra theo khóa ngoại sau bước 2.11 |
 | B4 | **ERD (Hình 45)** — `core_product.tags` là cột `VARCHAR` | `django-taggit` lưu ở bảng riêng (`taggit_tag`, `taggit_taggeditem`). ERD cũng thiếu bảng nối M2M `cartorder ↔ coupon` |
 | B5 | **Bảng 28** mô tả `core_tag` như một bảng thật | `core.models.Tag` là `class Tag(models.Model): pass` — model rỗng không dùng |
 | B6 | Định vị **multi-vendor**, "Người bán" có gian hàng riêng | `Vendor` thực chất là thương hiệu/nhà cung cấp. [ADR-0003](DECISIONS.md) **đã chốt 2026-08-25** → sửa báo cáo, xem [PLAN](PLAN.md) bước 3.9–3.11 |
@@ -53,7 +55,7 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 | B8 | **Hình 11** (Cập nhật giỏ) có nhánh `[Số lượng mới = 0] Xóa sản phẩm khỏi Session` | Code ép tối thiểu là 1, không xóa; và nay có thêm bước kiểm tồn kho mà hình chưa vẽ |
 | B9 | **Không có lược đồ tuần tự nào cho `vnpay_ipn`** | IPN là chỗ kiểm chữ ký, kiểm số tiền và chống xác nhận trùng — phần đáng trình bày nhất của tích hợp VNPay lại không có hình |
 | B10 | **Bảng 30** mô tả `product_status` là *"Trạng thái xử lý"* | Giống hệt mô tả ở Bảng 32 và 33 dù nghĩa hoàn toàn khác (đăng bán vs giao hàng) — báo cáo đang che mất bẫy #1 |
-| B11 | **ERD Hình 45 và Bảng 32 không có `cartorder.stripe_payment_intent`** | Cột **có thật** trên production (tàn dư template Stripe). Ở đây báo cáo đúng còn code sai → drop cột sẽ làm hai bên khớp, xem [PLAN](PLAN.md) bước 2.4 |
+| B11 | **ERD Hình 45 và Bảng 32 không có `cartorder.stripe_payment_intent`** | 🔸 **Code đã xong 2026-08-26**, chờ deploy. Migration `0006_drop_stripe_payment_intent` đã viết và đã áp lên SQLite local; cột **vẫn còn trên production Neon** cho tới khi merge vào `main`. Ở mục này báo cáo đúng còn code sai, nên không phải sửa báo cáo |
 
 ## C. Lỗi trình bày trong báo cáo
 

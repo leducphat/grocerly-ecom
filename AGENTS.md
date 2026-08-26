@@ -62,16 +62,32 @@ python manage.py makemessages -l vi # trích chuỗi cần dịch
 
 ```bash
 # Test phải chạy với settings riêng — xem cảnh báo bên dưới
-python manage.py test core --settings=grocerly.settings_test
+python manage.py test --settings=grocerly.settings_test
 ```
 
 ⚠️ **Luôn dùng `--settings=grocerly.settings_test` khi chạy test.** Với settings mặc định,
 `manage.py test` sẽ tạo database `test_<tên-db>` **trên máy chủ production Neon** (bẫy #5).
 Module này ép SQLite in-memory.
 
-Hiện chỉ [core/tests.py](grocerly/core/tests.py) có test (12 test hồi quy cho các lỗ hổng
-đã vá ở [docs/SECURITY.md](docs/SECURITY.md)). `userauths`, `useradmin`, `store_api` vẫn là
-stub rỗng — các luồng đó kiểm thử thủ công theo kịch bản hộp đen ở chương 4 báo cáo.
+**126 test** tính đến 2026-08-26, chia hai tầng:
+
+| File | Nội dung |
+|---|---|
+| [core/tests.py](grocerly/core/tests.py) · [store_api/tests.py](grocerly/store_api/tests.py) · [useradmin/tests.py](grocerly/useradmin/tests.py) | Hồi quy ở mức HTTP — tái hiện kịch bản khai thác ở [docs/SECURITY.md](docs/SECURITY.md) |
+| [core/test_vnpay.py](grocerly/core/test_vnpay.py) | Unit test thuần (`SimpleTestCase`, **không dựng database**) |
+| [core/test_softdelete.py](grocerly/core/test_softdelete.py) | Hạ tầng xóa mềm ở mức model, chốt bẫy #3 |
+| [core/test_contact_form.py](grocerly/core/test_contact_form.py) · [useradmin/test_delete_product.py](grocerly/useradmin/test_delete_product.py) · [useradmin/test_order_status.py](grocerly/useradmin/test_order_status.py) | Theo chức năng |
+
+**Còn trống:** `save_checkout_info` và toàn bộ luồng checkout chưa có test nào;
+[userauths/tests.py](grocerly/userauths/tests.py) vẫn là stub rỗng. Xem
+[docs/PLAN.md](docs/PLAN.md) bước 2.6.
+
+**Quy ước:** test mới đặt ở file riêng `test_<chủ_đề>.py` trong app tương ứng —
+`tests.py` giữ nguyên vai trò file hồi quy bảo mật. Django tự nhặt cả hai.
+
+⚠️ **`makemessages`/`compilemessages` không chạy được ở máy này** (không có gettext).
+Thêm chuỗi dịch phải sửa `.po` bằng tay — xem *Bẫy i18n* trong [docs/PLAN.md](docs/PLAN.md)
+giai đoạn 1.
 
 ## Ngăn xếp công nghệ
 
