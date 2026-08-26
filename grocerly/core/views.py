@@ -6,9 +6,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.conf import settings
 from django.core import serializers
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.utils.translation import gettext as _
 from taggit.models import Tag
 
@@ -964,26 +967,69 @@ from userauths.models import ContactUs
 def contact(request):
     return render(request, "core/contact.html")
 
+# Khớp max_length của `ContactUs`. `message` là TextField không giới hạn ở model, nên
+# trần này là thứ duy nhất chặn việc nhồi dòng khổng lồ vào database.
+CONTACT_FIELD_MAX_LENGTH = 200
+CONTACT_MESSAGE_MAX_LENGTH = 2000
+
+
+def validated_contact_payload(request):
+    """Đọc form liên hệ từ POST. Trả `(payload, None)` hoặc `(None, JsonResponse lỗi)`."""
+    payload = {}
+
+    for name in ('full_name', 'email', 'phone', 'subject', 'message'):
+        value = (request.POST.get(name) or '').strip()
+        if not value:
+            return None, JsonResponse({
+                'bool': False,
+                'error': _("Please fill in every field."),
+            }, status=400)
+
+        limit = CONTACT_MESSAGE_MAX_LENGTH if name == 'message' else CONTACT_FIELD_MAX_LENGTH
+        if len(value) > limit:
+            return None, JsonResponse({
+                'bool': False,
+                'error': _("That is too long. Please keep it under %(limit)s characters.")
+                         % {'limit': limit},
+            }, status=400)
+
+        payload[name] = value
+
+    try:
+        validate_email(payload['email'])
+    except ValidationError:
+        return None, JsonResponse({
+            'bool': False,
+            'error': _("Please enter a valid email address."),
+        }, status=400)
+
+    return payload, None
+
+
+@require_POST
 def ajax_contact_form(request):
-    full_name = request.GET.get('full_name')
-    email = request.GET.get('email')
-    phone = request.GET.get('phone')
-    subject = request.GET.get('subject')
-    message = request.GET.get('message')
+    # Trước đây đây là một view GET không xác thực, ghi thẳng vào database từ query
+    # string. Vì không cần cookie nên SameSite không đỡ được: mọi trang bên ngoài chỉ cần
+    # nhúng
+    #
+    #     <img src="https://.../vi/ajax-contact-form/?full_name=x&...&message=<rác>">
+    #
+    # là mỗi lượt xem trang của họ tạo một dòng ContactUs trên database production. Kèm
+    # `message` là TextField không giới hạn, đó là đường làm phình storage.
+    #
+    # Đổi sang POST khiến CSRF middleware bắt đầu kiểm token, và token thì không lấy được
+    # từ site khác. Form ở contact.html vốn đã có {% csrf_token %} sẵn — chỉ JS là đang
+    # tự ý gửi bằng GET.
+    payload, error = validated_contact_payload(request)
+    if error is not None:
+        return error
 
-    ContactUs.objects.create(
-        full_name=full_name,
-        email=email,
-        phone=phone,
-        subject=subject,
-        message=message,
-    )
+    ContactUs.objects.create(**payload)
 
-    data = {
+    return JsonResponse({"data": {
         "bool": True,
-        "message": "Message Sent Successfully"
-    }
-    return JsonResponse({"data": data})
+        "message": _("Message Sent Successfully"),
+    }})
 
 def about_us(request):
     return render(request, "core/about_us.html")

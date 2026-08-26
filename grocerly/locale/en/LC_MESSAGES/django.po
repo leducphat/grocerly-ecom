@@ -578,3 +578,21 @@ msgstr ""
 
 msgid "This order was delivered. Its status is final."
 msgstr ""
+
+msgid "Please fill in every field."
+msgstr ""
+
+msgid "That is too long. Please keep it under %(limit)s characters."
+msgstr ""
+
+msgid "Please enter a valid email address."
+msgstr ""
+
+msgid "Message Sent Successfully"
+msgstr ""
+
+msgid "Message Sent Successfully!"
+msgstr ""
+
+msgid "Could not send your message. Please try again."
+msgstr ""

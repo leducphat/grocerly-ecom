@@ -949,23 +949,36 @@
             let subject = $("#subject").val();
             let message = $("#message").val();
 
+            // POST, không phải GET: gửi bằng GET thì CSRF middleware không kiểm token,
+            // nên bất kỳ trang nào cũng nhúng được một <img src> để ghi vào database.
+            // Form ở contact.html vốn đã có {% csrf_token %}, trước đây JS chỉ không dùng tới.
             $.ajax({
                 url: "{% url 'core:ajax-contact-form' %}",
-                type: "GET",
+                type: "POST",
                 data: {
                     "full_name": full_name,
                     "email": email,
                     "phone": phone,
                     "subject": subject,
                     "message": message,
+                    "csrfmiddlewaretoken": getCookie("csrftoken"),
                 },
                 dataType: "json",
                 success: function(response){
                     if(response.data.bool === true){
-                        $("#message-response").html("Message Sent Successfully!");
+                        $("#message-response").html("{% trans 'Message Sent Successfully!' %}");
                         $("form#contact-form-ajax").hide();
                         $(".contact_us_p").hide();
                     }
+                },
+                // Không có nhánh này thì mọi lỗi 400 mới (thiếu trường, quá dài, email
+                // sai định dạng) bị nuốt im lặng — người dùng bấm Gửi và không thấy gì.
+                error: function(xhr){
+                    let reason = "{% trans 'Could not send your message. Please try again.' %}";
+                    if (xhr && xhr.responseJSON && xhr.responseJSON.error) {
+                        reason = xhr.responseJSON.error;
+                    }
+                    $("#message-response").html('<span class="text-danger">' + reason + '</span>');
                 }
             });
         });

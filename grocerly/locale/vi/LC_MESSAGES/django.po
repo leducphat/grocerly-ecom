@@ -1003,3 +1003,21 @@ msgstr "Lưu"
 
 msgid "This order was delivered. Its status is final."
 msgstr "Đơn hàng này đã giao xong, trạng thái là cuối cùng."
+
+msgid "Please fill in every field."
+msgstr "Vui lòng điền đầy đủ các trường."
+
+msgid "That is too long. Please keep it under %(limit)s characters."
+msgstr "Nội dung quá dài. Vui lòng giữ dưới %(limit)s ký tự."
+
+msgid "Please enter a valid email address."
+msgstr "Vui lòng nhập địa chỉ email hợp lệ."
+
+msgid "Message Sent Successfully"
+msgstr "Đã gửi tin nhắn thành công"
+
+msgid "Message Sent Successfully!"
+msgstr "Đã gửi tin nhắn thành công!"
+
+msgid "Could not send your message. Please try again."
+msgstr "Không gửi được tin nhắn. Vui lòng thử lại."
