@@ -69,7 +69,7 @@ python manage.py test --settings=grocerly.settings_test
 `manage.py test` sẽ tạo database `test_<tên-db>` **trên máy chủ production Neon** (bẫy #5).
 Module này ép SQLite in-memory.
 
-**454 test** tính đến 2026-08-26, chia ba tầng — unit thuần (`SimpleTestCase`, không
+**513 test** tính đến 2026-08-26, chia ba tầng — unit thuần (`SimpleTestCase`, không
 dựng database) · mức model · hồi quy ở mức HTTP:
 
 | File | Nội dung |
@@ -79,6 +79,8 @@ dựng database) · mức model · hồi quy ở mức HTTP:
 | [core/test_money_helpers.py](grocerly/core/test_money_helpers.py) | Unit test thuần cho `safe_float`/`safe_int`/`vnd`/`mul` — **đường tiền**, đọc trước khi đụng bốn hàm đó |
 | [core/test_middleware.py](grocerly/core/test_middleware.py) | Hai middleware tự viết + **thứ tự** trong `settings.MIDDLEWARE`. Chốt bẫy #6 thành test |
 | [userauths/test_auth_flow.py](grocerly/userauths/test_auth_flow.py) | Đăng ký / đăng nhập / đăng xuất và điều hướng theo vai trò |
+| [core/test_settings_security.py](grocerly/core/test_settings_security.py) | Quy tắc suy ra `SECRET_KEY` / `DEBUG` / cờ cookie (S-05, S-11). Nạp lại module settings với môi trường giả |
+| [core/test_state_changing_methods.py](grocerly/core/test_state_changing_methods.py) | Endpoint nào phải POST, endpoint nào **cố ý** vẫn GET (S-10) — kèm khẳng định ở tầng template |
 | [core/test_vnpay_flow.py](grocerly/core/test_vnpay_flow.py) | Hai callback VNPay ở mức HTTP — **đường thanh toán online**, trước 2026-08-26 không test nào chạm tới |
 | [core/test_softdelete.py](grocerly/core/test_softdelete.py) | Hạ tầng xóa mềm ở mức model, chốt bẫy #3 |
 | [core/test_checkout.py](grocerly/core/test_checkout.py) | Luồng tạo đơn — **đọc trước khi đụng `save_checkout_info`** |

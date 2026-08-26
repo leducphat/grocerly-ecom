@@ -18,19 +18,27 @@ mục dưới đây là **lỗi logic nghiệp vụ** mà framework không đỡ
 | S-02 | Giả mạo giá sản phẩm qua query string | 🔴 Nghiêm trọng | ✅ Đã sửa 2026-08-24 |
 | S-03 | Endpoint AI không xác thực, không giới hạn tần suất | 🟠 Cao | ✅ Đã sửa 2026-08-25 |
 | S-04 | Rò rỉ sản phẩm chưa đăng bán qua API và chatbot | 🟠 Cao | ✅ Đã sửa 2026-08-24 |
-| S-05 | `SECRET_KEY` có giá trị mặc định | 🟡 Trung bình | Chưa sửa |
+| S-05 | `SECRET_KEY` có giá trị mặc định | 🟡 Trung bình | ✅ Đã sửa 2026-08-26 |
 | S-06 | Lộ thông tin đăng nhập production trong báo cáo | 🔴 Nghiêm trọng | Cần đổi mật khẩu sau bảo vệ |
-| S-07 | `except:` trần nuốt lỗi ở luồng đăng nhập | 🔵 Thấp | Chưa sửa |
+| S-07 | `except:` trần nuốt lỗi ở luồng đăng nhập | 🔵 Thấp | ✅ Đã sửa 2026-08-26 |
 | S-08 | Chốt chặn đánh giá chỉ nằm ở template | 🟠 Cao | ✅ Đã sửa 2026-08-24 |
 | S-09 | Form liên hệ ghi database bằng GET không xác thực | 🟠 Cao | ✅ Đã sửa 2026-08-26 |
-| S-10 | Các endpoint khác đổi dữ liệu bằng GET | 🟡 Trung bình | Chưa sửa — [PLAN](PLAN.md) bước 2.14 |
-| S-11 | Cookie phiên không có cờ `Secure` | 🔵 Thấp | Chưa sửa — [PLAN](PLAN.md) bước 2.14 |
-| S-12 | `Coupon.discount` không giới hạn → giá đơn âm | 🟡 Trung bình | Chưa sửa |
-| S-13 | `vnpay_ipn` so số tiền theo giá **hiện tại** của đơn | 🟡 Trung bình | Chưa sửa |
+| S-10 | Các endpoint khác đổi dữ liệu bằng GET | 🟡 Trung bình | ✅ Đã sửa 2026-08-26 |
+| S-11 | Cookie phiên không có cờ `Secure` | 🔵 Thấp | ✅ Đã sửa 2026-08-26 |
+| S-12 | `Coupon.discount` không giới hạn → giá đơn âm | 🟡 Trung bình | ✅ Đã sửa 2026-08-26 |
+| S-13 | `vnpay_ipn` so số tiền theo giá **hiện tại** của đơn | 🟡 Trung bình | ✅ Đã sửa 2026-08-26 — [ADR-0008](DECISIONS.md) |
 
-⚠️ **Không mục nào trong bảng này đang được bảo vệ trên production.** Mọi bản vá vẫn nằm
-trên `develop`; `main` chậm 44 commit và việc deploy **đã được hoãn có chủ ý** — xem
+**Tính tới 2026-08-26, 12/13 mục đã vá.** Còn lại đúng [S-06](#s-06--lộ-thông-tin-đăng-nhập-production)
+— không phải lỗi code mà là ba mật khẩu in trong báo cáo, phải đổi sau khi bảo vệ.
+
+⚠️ **Nhưng không mục nào đang được bảo vệ trên production.** Mọi bản vá vẫn nằm trên
+`develop`; `main` chậm 50 commit và việc deploy **đã được hoãn có chủ ý** — xem
 [PLAN.md](PLAN.md) giai đoạn 1.
+
+⚠️ **Hai bản vá đặt điều kiện cho lần deploy tới**, bỏ qua là site không lên được:
+`DJANGO_SECRET_KEY` phải có mặt trên Render ([S-05](#s-05--secret_key-có-giá-trị-mặc-định)),
+và không coupon nào được mang `discount` âm ([S-12](#s-12--coupondiscount-không-giới-hạn-giá-đơn-có-thể-âm)).
+Chi tiết ở [PLAN.md](PLAN.md) bước 1.1.
 
 Các mục đã sửa đều có test hồi quy. Chạy toàn bộ:
 
@@ -44,6 +52,11 @@ python manage.py test --settings=grocerly.settings_test
 | S-01, S-02, S-08 | [core/tests.py](../grocerly/core/tests.py) |
 | S-03, S-04 | [store_api/tests.py](../grocerly/store_api/tests.py) |
 | S-09 | [core/test_contact_form.py](../grocerly/core/test_contact_form.py) |
+| S-05, S-11 | [core/test_settings_security.py](../grocerly/core/test_settings_security.py) |
+| S-07 | [userauths/test_auth_flow.py](../grocerly/userauths/test_auth_flow.py) |
+| S-10 | [core/test_state_changing_methods.py](../grocerly/core/test_state_changing_methods.py) |
+| S-12 | [core/test_coupon.py](../grocerly/core/test_coupon.py) |
+| S-13 | [core/test_vnpay_flow.py](../grocerly/core/test_vnpay_flow.py) |
 
 ---
 
@@ -198,6 +211,15 @@ in_stock=True)`). Việc ba cờ chồng chéo là nợ kỹ thuật riêng, xem
 
 ## S-05 — `SECRET_KEY` có giá trị mặc định
 
+> ✅ **Đã sửa 2026-08-26.** `_resolve_secret_key()` ném `ImproperlyConfigured` khi
+> `DEBUG=False` mà thiếu biến; `DJANGO_DEBUG` mặc định đảo thành `'0'`; khóa dự phòng
+> thay bằng một khóa mới, vì khóa cũ còn nằm trong lịch sử git của repo public.
+> Test: [core/test_settings_security.py](../grocerly/core/test_settings_security.py).
+>
+> ⚠️ **Điều kiện cho lần deploy tới:** Render **phải** có `DJANGO_SECRET_KEY`, nếu không
+> site không khởi động. Đó chính là mục đích, nhưng phải xác nhận trước — [PLAN](PLAN.md)
+> bước 1.1.
+
 **Vị trí:** [grocerly/settings.py:43](../grocerly/grocerly/settings.py#L43)
 
 ```python
@@ -233,6 +255,12 @@ demo cho người xem repo, tạo tài khoản riêng quyền hạn chế, tuy�
 ---
 
 ## S-07 — `except:` trần ở luồng đăng nhập
+
+> ✅ **Đã sửa 2026-08-26.** Bỏ hẳn khối `try` — `User.objects.get()` chỉ tồn tại để sinh
+> ra `DoesNotExist`, mà `authenticate()` đã trả `None` cho cả hai trường hợp sai. Hai
+> thông điệp cũng gộp làm một: bản cũ nói khác nhau cho "sai mật khẩu" và "email chưa
+> đăng ký", tức một **oracle liệt kê tài khoản**, và còn dội chuỗi người dùng gửi lên ra
+> template. Test: [userauths/test_auth_flow.py](../grocerly/userauths/test_auth_flow.py).
 
 **Vị trí:** [userauths/views.py:64](../grocerly/userauths/views.py#L64)
 
@@ -356,7 +384,12 @@ Render nhiều worker là vô nghĩa. Cùng loại giới hạn mà [S-03](#s-03
 
 ## S-10 — Các endpoint khác đổi dữ liệu bằng GET
 
-**Chưa sửa** — [PLAN.md](PLAN.md) bước 2.14.
+> ✅ **Đã sửa 2026-08-26.** Năm endpoint đổi dữ liệu của người khác nay là POST + CSRF:
+> `make_address_default`, `add_to_wishlist`, `remove_wishlist`, `logout_view`,
+> `vnpay_payment`. Bốn endpoint giỏ hàng **cố ý giữ GET** — chúng chỉ đụng session của
+> chính người gửi. Test:
+> [core/test_state_changing_methods.py](../grocerly/core/test_state_changing_methods.py),
+> trong đó có cả nhóm khẳng định **template** vẫn là form POST chứ không quay lại `<a href>`.
 
 Khác S-09 ở một điểm quyết định: **tất cả đều cần phiên đăng nhập**. Mà settings không
 đặt `SESSION_COOKIE_SAMESITE` nên Django 5.2 dùng mặc định `Lax`, và `Lax` **không gửi
@@ -381,7 +414,10 @@ link. Đó là mức độ còn lại của nhóm này.
 
 ## S-11 — Cookie phiên không có cờ `Secure`
 
-**Chưa sửa** — [PLAN.md](PLAN.md) bước 2.14.
+> ✅ **Đã sửa 2026-08-26.** `SESSION_COOKIE_SECURE` và `CSRF_COOKIE_SECURE` nay là nghịch
+> đảo của `DEBUG`. `settings_local` và `settings_test` đặt tay cả hai thành `False` —
+> dev server chạy http:// và test client dùng `http://testserver`.
+> Test: [core/test_settings_security.py](../grocerly/core/test_settings_security.py).
 
 `settings.py` không đặt `SESSION_COOKIE_SECURE` hay `CSRF_COOKIE_SECURE`, nên cả hai là
 `False`. Render phục vụ qua HTTPS, nhưng cookie không mang cờ `Secure` thì trình duyệt
@@ -419,6 +455,15 @@ việc đó là điều hướng hay subresource — và đó mới là thứ qu
 
 ## S-12 — `Coupon.discount` không giới hạn, giá đơn có thể âm
 
+> ✅ **Đã sửa 2026-08-26**, ở ba mức: validator 1–100 (chặn đường nhập liệu qua Django
+> admin), `PositiveIntegerField` → `CHECK (discount >= 0)` ở tầng database (chặn mọi
+> đường, kể cả shell), và kẹp trong `checkout()` vào khoảng `[0, giá đơn]` (lo cận trên
+> và các bản ghi có từ trước). Test: [core/test_coupon.py](../grocerly/core/test_coupon.py).
+>
+> ⚠️ **Điều kiện cho lần deploy tới:** migration `0010` áp `CHECK` lên **dữ liệu đang
+> có** — coupon nào trên Neon mang `discount` âm sẽ làm migration thất bại. Soát trước:
+> `Coupon.all_objects.filter(discount__lt=0)`.
+
 **Vị trí:** [core/models.py](../grocerly/core/models.py) — `Coupon.discount`
 
 ```python
@@ -444,6 +489,12 @@ là "đằng nào cũng có migration trên `Coupon`, sửa luôn thể".
 ---
 
 ## S-13 — `vnpay_ipn` so số tiền theo giá hiện tại của đơn
+
+> ✅ **Đã sửa 2026-08-26** — [ADR-0008](DECISIONS.md). Thêm `CartOrder.vnpay_amount` ghi
+> lại số tiền **đã gửi** sang cổng; `vnpay_ipn` đối chiếu với con số đó thay vì tính lại,
+> và `checkout()` khóa giá sau khi đơn đã sang cổng. `NULL` (đơn COD, đơn có từ trước
+> migration `0011`) rơi về hành vi cũ, nếu không thì mọi đơn treo trên production hỏng
+> ngay sau khi deploy. Test: [core/test_vnpay_flow.py](../grocerly/core/test_vnpay_flow.py).
 
 **Vị trí:** [core/views.py](../grocerly/core/views.py) — `vnpay_ipn` và `vnpay_payment`
 

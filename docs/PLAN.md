@@ -42,7 +42,7 @@ quyết định nghiệp vụ, không phải cắt giảm vì thiếu thời gia
 
 - [ ] **1.1** Merge `develop` → `main`, Render tự deploy — **hoãn có chủ ý, 2026-08-26**
 
-`main` đang chậm **44 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
+`main` đang chậm **50 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
 mọi bản vá đã làm **chưa bảo vệ được gì**.
 
 **Quyết định 2026-08-26: hoãn.** Production đang chạy ổn định và chưa cần demo cho GVHD,
@@ -63,9 +63,32 @@ Hệ quả cần nhớ khi deploy:
 - Migration `0009` thêm ba cột cho `Coupon` (`valid_to`, `usage_limit`, `used_count`).
   Cả ba đều nullable hoặc có default nên **không backfill**: mã đang có giữ nguyên nghĩa
   "không hết hạn, không giới hạn lượt". Trên PostgreSQL đây là `ADD COLUMN` thường
+- Migration `0010` đổi `Coupon.discount` sang `PositiveIntegerField`, tức thêm
+  `CHECK (discount >= 0)` **lên dữ liệu đang có**. Coupon nào mang `discount` âm sẽ làm
+  migration **thất bại giữa chừng** — soát trước bằng
+  `Coupon.all_objects.filter(discount__lt=0)`
+- Migration `0011` thêm `CartOrder.vnpay_amount`, nullable, `ADD COLUMN` thường, **không
+  backfill**. Đơn treo mang `NULL` và đi vào nhánh dự phòng của `vnpay_ipn` ([ADR-0008](DECISIONS.md))
 - Trước khi deploy nên soát đơn hàng mắc kẹt ở trạng thái rác:
   `CartOrder.objects.exclude(product_status__in=['processing','shipped','delivered'])`
   — xem bước 2.2
+
+### 🚨 Hai điều kiện bắt buộc trước lần deploy tới
+
+Từ 2026-08-26 việc deploy **không còn là thao tác thuần túy vô hại**. Hai bản vá bảo mật
+đặt điều kiện lên môi trường production, và bỏ qua chúng là site không lên được:
+
+1. **`DJANGO_SECRET_KEY` phải có trên Render.** Sau [S-05](SECURITY.md), thiếu biến này
+   khi `DEBUG=False` thì `settings.py` ném `ImproperlyConfigured` ngay lúc khởi động. Đó
+   đúng là mục đích của bản vá, nhưng phải xác nhận **trước** khi merge.
+
+   Cùng lô đó, `DJANGO_DEBUG` đảo mặc định thành `'0'`. Nếu Render đang **không** đặt
+   biến này thì production đang chạy `DEBUG=True` — và sau khi deploy nó sẽ tắt, kéo theo
+   `ALLOWED_HOSTS` bắt đầu có hiệu lực thật. Kiểm luôn `DJANGO_ALLOWED_HOSTS` có tên miền
+   Render trong đó chưa.
+
+2. **Không coupon nào được mang `discount` âm** — nếu không migration `0010` thất bại.
+   Xem gạch đầu dòng ở trên.
 
 ### ⚠️ Bẫy i18n — máy dev không có gettext
 
@@ -94,8 +117,8 @@ là đóng gap mà không phải sửa báo cáo.
 | ✅ **2.2** | ~~Chặn đổi trạng thái khi đơn đã `delivered` ([A8](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.20 Exception Flow | thấp |
 | ✅ **2.3** | ~~Làm sạch giỏ hàng ([A4](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.6 Alternate Flow | thấp |
 | ✅ **2.4** | ~~Drop cột `stripe_payment_intent`~~ **Migration xong 2026-08-26**, chạy khi deploy | ERD + Bảng 32 **không có** cột này | thấp |
-| **2.5** | `except:` trần ([S-07](SECURITY.md)) + `SECRET_KEY`/`DEBUG` ([S-05](SECURITY.md)) | mục 1.2.2 Yêu cầu phi chức năng | thấp |
-| **2.6** | **Tầng unit test** — xem bảng riêng bên dưới | Chương 4 — hai điểm nhấn chưa có test nào | trung bình |
+| ✅ **2.5** | ~~`except:` trần ([S-07](SECURITY.md)) + `SECRET_KEY`/`DEBUG` ([S-05](SECURITY.md))~~ **Xong 2026-08-26** | mục 1.2.2 Yêu cầu phi chức năng | thấp |
+| ✅ **2.6** | ~~**Tầng unit test** — xem bảng riêng bên dưới~~ **Xong 2026-08-26** | Chương 4 — hai điểm nhấn chưa có test nào | trung bình |
 | ✅ **2.7** | ~~Nhập mã vận đơn ở `useradmin` ([A9](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.20 Alternate Flow | trung bình |
 | ✅ **2.8** | ~~Phân trang ([A3](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.3 Alternate Flow | trung bình |
 | **2.8b** | Đẩy trạng thái bộ lọc lên URL (`replaceState` + khôi phục checkbox) | — | trung bình |
@@ -104,7 +127,8 @@ là đóng gap mà không phải sửa báo cáo.
 | ✅ **2.11** | ~~**Khóa ngoại `CartOrderItem` → `Product`**~~ **Xong 2026-08-26** | [ADR-0006](DECISIONS.md); vá nợ kỹ thuật #6 | cao, đụng checkout |
 | ✅ **2.12** | ~~Điều kiện đã mua mới đánh giá ([A2](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.14 + **Hình 21** | phụ thuộc 2.11 |
 | **2.13** | Gửi email hàng loạt ([A10](SPEC-GAPS.md)) | UC 3.2.22 Alternate Flow | cao, cần cấu hình SMTP |
-| **2.14** | Các endpoint đổi dữ liệu bằng GET còn lại ([S-10](SECURITY.md)) + cờ `Secure` cho cookie ([S-11](SECURITY.md)) | mục 1.2.2 Yêu cầu phi chức năng | thấp-trung bình |
+| ✅ **2.14** | ~~Các endpoint đổi dữ liệu bằng GET còn lại ([S-10](SECURITY.md)) + cờ `Secure` cho cookie ([S-11](SECURITY.md))~~ **Xong 2026-08-26** | mục 1.2.2 Yêu cầu phi chức năng | thấp-trung bình |
+| ✅ **2.15** | ~~`Coupon.discount` không giới hạn ([S-12](SECURITY.md)) + `vnpay_ipn` so sai số tiền ([S-13](SECURITY.md))~~ **Xong 2026-08-26** | [ADR-0008](DECISIONS.md); UC 3.2.21 cần thêm tiền điều kiện | trung bình, hai migration |
 
 **Ghi chú 2.4:** hôm 2026-08-25 mục này còn treo vì chưa biết báo cáo có mô tả cột đó
 không. Đã đọc bản gốc: **ERD Hình 45 và Bảng 32 đều không có** `stripe_payment_intent`.
@@ -207,6 +231,11 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
       tính mới cần bổ sung ([A6](SPEC-GAPS.md))
 - [ ] **3.25** **UC 3.2.3** — đối chiếu Alternate Flow xem có ghi cỡ trang cụ thể không.
       Code dùng 8 sản phẩm/trang
+- [ ] **3.26** **UC 3.2.21** (Áp mã giảm giá) — bổ sung tiền điều kiện *đơn chưa được
+      chuyển sang cổng thanh toán* ([ADR-0008](DECISIONS.md)). Cùng loại bổ sung với hai
+      tiền điều kiện của UC 3.2.25 ở bước 3.21 — lại là chỗ code **hẹp hơn** báo cáo
+- [ ] **3.27** **ERD Hình 45** và bảng mô tả `cartorder` — bổ sung cột `vnpay_amount`
+      (migration `0011`)
 
 ### 3D — Định vị và tác nhân ([ADR-0003](DECISIONS.md) đã chốt)
 
@@ -235,13 +264,13 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
 
 Đây là phần trả lời câu hỏi chắc chắn sẽ bị hỏi: *"khác gì bản Tiểu luận?"*
 
-- [ ] **4.1** Chương/mục **rà soát bảo mật** — **11 lỗ hổng** ở [SECURITY.md](SECURITY.md),
+- [ ] **4.1** Chương/mục **rà soát bảo mật** — **13 lỗ hổng** ở [SECURITY.md](SECURITY.md), 12 đã vá,
       kịch bản khai thác, cách vá, và cái gì **cố ý không vá** kèm lý do.
       Phần đáng giá nhất không phải danh sách lỗi mà là mục *Rà soát 2026-08-26*: **ba
       phát hiện ban đầu bị bác bỏ** khi có bước phản biện độc lập. Thấy `@csrf_exempt`
       trong code **chưa đủ để kết luận có lỗ hổng** — còn phải trả lời được request của
       kẻ tấn công có mang được cookie phiên tới không, mà điều đó phụ thuộc `SameSite`
-- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **454 test tự động**
+- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **513 test tự động**
       (số tính tới 2026-08-26), cộng bảng test case cho AI Chatbot và VNPay.
       Điểm mạnh hơn con số: nay trình bày được thành **kim tự tháp test** — unit test
       thuần (`SimpleTestCase`, không DB) / test ở mức model / test hồi quy ở mức HTTP
@@ -254,6 +283,81 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
 ---
 
 ## Đã xong
+
+### 2026-08-26 — Bước 2.5, 2.14, 2.15: đóng nốt bảng lỗ hổng
+
+**454 → 513 test**, năm commit. [SECURITY.md](SECURITY.md) nay **12/13 mục đã vá**; mục
+còn lại là [S-06](SECURITY.md) — không phải lỗi code mà là ba mật khẩu in trong báo cáo,
+đổi sau khi bảo vệ.
+
+Lô này sinh ra [ADR-0008](DECISIONS.md) và **hai migration** (`0010`, `0011`), và lần đầu
+tiên trong dự án việc deploy có **điều kiện bắt buộc** — xem khối 🚨 ở [giai đoạn 1](#giai-đoạn-1--deploy).
+
+- **S-05 + S-11** — thiếu `DJANGO_SECRET_KEY` khi `DEBUG=False` nay là `ImproperlyConfigured`
+  lúc khởi động, `DJANGO_DEBUG` đảo mặc định thành `'0'`, hai cờ `Secure` của cookie thành
+  nghịch đảo của `DEBUG`. Khóa dự phòng thay bằng khóa mới: khóa cũ còn nằm trong lịch sử
+  git của một repo public nên không được tiếp tục làm giá trị dự phòng ở đâu cả.
+
+  **Lượt đột biến đầu tiên bắt được một lỗ hổng trong chính cách test.** Khôi phục đúng
+  mặc định cũ (`_env_flag('DJANGO_DEBUG', '1')`) mà **không test nào đỏ**, vì mọi test đều
+  tự truyền giá trị mặc định vào lời gọi của chính nó — tức chúng kiểm *hàm*, không kiểm
+  *chỗ gọi*. Phải thêm `DJANGO_SKIP_DOTENV` để nạp lại được cả module với môi trường giả
+  thì mới phủ được chỗ gọi. Đây là biến thể mới của bài học ở bước 2.8/2.9, lần này ở tầng
+  cấu hình chứ không phải tầng nghiệp vụ.
+
+- **S-07** — bỏ hẳn khối `try`/`except:` trần ở luồng đăng nhập. Nó không cần thiết ngay
+  từ đầu: `User.objects.get()` chỉ tồn tại để sinh ra `DoesNotExist`, mà `authenticate()`
+  đã trả `None` cho cả hai trường hợp sai.
+
+  Lộ ra thêm một thứ không nằm trong mô tả của S-07: hai nhánh sai trả **hai thông điệp
+  khác nhau** — "User does not exist" cho sai mật khẩu, "User with email X does not exist"
+  cho email chưa đăng ký. Đó là **oracle liệt kê tài khoản**, và vế sau còn dội thẳng
+  chuỗi người dùng gửi lên ra template. Nay gộp làm một.
+
+- **S-10** — năm endpoint đổi dữ liệu của người khác chuyển sang POST + CSRF. Phần tốn
+  công không phải view mà là **template**: ba lời gọi AJAX, năm link đăng xuất và nút
+  VNPay đều phải thành form.
+
+  Đó cũng là chỗ loại thay đổi này hay hỏng: view vá xong, nút vẫn hiện, bấm vào trả
+  **405**, và không test nào ở tầng view thấy. Nên có hẳn hai nhóm test khẳng định
+  **markup** là form POST chứ không phải `<a href>` — cám dỗ "sửa cho đẹp" bằng cách trả
+  về link là có thật, nút form khó style hơn link.
+
+  Bốn endpoint giỏ hàng **cố ý giữ GET**: chúng chỉ đụng session của chính người gửi nên
+  không có dữ liệu của ai khác để giả mạo. Có một nhóm test nói rõ điều đó, để lần sau ai
+  đọc S-10 rồi thấy chúng còn GET thì biết là đã cân nhắc chứ không phải bỏ sót.
+
+- **S-12** — `Coupon.discount` vá ở **ba** mức chứ không một: validator 1–100 chặn đường
+  nhập liệu (chỉ chạy qua ModelForm, tức Django admin), `CHECK (discount >= 0)` từ
+  `PositiveIntegerField` chặn ở tầng database, và kẹp trong `checkout()` lo cận trên cùng
+  các bản ghi có từ trước.
+
+  Viết test làm đổi một kết luận: test cho "bản ghi âm có sẵn" được viết để chứng minh
+  cái kẹp xử lý được nó, và nó **lỗi** thay vì đỏ — `CHECK` mới từ chối bản ghi ngay từ
+  đầu. Khẳng định đúng là `IntegrityError`, mạnh hơn hẳn điều định chứng minh ban đầu.
+
+- **S-13** — chỗ nghiêm trọng nhất của lô, dù xếp mức Trung bình: `vnpay_ipn` đối chiếu
+  callback với `order.price` **lúc nhận** thay vì số tiền **đã gửi**, nên khách trả tiền
+  thật mà đơn không bao giờ được ghi nhận. Chi tiết và các phương án đã loại ở
+  [ADR-0008](DECISIONS.md).
+
+  Nhánh dự phòng cho `vnpay_amount IS NULL` là **bắt buộc**, không phải cho gọn: bỏ đi là
+  mọi đơn treo trên production hỏng ngay khi deploy. Có test riêng cho đúng điều đó, và
+  nó đỏ khi thử bỏ nhánh.
+
+**Kiểm chứng.** Mười tám đột biến, mỗi bản vá 3–6 cái, **tất cả đều làm đỏ ít nhất một
+test**. Nhưng như mục S-05 ở trên cho thấy, điều đáng ghi cho [bước 4.1](#giai-đoạn-4--nội-dung-mới-cho-kltn)
+không phải con số đó — mà là lượt đột biến **thất bại** ở lần đầu, và những gì nó buộc
+phải sửa trong chính bộ test.
+
+**Ba lần giả định sai bị test bắt**, cả ba đều là giả định của người viết chứ không phải
+lỗi code: `payment_method` mặc định đã là `'online'` và `product_status` mặc định đã là
+`'processing'` nên không field nào của `vnpay_payment` quan sát được (phải dựng đơn ở
+`shipped`); và bản ghi coupon âm không tồn tại được nữa sau migration `0010`.
+
+**Còn nợ lại:** thông điệp trong `userauths/views.py` **chưa qua i18n** — hiện tiếng Anh
+ở cả hai ngôn ngữ. Có từ trước lô này; bọc một chuỗi trong khi hàng xóm của nó không bọc
+thì tệ hơn là để nguyên cho nhất quán. Cần một lượt riêng cho cả file.
 
 ### 2026-08-26 — Bước 2.6b, 2.6c, 2.6e, 2.6g: đóng nốt tầng unit test
 

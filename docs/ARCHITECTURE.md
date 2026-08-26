@@ -275,7 +275,7 @@ khi `settings.py` hiện chỉ hiểu `USE_CLOUDINARY` — cấu hình này đã
 
 | # | Vấn đề | Ảnh hưởng |
 |---|---|---|
-| 1 | ~~Thiếu tầng unit test~~ 🔸 **Đã đóng 2026-08-26** — **454 test**, ba tầng: unit thuần (`SimpleTestCase`, không dựng database) / mức model / hồi quy ở mức HTTP. Nhóm 2.6 xong toàn bộ | Không còn mục nào phải kiểm thử tay. Chỗ mỏng nhất còn lại là `store_api` (11 test) và các view thống kê ở `useradmin` |
+| 1 | ~~Thiếu tầng unit test~~ 🔸 **Đã đóng 2026-08-26** — **513 test**, ba tầng: unit thuần (`SimpleTestCase`, không dựng database) / mức model / hồi quy ở mức HTTP. Nhóm 2.6 xong toàn bộ | Không còn mục nào phải kiểm thử tay. Chỗ mỏng nhất còn lại là `store_api` (11 test) và các view thống kê ở `useradmin` |
 | 2 | Truy vấn không `select_related` → N+1 | Chậm khi dữ liệu lớn |
 | 3 | ~~Không phân trang ở mọi trang danh sách~~ | 🔸 **Đã vá một phần 2026-08-26** (PLAN bước 2.8). Năm trang danh sách sản phẩm phía khách đã phân trang. **Chưa phân trang**: danh sách đơn hàng ở dashboard nhân viên, danh sách đánh giá, `shop_page`, và bảng đơn ở dashboard khách — bốn chỗ đó đã có `.order_by()` nên phân trang được bất cứ lúc nào |
 | 4 | `useradmin` không giới hạn phạm vi theo nhân viên | Mọi staff thấy toàn bộ dữ liệu |
