@@ -7,7 +7,21 @@ SQLite in-memory để test hoàn toàn không đụng tới dữ liệu thật.
     python manage.py test --settings=grocerly.settings_test
 """
 
-from grocerly.settings import *  # noqa: F401,F403
+import os
+
+# Đặt TRƯỚC khi import settings: từ 2026-08-26 `settings.py` từ chối khởi động nếu
+# `DEBUG=False` mà thiếu `DJANGO_SECRET_KEY` ([S-05](../../docs/SECURITY.md)). Không có
+# dòng này thì một bản clone mới — chưa có `.env` — không chạy nổi `manage.py test`.
+# `setdefault` nên `.env` của máy đang làm việc vẫn thắng.
+os.environ.setdefault('DJANGO_SECRET_KEY', 'insecure-key-for-the-test-suite-only')
+
+from grocerly.settings import *  # noqa: E402,F401,F403
+
+# Đặt tay chứ không để suy ra từ `DEBUG`: giá trị đó phụ thuộc `.env` của từng máy, mà
+# test phải cho cùng kết quả ở mọi máy. `manage.py test` chạy trên `http://testserver`
+# nên cookie có cờ `Secure` sẽ không bao giờ được gửi đi.
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 DATABASES = {
     'default': {

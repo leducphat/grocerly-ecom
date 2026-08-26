@@ -15,9 +15,19 @@ media của production.
 
 import os
 
-from grocerly.settings import *  # noqa: F401,F403
+# Xem ghi chú cùng nội dung trong `settings_test.py`: `settings.py` nay từ chối khởi
+# động khi `DEBUG=False` mà thiếu `DJANGO_SECRET_KEY`.
+os.environ.setdefault('DJANGO_SECRET_KEY', 'insecure-key-for-local-development-only')
+
+from grocerly.settings import *  # noqa: E402,F401,F403
 
 DEBUG = True
+
+# `DEBUG` ở trên được gán SAU khi `settings.py` đã tính hai cờ này, nên phải đặt lại tay.
+# Bỏ qua là dev server local chạy trên http:// mất sạch cookie — đăng nhập không vào được
+# mà không có thông báo lỗi nào.
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 DATABASES = {

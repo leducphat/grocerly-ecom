@@ -14,38 +14,98 @@ from pathlib import Path
 import os
 from urllib.parse import urlparse
 from django.contrib.messages import constants as messages
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env file
-load_dotenv(os.path.join(BASE_DIR, '.env'))
+# `DJANGO_SKIP_DOTENV=1` bỏ qua hoàn toàn `.env`.
+#
+# Hai chỗ cần: môi trường chạy bằng biến môi trường thật (Render, container) không muốn
+# một file `.env` sót lại xen vào, và `core/test_settings_security.py` cần nạp lại module
+# này với môi trường giả — không có cờ này thì `.env` của máy ghi đè lại ngay, và quy tắc
+# suy ra `DEBUG` / `SECRET_KEY` không kiểm chứng được.
+_SKIP_DOTENV = os.environ.get('DJANGO_SKIP_DOTENV', '').strip() == '1'
 
-# Manual .env loader (No external library required)
-env_file = BASE_DIR / ".env"
-if env_file.exists():
-    with open(env_file) as f:
-        for line in f:
-            if line.strip() and not line.startswith("#"):
-                try:
-                    key, value = line.strip().split("=", 1)
-                    os.environ[key] = value
-                except ValueError:
-                    continue
+if not _SKIP_DOTENV:
+    # Load environment variables from .env file
+    load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+    # Manual .env loader (No external library required)
+    env_file = BASE_DIR / ".env"
+    if env_file.exists():
+        with open(env_file) as f:
+            for line in f:
+                if line.strip() and not line.startswith("#"):
+                    try:
+                        key, value = line.strip().split("=", 1)
+                        os.environ[key] = value
+                    except ValueError:
+                        continue
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-+bab1(0x+np=n+**co(_=c^#rrhjx1=7i$j)6xm+%jci&3mf2@')
+# Khóa dự phòng, CHỈ dùng khi DEBUG=True. Không phải khóa cũ: khóa đó đã nằm công khai
+# trên GitHub nên không được tiếp tục làm giá trị dự phòng ở bất kỳ môi trường nào.
+DEV_SECRET_KEY = 'django-insecure-development-only-do-not-deploy-with-this-key'
+
+
+def _env_flag(name, default):
+    """Đọc một biến môi trường dạng cờ. Chỉ đúng `'1'` mới là bật.
+
+    `.strip()` là bắt buộc, không phải cho đẹp: `.env` được nạp bằng `split('=', 1)`
+    thủ công ở đầu file này nên giá trị **giữ nguyên khoảng trắng thừa**, và
+    `DJANGO_DEBUG=1 ` với một dấu cách ở cuối từng bị đọc thành tắt.
+    """
+    return os.environ.get(name, default).strip() == '1'
+
+
+def _resolve_secret_key(debug):
+    """Trả `SECRET_KEY`, hoặc **từ chối khởi động** nếu thiếu ở production — S-05.
+
+    Trước bản vá, thiếu `DJANGO_SECRET_KEY` thì ứng dụng vẫn chạy bình thường bằng một
+    khóa mặc định đã công khai trên GitHub. `SECRET_KEY` ký cookie phiên và token đặt lại
+    mật khẩu, nên biết khóa là giả mạo được phiên đăng nhập của bất kỳ ai — và không có
+    dấu hiệu nào cho thấy điều đó đang xảy ra.
+
+    Sập lúc khởi động ồn ào hơn nhiều so với chạy tiếp bằng khóa ai cũng biết.
+
+    ⚠️ **Trước khi deploy phải xác nhận Render đã đặt `DJANGO_SECRET_KEY`** — xem
+    [PLAN.md](../../docs/PLAN.md) bước 1.1. Thiếu nó là site không khởi động được.
+    """
+    key = os.environ.get('DJANGO_SECRET_KEY', '').strip()
+    if key:
+        return key
+    if not debug:
+        raise ImproperlyConfigured(
+            "Thiếu biến môi trường DJANGO_SECRET_KEY. Bắt buộc phải đặt khi DEBUG=False: "
+            "khóa dự phòng dành cho môi trường dev đã nằm công khai trong repo, dùng nó "
+            "ở production nghĩa là bất kỳ ai cũng giả mạo được cookie phiên."
+        )
+    return DEV_SECRET_KEY
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
+#
+# Mặc định là TẮT. Trước đây mặc định là bật, nghĩa là quên đặt biến trên máy chủ thì
+# trang lỗi phơi traceback và toàn bộ cấu hình cho bất kỳ ai gõ một URL sai.
+DEBUG = _env_flag('DJANGO_DEBUG', '0')
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = _resolve_secret_key(DEBUG)
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Cookie chỉ được đi qua HTTPS khi không phải môi trường dev — S-11.
+#
+# Render vốn phục vụ qua HTTPS, nhưng cookie thiếu cờ `Secure` thì trình duyệt vẫn được
+# phép gửi nó qua một kết nối HTTP thường nếu có đường nào dẫn tới đó.
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 
 # Application definition
