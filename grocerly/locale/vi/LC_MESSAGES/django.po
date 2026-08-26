@@ -1113,6 +1113,10 @@ msgid "This order has already been placed."
 msgstr "Đơn hàng này đã được đặt."
 
 #: core/views.py
+msgid "This order has already been sent to the payment gateway."
+msgstr "Đơn hàng này đã được chuyển sang cổng thanh toán."
+
+#: core/views.py
 msgid "This coupon has expired."
 msgstr "Mã giảm giá này đã hết hạn."
 

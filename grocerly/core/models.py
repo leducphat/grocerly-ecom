@@ -314,6 +314,21 @@ class CartOrder(models.Model):
 
     shipping_method = models.CharField(max_length=100, null=True, blank=True)
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='online')
+
+    # Số tiền đã gửi sang VNPay ở lần chuyển hướng gần nhất, theo đúng đơn vị của cổng
+    # (VND × 100) — SECURITY.md S-13, ADR-0008.
+    #
+    # Tồn tại vì `vnpay_ipn` phải đối chiếu callback với con số **đã thật sự gửi đi**, chứ
+    # không phải với `order.price` đang có lúc nhận callback. Hai con số đó lệch nhau được,
+    # và khi lệch thì IPN trả `'04'`: khách mất tiền thật mà đơn không bao giờ được ghi
+    # nhận đã thanh toán.
+    #
+    # `NULL` có hai nghĩa, cả hai đều là "chưa từng sang cổng": đơn COD, và đơn có từ
+    # trước migration `0011`. `vnpay_ipn` có nhánh dự phòng đọc `order.price` cho chúng.
+    vnpay_amount = models.PositiveBigIntegerField(
+        null=True, blank=True,
+        help_text="Số tiền đã gửi sang VNPay (VND × 100). Trống nghĩa là đơn chưa sang cổng.",
+    )
     tracking_id = models.CharField(max_length=100, null=True, blank=True)
     tracking_website_address = models.CharField(max_length=100, null=True, blank=True)
 

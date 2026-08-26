@@ -398,3 +398,81 @@ khách, nên đơn COD đang xử lý luôn hủy được. Đây là phần l�
 chúng đúng về nghiệp vụ hơn, mà vì chúng **xóa bỏ một lớp lỗi** thay vì phải phòng thủ
 trước lớp lỗi đó. Không có nhánh hoàn kho thì không hoàn kho sai được; không có đơn vừa
 hủy vừa đã thu tiền thì không cần màn hình xử lý nó.
+
+---
+
+## ADR-0008 — Đơn đã chuyển sang cổng thanh toán thì khóa giá
+
+**Trạng thái:** Đã chốt · 2026-08-26
+
+### Bối cảnh
+
+[S-13](SECURITY.md): `vnpay_payment` chốt số tiền **tại thời điểm chuyển hướng**
+(`amount = int(order.price) * 100`), còn `vnpay_ipn` lại đối chiếu callback với
+`order.price` **đang có trong database lúc nhận**. Hai con số đó lệch nhau được.
+
+Khi lệch, IPN trả `'04' Invalid amount` và đơn **không bao giờ được đánh dấu đã thanh
+toán** — dù khách đã mất tiền thật. `used_count` của mã giảm giá cũng không tăng theo.
+
+Đường đi tới chỗ lệch có sẵn: mở `/checkout/<oid>/` ở tab khác rồi áp thêm mã giảm giá
+sau khi đã bấm sang VNPay. Bản vá bước 2.9/2.10 đã bịt đường tương tự cho đơn COD
+(`checkout()` từ chối đơn `payment_method == 'cod'`), nhưng đơn online đã sang cổng thì
+`payment_method` vẫn là `'online'` nên không có dấu hiệu nào để chặn.
+
+### Quyết định
+
+Thêm `CartOrder.vnpay_amount` — số tiền đã gửi sang cổng, theo đúng đơn vị VNPay dùng
+(VND × 100). Ghi ở `vnpay_payment`, mỗi lần chuyển hướng ghi đè lần trước.
+
+Từ đó ra hai chốt:
+
+1. **`vnpay_ipn` đối chiếu với `vnpay_amount`**, không tính lại từ `order.price`.
+   `NULL` (đơn COD, hoặc đơn có từ trước migration `0011`) thì rơi về hành vi cũ.
+2. **`checkout()` từ chối mọi đơn có `vnpay_amount is not None`** — giá bị khóa sau khi
+   đã sang cổng.
+
+### Lý do
+
+**Chốt 1 sửa đúng chỗ sai.** Câu hỏi mà IPN phải trả lời là *"số tiền cổng báo có đúng
+bằng số ta đã yêu cầu không"*. Tính lại từ `order.price` là trả lời một câu hỏi khác —
+*"có đúng bằng giá đơn bây giờ không"* — và hai câu đó chỉ trùng nhau khi giá không đổi.
+Lưu lại con số đã gửi làm câu hỏi thứ nhất trả lời được trực tiếp, không phải suy ra.
+
+**Chốt 2 mới là chỗ phải cân nhắc.** Chỉ có chốt 1 thì đơn vẫn được ghi nhận đã trả, nhưng
+`order.price` nói một con số còn số khách thật sự trả nói một nẻo — và không có luồng hoàn
+tiền nào để chỉnh lại ([ADR-0007](#adr-0007--hủy-đơn-chỉ-áp-dụng-cho-đơn-chưa-thanh-toán-và-chưa-xuất-kho)).
+Khóa giá là cách duy nhất giữ hai con số bằng nhau.
+
+Cùng một logic với `payment_method == 'cod'` ngay bên trên nó: *đơn đã rời khỏi tay khách
+thì không hạ giá được nữa*, chỉ khác dấu hiệu nhận biết.
+
+### Phương án đã cân nhắc
+
+| Phương án | Đánh giá |
+|---|---|
+| **Lưu số đã gửi + khóa giá sau khi sang cổng** ✔ | Giữ `order.price` luôn bằng số khách trả. Đánh đổi: khách bỏ dở ở VNPay rồi đổi ý thì không áp thêm mã cho đơn đó được nữa |
+| Chỉ lưu số đã gửi, không khóa giá | Đơn được ghi nhận đã trả đúng, nhưng sinh ra đơn có `price` khác số tiền thu được — mà không màn hình nào và không luồng nào xử lý được sự chênh đó |
+| Xóa `vnpay_amount` mỗi khi giá đổi | Tệ hơn hẳn: khách **đã trả** theo số cũ thì callback của họ bị từ chối. Đúng lỗi đang vá, chỉ đổi hình dạng |
+| Cho IPN chấp nhận nếu khớp **một trong hai** số | Nới điều kiện đối chiếu số tiền — chính là chốt chống giả mạo. Không đánh đổi an toàn lấy tiện lợi ở đúng chỗ này |
+
+### Hệ quả
+
+- Migration `0011_cartorder_vnpay_amount` thêm một cột nullable → `ADD COLUMN` thường
+  trên PostgreSQL, **không backfill**. Đơn đang treo trên production mang `NULL` và đi
+  vào nhánh dự phòng ở chốt 1, nên deploy không làm hỏng chúng.
+- Nhánh dự phòng đó **bắt buộc phải có**. Bỏ đi là mọi đơn treo trước lúc deploy hỏng
+  ngay — [core/test_vnpay_flow.py](../grocerly/core/test_vnpay_flow.py) có test riêng cho
+  đúng điều đó, và nó đỏ khi thử bỏ nhánh.
+- Khách bỏ dở ở cổng rồi quay lại vẫn **trả được** đơn đó, chỉ là trả theo giá đã khóa.
+  Muốn giá khác thì đặt đơn mới.
+- Báo cáo: UC 3.2.21 (áp mã giảm giá) cần thêm một tiền điều kiện *đơn chưa được chuyển
+  sang cổng thanh toán* — cùng loại bổ sung với hai tiền điều kiện của UC 3.2.25 ở
+  ADR-0007. Ghi ở [PLAN](PLAN.md) bước 3.26.
+
+### Ghi chú cho báo cáo
+
+Cặp S-12 / S-13 đáng để cạnh nhau trong mục rà soát bảo mật: cả hai đều **không phải lỗ
+hổng cho người ngoài** — S-12 cần quyền quản trị viên, S-13 cần chính khách hàng tự làm
+lệch đơn của mình. Nhưng hậu quả đi ngược chiều nhau: S-12 làm hệ thống **thu thiếu**,
+S-13 làm hệ thống **không ghi nhận khoản đã thu**. Cái thứ hai tệ hơn cho khách hàng, và
+là loại lỗi không ai báo cáo vì người gặp không biết mình đang gặp.

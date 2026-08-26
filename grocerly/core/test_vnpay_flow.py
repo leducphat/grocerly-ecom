@@ -69,6 +69,14 @@ class VnpayCallbackTestCase(TestCase):
         params['vnp_SecureHash'] = expected_signature(params)
         return params
 
+    def hand_off_to_gateway(self, order=None):
+        """Bấm nút "Thanh toán qua VNPay" — POST từ 2026-08-26 (S-10)."""
+        order = order or self.order
+        session = self.client.session
+        session['pending_order_oid'] = str(order.oid)
+        session.save()
+        return self.client.post(reverse("core:vnpay_payment", args=[order.oid]))
+
     def apply_coupon(self, order=None):
         order = order or self.order
         self.client.post(reverse("core:checkout", args=[order.oid]), {'code': "GIAM10"})
@@ -215,3 +223,98 @@ class VnpayAndReturnTogetherTests(VnpayCallbackTestCase):
         second.refresh_from_db()
         self.assertEqual(second.price, Decimal("100000.00"))
         self.assertEqual(second.coupons.count(), 0)
+
+
+class AmountLockedAtHandoffTests(VnpayCallbackTestCase):
+    """Số tiền được chốt lúc chuyển sang cổng — [S-13](../../docs/SECURITY.md), [ADR-0008](../../docs/DECISIONS.md).
+
+    `vnpay_payment` chốt `amount = int(order.price) * 100` **tại thời điểm chuyển hướng**,
+    còn `vnpay_ipn` trước đây lại đối chiếu với `order.price` **đang có trong database lúc
+    nhận callback**. Hai con số đó có thể khác nhau, và khi khác thì IPN trả `'04'` —
+    nghĩa là **khách mất tiền thật mà đơn không bao giờ được ghi nhận đã thanh toán**, và
+    `used_count` của mã giảm giá cũng không tăng.
+
+    Đường đi tới chỗ lệch: mở `/checkout/<oid>/` ở tab khác rồi áp thêm mã giảm giá sau
+    khi đã bấm sang VNPay. Bản vá bước 2.9/2.10 đã bịt đường tương tự cho đơn COD
+    (`checkout()` từ chối đơn `payment_method == 'cod'`), nhưng đơn online sang cổng rồi
+    thì `payment_method` vẫn là `'online'` nên không có gì chặn.
+    """
+
+    def test_handoff_records_the_amount_that_was_sent(self):
+        self.hand_off_to_gateway()
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.vnpay_amount, int(Decimal("100000.00")) * 100)
+
+    def test_the_checkout_page_refuses_a_coupon_after_handoff(self):
+        """Khóa giá sau khi đã sang cổng — nửa còn lại của bản vá.
+
+        Chỉ so theo số tiền đã gửi thì đơn vẫn được ghi nhận đã trả, nhưng `order.price`
+        lại nói một con số khác với số khách thật sự trả. Khóa luôn là cách duy nhất giữ
+        hai con số bằng nhau.
+        """
+        self.hand_off_to_gateway()
+        self.apply_coupon()
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.price, Decimal("100000.00"))
+        self.assertEqual(self.used(), 0)
+
+    def test_the_ipn_still_confirms_after_a_price_change(self):
+        """Kịch bản đầy đủ của S-13, đi qua đúng thứ tự khách hàng gặp."""
+        self.hand_off_to_gateway()
+        params = self.callback_params()
+
+        # Giả lập giá bị đổi sau khi đã sang cổng — nay `checkout()` chặn đường này, nên
+        # ghi thẳng vào database để test vẫn tái hiện được tình huống.
+        self.order.price = Decimal("90000.00")
+        self.order.save(update_fields=['price'])
+
+        response = self.client.get(reverse("core:vnpay_ipn"), params)
+        self.assertEqual(response.json()['RspCode'], '00')
+        self.assertTrue(self.paid())
+
+    def test_the_ipn_still_rejects_an_amount_that_was_never_sent(self):
+        """Khóa chặt hơn chứ không lỏng hơn: chốt chống giả mạo số tiền vẫn còn."""
+        self.hand_off_to_gateway()
+        params = self.callback_params()
+        params['vnp_Amount'] = str(int(Decimal("1.00")) * 100)
+        params['vnp_SecureHash'] = expected_signature(
+            {k: v for k, v in params.items() if k != 'vnp_SecureHash'}
+        )
+
+        response = self.client.get(reverse("core:vnpay_ipn"), params)
+        self.assertEqual(response.json()['RspCode'], '04')
+        self.assertFalse(self.paid())
+
+    def test_an_order_that_never_reached_the_gateway_falls_back_to_its_price(self):
+        """Đơn có từ trước migration `0011` mang `vnpay_amount = NULL`.
+
+        Chúng vẫn phải thanh toán được, nên nhánh dự phòng đọc `order.price` — đúng hành
+        vi cũ. Không có nhánh này là mọi đơn treo trên production hỏng ngay sau khi deploy.
+        """
+        self.order.refresh_from_db()
+        self.assertIsNone(self.order.vnpay_amount)
+
+        response = self.client.get(reverse("core:vnpay_ipn"), self.callback_params())
+        self.assertEqual(response.json()['RspCode'], '00')
+        self.assertTrue(self.paid())
+
+    def test_a_coupon_applied_before_handoff_is_what_gets_sent(self):
+        """Khóa chỉ áp dụng **sau** khi sang cổng — áp mã trước đó vẫn bình thường."""
+        self.apply_coupon()
+        self.hand_off_to_gateway()
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.price, Decimal("90000.00"))
+        self.assertEqual(self.order.vnpay_amount, 90000 * 100)
+
+    def test_going_back_to_the_gateway_restamps_the_amount(self):
+        """Khách bỏ dở rồi quay lại bấm trả tiếp: lần chuyển hướng sau ghi đè lần trước.
+
+        Quan trọng vì con số cũ mà còn lại thì lần trả sau bị từ chối — đúng lỗi mà bản
+        vá này đang sửa, chỉ khác hình dạng.
+        """
+        self.hand_off_to_gateway()
+        self.order.price = Decimal("80000.00")
+        self.order.save(update_fields=['price'])
+        self.hand_off_to_gateway()
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.vnpay_amount, 80000 * 100)

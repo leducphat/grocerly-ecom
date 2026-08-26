@@ -928,12 +928,17 @@ def vnpay_payment(request, oid):
         messages.info(request, _("This order has already been placed."))
         return redirect("core:payment-completed", order.oid)
 
-    order.payment_method = 'online' # vnpay is an online method
-    order.product_status = 'processing'
-    order.save(update_fields=['payment_method', 'product_status'])
-    
     import time
     amount = int(order.price) * 100 # VNPAY expects amount * 100
+
+    order.payment_method = 'online' # vnpay is an online method
+    order.product_status = 'processing'
+    # Chốt số tiền lại ngay tại đây — SECURITY.md S-13, ADR-0008. `vnpay_ipn` đối chiếu
+    # callback với CON SỐ NÀY chứ không tính lại từ `order.price`; tính lại chính là lỗi
+    # đang được vá. Ghi đè mỗi lần chuyển hướng: khách bỏ dở rồi quay lại trả tiếp thì con
+    # số của lần gần nhất mới là con số cổng đang giữ.
+    order.vnpay_amount = amount
+    order.save(update_fields=['payment_method', 'product_status', 'vnpay_amount'])
     order_desc = f"Thanh_toan_don_hang_{order.oid}"
     txn_ref = f"{order.oid}-{int(time.time())}"
 
@@ -1021,7 +1026,16 @@ def vnpay_ipn(request):
         if vnp.validate_response(settings.VNPAY_HASH_SECRET):
             try:
                 order = CartOrder.objects.get(oid=order_id)
-                if int(amount) != int(order.price) * 100:
+                # So với số tiền ĐÃ GỬI, không phải giá hiện tại — SECURITY.md S-13.
+                #
+                # `NULL` nghĩa là đơn chưa từng qua `vnpay_payment` (đơn COD, hoặc đơn có
+                # từ trước migration `0011`); nhánh dự phòng giữ nguyên hành vi cũ để đơn
+                # treo trên production không hỏng ngay sau khi deploy.
+                expected_amount = (
+                    order.vnpay_amount if order.vnpay_amount is not None
+                    else int(order.price) * 100
+                )
+                if int(amount) != expected_amount:
                     return JsonResponse({'RspCode': '04', 'Message': 'Invalid amount'})
                     
                 if order.product_status == CANCELLED_ORDER_STATUS:
@@ -1113,6 +1127,18 @@ def checkout(request, oid):
     # `'cod'`, nên giá trị đó là dấu hiệu tin cậy của "đơn COD đã đặt".
     if order.payment_method == 'cod':
         messages.info(request, _("This order has already been placed."))
+        return redirect("core:payment-completed", order.oid)
+
+    # Đã chuyển sang cổng thanh toán thì giá bị khóa — SECURITY.md S-13, ADR-0008.
+    #
+    # Cổng đang giữ một giao dịch chờ với số tiền cố định. Cho áp thêm mã giảm giá ở đây
+    # là tạo ra đơn mà `order.price` nói một đằng còn số khách thật sự trả nói một nẻo —
+    # và không có luồng hoàn tiền nào để chỉnh lại (ADR-0007).
+    #
+    # Cùng họ với chốt `payment_method == 'cod'` ngay trên: cả hai đều là "đơn đã rời khỏi
+    # tay khách rồi thì không hạ giá được nữa", chỉ khác dấu hiệu nhận biết.
+    if order.vnpay_amount is not None:
+        messages.info(request, _("This order has already been sent to the payment gateway."))
         return redirect("core:payment-completed", order.oid)
 
     if request.method == "POST":
