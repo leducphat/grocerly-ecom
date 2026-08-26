@@ -54,7 +54,17 @@
                     </div>
                     <div class="col-lg-3 col-sm-2 col-4 col-action text-end">
                         <a href="{% url 'useradmin:dashboard-edit-products'  p.p_id %}" class="btn btn-sm font-sm rounded btn-brand"> <i class="material-icons md-edit"></i> Edit </a>
-                        <a href="{% url 'useradmin:dashboard-delete-products' p.p_id  %}" class="btn btn-sm font-sm btn-light rounded"> <i class="material-icons md-delete_forever"></i> Delete </a>
+                        {# Xóa là thao tác phá hủy nên phải là POST + CSRF, không phải <a href>. #}
+                        {# Câu xác nhận đi qua data-attribute chứ không nhét thẳng vào chuỗi JS: tên sản #}
+                        {# phẩm do nhân viên nhập, mà nhét vào JS thì phải escape hai tầng (HTML rồi JS) #}
+                        {# và người dùng đọc được &#x27; thay vì dấu nháy. Thuộc tính HTML chỉ cần escape #}
+                        {# một tầng, và trình duyệt tự giải mã khi JS đọc qua `dataset`. #}
+                        {# Dùng nháy cong “ ” chứ không phải " để không đóng sớm chính thuộc tính này. #}
+                        {% blocktrans with title=p.title asvar confirm_delete %}Delete “{{ title }}”? A product that has never been ordered is erased permanently and cannot be recovered.{% endblocktrans %}
+                        <form method="post" action="{% url 'useradmin:dashboard-delete-products' p.p_id %}" class="d-inline" data-confirm="{{ confirm_delete }}" onsubmit="return confirm(this.dataset.confirm);">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm font-sm btn-light rounded"> <i class="material-icons md-delete_forever"></i> {% trans "Delete" %} </button>
+                        </form>
                     </div>
                 </div>
             </article>

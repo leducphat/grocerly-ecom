@@ -548,3 +548,33 @@ msgstr ""
 msgid "⏳ Hệ thống AI đang tạm nghỉ do giới hạn miễn phí. Vui lòng đợi khoảng 30 giây rồi thử lại nhé!"
 msgstr ""
 
+
+
+msgid ""
+"Product '%(title)s' has order history, so it was hidden instead of erased. "
+"It no longer appears in the store and can be restored from the admin site."
+msgstr ""
+
+msgid "Product '%(title)s' had no orders and was permanently deleted."
+msgstr ""
+
+msgid "Delete “%(title)s”? A product that has never been ordered is erased permanently and cannot be recovered."
+msgstr ""
+
+msgid "Change Order Status"
+msgstr ""
+
+msgid "Order %(oid)s was already delivered. Its status can no longer be changed."
+msgstr ""
+
+msgid "Order status changed to %(status)s."
+msgstr ""
+
+msgid "Please choose a valid order status."
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "This order was delivered. Its status is final."
+msgstr ""

@@ -1,6 +1,7 @@
 {% extends 'useradmin/base.html' %}
 {% load static currency_filters %}
 {% load humanize %}
+{% load i18n %}
 {% block content %}  
 
 <section class="content-main">
@@ -19,13 +20,18 @@
                 </div>
                 <form method="POST" action="{% url 'useradmin:change_order_status' order.oid %}" class="col-lg-6 col-md-6 ms-auto text-md-end">
                     {% csrf_token %}
-                    <select name="status" class="form-select d-inline-block mb-lg-0 mr-5 mw-200">
-                        <option value="pending">Change Order Status</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
+                    {# Option dựng từ STATUS_CHOICES của model. Danh sách viết tay trước đây có #}
+                    {# một mục placeholder gửi value="pending" — giá trị không hợp lệ. #}
+                    <select name="status" class="form-select d-inline-block mb-lg-0 mr-5 mw-200" {% if order_is_final %}disabled{% endif %}>
+                        <option value="">{% trans "Change Order Status" %}</option>
+                        {% for value, label in order_status_options %}
+                        <option value="{{ value }}" {% if value == order.product_status %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
                     </select>
-                    <button class="btn btn-primary" type="submit" >Save</button>
+                    <button class="btn btn-primary" type="submit" {% if order_is_final %}disabled{% endif %}>{% trans "Save" %}</button>
+                    {% if order_is_final %}
+                    <div><small class="text-muted">{% trans "This order was delivered. Its status is final." %}</small></div>
+                    {% endif %}
                 </form>
             </div>
         </header>

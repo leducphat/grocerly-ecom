@@ -972,3 +972,34 @@ msgstr "Câu hỏi & trả lời của khách hàng"
 
 msgid "⏳ Bạn đang nhắn quá nhanh. Vui lòng đợi khoảng %(wait_seconds)s giây rồi thử lại nhé!"
 msgstr "⏳ Bạn đang nhắn quá nhanh. Vui lòng đợi khoảng %(wait_seconds)s giây rồi thử lại nhé!"
+
+msgid ""
+"Product '%(title)s' has order history, so it was hidden instead of erased. "
+"It no longer appears in the store and can be restored from the admin site."
+msgstr ""
+"Sản phẩm '%(title)s' đã nằm trong đơn hàng nên được ẩn đi thay vì xóa hẳn. "
+"Sản phẩm không còn hiển thị trong cửa hàng và có thể khôi phục từ trang quản trị."
+
+msgid "Product '%(title)s' had no orders and was permanently deleted."
+msgstr "Sản phẩm '%(title)s' chưa có đơn hàng nào nên đã được xóa vĩnh viễn."
+
+msgid "Delete “%(title)s”? A product that has never been ordered is erased permanently and cannot be recovered."
+msgstr "Xóa “%(title)s”? Sản phẩm chưa từng có đơn hàng nào sẽ bị xóa vĩnh viễn và không khôi phục lại được."
+
+msgid "Change Order Status"
+msgstr "Đổi trạng thái đơn hàng"
+
+msgid "Order %(oid)s was already delivered. Its status can no longer be changed."
+msgstr "Đơn %(oid)s đã giao xong nên không đổi trạng thái được nữa."
+
+msgid "Order status changed to %(status)s."
+msgstr "Đã chuyển trạng thái đơn hàng sang %(status)s."
+
+msgid "Please choose a valid order status."
+msgstr "Vui lòng chọn một trạng thái đơn hàng hợp lệ."
+
+msgid "Save"
+msgstr "Lưu"
+
+msgid "This order was delivered. Its status is final."
+msgstr "Đơn hàng này đã giao xong, trạng thái là cuối cùng."
