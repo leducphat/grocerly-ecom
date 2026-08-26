@@ -39,9 +39,16 @@ class StorefrontOrderingTests(TestCase):
             )
 
     def _products_from(self, url_name, *args, **params):
+        """Trả về **queryset gốc** phía sau trang, không phải đối tượng `Page`.
+
+        Từ bước 2.8 các view này đặt một `Page` vào context. `Page` không có `.ordered`
+        và cũng không phải chỗ cần kiểm — thứ phải có `ORDER BY` là queryset mà
+        `Paginator` cắt `LIMIT/OFFSET` lên trên.
+        """
         response = self.client.get(reverse(url_name, args=args), params)
         self.assertEqual(response.status_code, 200)
-        return response.context['products']
+        page = response.context['products']
+        return page.paginator.object_list
 
     def test_the_product_list_is_ordered(self):
         self.assertTrue(self._products_from("core:product-list").ordered)

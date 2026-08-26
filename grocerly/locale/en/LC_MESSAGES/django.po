@@ -670,3 +670,15 @@ msgstr ""
 #: templates/useradmin/order_detail.html
 msgid "This order is %(order_status_label)s. Its status is final."
 msgstr ""
+
+#: templates/partials/pagination.html
+msgid "Product pages"
+msgstr ""
+
+#: templates/partials/pagination.html
+msgid "Previous page"
+msgstr ""
+
+#: templates/partials/pagination.html
+msgid "Next page"
+msgstr ""

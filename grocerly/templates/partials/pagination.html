@@ -1,0 +1,54 @@
+{% load i18n %}
+{% comment %}
+Thanh phân trang dùng chung — PLAN bước 2.8, SPEC-GAPS A3 (UC 3.2.3 Alternate Flow).
+
+Cần biến `page_obj` trong context (đối tượng `Page` do `_paginate()` trả về).
+
+`{% querystring %}` (Django 5.1+) giữ nguyên mọi tham số GET khác và chỉ thay `page`,
+nên link sang trang 2 của trang tìm kiếm không làm mất `?q=...`. Tự nối chuỗi
+`?page=N` là mất từ khóa tìm kiếm — lỗi kinh điển của phân trang.
+
+`page_obj.elided_page_range` cho ra dãy kiểu `1 2 3 … 20` thay vì in hết mọi số trang.
+Nó do `_paginate()` gắn vào, KHÔNG phải thuộc tính sẵn có của Django: phương thức thật là
+`Paginator.get_elided_page_range(number)` mà template thì không truyền tham số được.
+
+Dấu lược so bằng `page_obj.paginator.ELLIPSIS` chứ không so với chuỗi "…" viết tay —
+giá trị đó là chuỗi dịch lười, so với literal là hành vi không chắc chắn.
+
+⚠️ Ở `product-list.html`, thẻ include partial này phải nằm **NGOÀI**
+`<div id="filtered-product-grid">` — vùng đó bị JS ghi đè nguyên khối khi khách lọc.
+Xem `core/test_product_list_layout.py`.
+{% endcomment %}
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pagination-area mt-20 mb-20">
+    <nav aria-label="{% trans 'Product pages' %}">
+        <ul class="pagination justify-content-start">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="{% querystring page=page_obj.previous_page_number %}"
+                   aria-label="{% trans 'Previous page' %}"><i class="fi-rs-arrow-small-left"></i></a>
+            </li>
+            {% endif %}
+
+            {% for number in page_obj.elided_page_range %}
+                {% if number == page_obj.paginator.ELLIPSIS %}
+                <li class="page-item"><span class="page-link dot">{{ number }}</span></li>
+                {% elif number == page_obj.number %}
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="{% querystring page=number %}">{{ number }}</a>
+                </li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="{% querystring page=number %}">{{ number }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{% querystring page=page_obj.next_page_number %}"
+                   aria-label="{% trans 'Next page' %}"><i class="fi-rs-arrow-small-right"></i></a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}

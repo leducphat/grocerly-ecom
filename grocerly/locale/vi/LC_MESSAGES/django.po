@@ -1095,3 +1095,15 @@ msgstr "Đơn hàng này đã hủy nên không có lô hàng nào để theo d�
 #: templates/useradmin/order_detail.html
 msgid "This order is %(order_status_label)s. Its status is final."
 msgstr "Đơn hàng này đang ở trạng thái %(order_status_label)s. Trạng thái là cuối cùng."
+
+#: templates/partials/pagination.html
+msgid "Product pages"
+msgstr "Các trang sản phẩm"
+
+#: templates/partials/pagination.html
+msgid "Previous page"
+msgstr "Trang trước"
+
+#: templates/partials/pagination.html
+msgid "Next page"
+msgstr "Trang sau"

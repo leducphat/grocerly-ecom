@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.conf import settings
 from django.core import serializers
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils.translation import gettext as _
@@ -59,6 +60,42 @@ def safe_int(val, default=1):
         return int(safe_float(val, default))
     except (ValueError, TypeError):
         return default
+
+
+# Cỡ trang của storefront — PLAN bước 2.8, SPEC-GAPS A3 (UC 3.2.3 Alternate Flow).
+#
+# 8 vì lưới sản phẩm là `col-xl-3` (4 cột) nên 8 lấp đúng hai hàng đầy. Đặt lớn hơn
+# (20-24 theo thói quen) thì với lượng hàng hiện có, thanh phân trang **không bao giờ
+# hiện ra** — mà với A3 thì thanh không hiện nghĩa là gap chưa đóng.
+PRODUCTS_PER_PAGE = 8
+
+
+def paginate(request, queryset, per_page=PRODUCTS_PER_PAGE):
+    """Cắt `queryset` thành một trang, đọc số trang từ `?page=`.
+
+    Không để tham số hỏng thành lỗi 500 — `?page=abc` về trang đầu, `?page=999` về trang
+    cuối. Đường dẫn phân trang là chỗ người dùng và bot sửa URL nhiều nhất.
+
+    Gắn thêm `elided_page_range` vào đối tượng `Page`: template không truyền tham số cho
+    `Paginator.get_elided_page_range(number)` được, mà không có nó thì trang thứ 300 in
+    ra 300 ô số.
+
+    ⚠️ Gọi hàm này **sau** khi đã tính xong mọi `aggregate()`/`count()` trên queryset gốc.
+    Giá trị trả về là `Page`, không phải QuerySet: `.aggregate()` ném `AttributeError`
+    còn `.count()` trả số của **một trang** chứ không phải tổng.
+    """
+    paginator = Paginator(queryset, per_page)
+    try:
+        page = paginator.page(request.GET.get('page'))
+    except PageNotAnInteger:
+        page = paginator.page(1)
+    except EmptyPage:
+        page = paginator.page(paginator.num_pages)
+
+    page.elided_page_range = paginator.get_elided_page_range(
+        page.number, on_each_side=1, on_ends=1,
+    )
+    return page
 
 
 def product_image_url(product):
@@ -112,13 +149,20 @@ def product_list_view(request):
 
     price_range = products.aggregate(min_price=Min('price'), max_price=Max('price'))
 
+    # Thứ tự bắt buộc: `aggregate()` và `count()` chạy trên QUERYSET, `paginate()` trả về
+    # `Page`. Đảo lại là `aggregate` ném AttributeError và `product_count` chỉ còn là số
+    # sản phẩm của một trang — thanh trượt giá ở sidebar vỡ theo.
+    product_count = products.count()
+    products = paginate(request, products)
+
     context = {
         'products': products,
+        'page_obj': products,
         'tags': tags,
         'categories': categories,
         'vendors': vendors,
         'deals_products': deals_products,
-        'product_count': products.count(),
+        'product_count': product_count,
         'min_price': price_range.get('min_price') or 0,
         'max_price': price_range.get('max_price') or 0,
     }
@@ -129,10 +173,12 @@ def product_list_view(request):
 def category_product_list_view(request, c_id):
     category = Category.objects.get(c_id=c_id)
     products = Product.objects.published().filter(category=category).order_by('-id')
+    products = paginate(request, products)
 
     context = {
         'category': category,
-        'products': products
+        'products': products,
+        'page_obj': products,
     }
 
     return render(request, 'core/category-product-list.html', context)
@@ -151,9 +197,12 @@ def vendor_list_view(request):
 def vendor_detail_view(request, v_id):
     vendor = Vendor.objects.get(v_id=v_id)
     products = Product.objects.published().filter(vendor=vendor).order_by('-id')
+    products = paginate(request, products)
+
     context = {
         'vendor': vendor,
-        'products': products
+        'products': products,
+        'page_obj': products,
     }
 
     return render(request, 'core/vendor-detail.html', context)
@@ -216,10 +265,15 @@ def tag_list(request, tag_slug=None):
     tag = None
     if tag_slug:
         tag = get_object_or_404(Tag, slug=tag_slug)
-        products = products.filter(tags__in=[tag])
+        # `.distinct()` vì lọc qua quan hệ nhiều-nhiều: sản phẩm gắn nhiều tag sẽ ra
+        # nhiều dòng, làm `Paginator.count` đếm thừa so với số thẻ thực sự hiện ra.
+        products = products.filter(tags__in=[tag]).distinct()
+
+    products = paginate(request, products)
 
     context = {
         'products': products,
+        'page_obj': products,
         'tag': tag,
     }
 
@@ -386,11 +440,15 @@ def ajax_add_review(request, p_id):
 # ======================== Search ========================
 
 def search_view(request):
-    query = request.GET.get("q")
+    # Mặc định chuỗi rỗng: `?q=` thiếu hẳn thì `title__icontains=None` ném lỗi, và link
+    # phân trang cũng cần `query` để dựng lại querystring.
+    query = request.GET.get("q", "")
     products = Product.objects.published().filter(title__icontains=query).order_by('-date', '-id')
+    products = paginate(request, products)
 
     context = {
         'products': products,
+        'page_obj': products,
         'query': query,
     }
     return render(request, 'core/search.html', context)
@@ -422,10 +480,25 @@ def filter_product(request):
     if vendor_ids:
         products = products.filter(vendor__id__in=vendor_ids).distinct()
 
-    data = render_to_string("core/async/product-list.html", {"products": products}, request=request)
+    # `count` là TỔNG số kết quả khớp bộ lọc, không phải số thẻ của một trang: nó được
+    # ghi thẳng vào dòng "We found N items" ở đầu trang. Lấy `len(page)` là khách thấy
+    # "We found 8 items" trong khi có 300 kết quả.
+    total = products.count()
+    page = paginate(request, products)
+
+    data = render_to_string(
+        "core/async/product-list.html", {"products": page}, request=request
+    )
+    # Thanh phân trang render riêng và thay vào `#pagination-area` — nó nằm NGOÀI vùng
+    # `#filtered-product-grid` mà JS ghi đè, nên không đi kèm trong `data` được.
+    pagination = render_to_string(
+        "partials/pagination.html", {"page_obj": page}, request=request
+    )
+
     return JsonResponse({
         "data": data,
-        "count": products.count(),
+        "pagination": pagination,
+        "count": total,
     })
 
 
