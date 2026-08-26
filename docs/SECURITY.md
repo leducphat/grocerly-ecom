@@ -29,7 +29,7 @@ mục dưới đây là **lỗi logic nghiệp vụ** mà framework không đỡ
 | S-13 | `vnpay_ipn` so số tiền theo giá **hiện tại** của đơn | 🟡 Trung bình | Chưa sửa |
 
 ⚠️ **Không mục nào trong bảng này đang được bảo vệ trên production.** Mọi bản vá vẫn nằm
-trên `develop`; `main` chậm 40 commit và việc deploy **đã được hoãn có chủ ý** — xem
+trên `develop`; `main` chậm 44 commit và việc deploy **đã được hoãn có chủ ý** — xem
 [PLAN.md](PLAN.md) giai đoạn 1.
 
 Các mục đã sửa đều có test hồi quy. Chạy toàn bộ:

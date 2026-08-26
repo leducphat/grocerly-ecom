@@ -42,7 +42,7 @@ quyết định nghiệp vụ, không phải cắt giảm vì thiếu thời gia
 
 - [ ] **1.1** Merge `develop` → `main`, Render tự deploy — **hoãn có chủ ý, 2026-08-26**
 
-`main` đang chậm **40 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
+`main` đang chậm **44 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
 mọi bản vá đã làm **chưa bảo vệ được gì**.
 
 **Quyết định 2026-08-26: hoãn.** Production đang chạy ổn định và chưa cần demo cho GVHD,
@@ -129,24 +129,36 @@ Ban đầu mục này chỉ là *"unit test VNPay"*. Rà lại thì vấn đề 
 đích của chúng, nhưng **không có tầng unit test nào** dưới đó. Grep xác nhận `safe_float`,
 `vnd`, `vnpay.*`, `SoftDeleteModel.*`, hai middleware — tất cả 0 lần xuất hiện trong test.
 
-Thứ tự trong nhóm là đường găng: **2.6a → 2.6d → 2.6f**. Ba mục này đã xong.
+Thứ tự trong nhóm là đường găng: **2.6a → 2.6d → 2.6f**. **Toàn bộ nhóm 2.6 đã xong
+2026-08-26.**
 
 | | Việc | Vì sao | Trạng thái |
 |---|---|---|---|
 | **2.6a** | `core/vnpay.py` — ký, sort, bỏ giá trị rỗng, URL-encode; `validate_response` với chữ ký đúng/sai/thiếu | Hàm thuần, không DB. Điểm nhấn thứ hai của đề tài mà [C7](SPEC-GAPS.md) ghi là không có TC nào | ✅ **Xong 2026-08-26** — 18 test |
-| **2.6b** | `safe_float` / `safe_int` | Nằm trên đường tiền. Hành vi **đang sai so với mô tả** — xem ghi chú dưới | chưa làm |
-| **2.6c** | Filter `vnd` / `mul` | Hiển thị trên **mọi** trang có giá | chưa làm |
+| **2.6b** | `safe_float` / `safe_int` | Nằm trên đường tiền. Hành vi **đang sai so với mô tả** — xem ghi chú dưới | ✅ **Xong 2026-08-26** — 34 test, và hàm đã được sửa |
+| **2.6c** | Filter `vnd` / `mul` | Hiển thị trên **mọi** trang có giá | ✅ **Xong 2026-08-26** — 17 test, không phải sửa gì |
 | **2.6d** | `SoftDeleteModel` + cascade/restore của `Vendor` | Chốt **Bẫy #3** thành test; là tiền đề của 2.1 | ✅ **Xong 2026-08-26** — 14 test, phát hiện lỗi thật |
-| **2.6e** | `RestrictStaffMiddleware` (**Bẫy #6**), `ForceDefaultLanguageMiddleware` | Thứ tự middleware bắt buộc mà không gì bảo vệ | chưa làm |
+| **2.6e** | `RestrictStaffMiddleware` (**Bẫy #6**), `ForceDefaultLanguageMiddleware` | Thứ tự middleware bắt buộc mà không gì bảo vệ | ✅ **Xong 2026-08-26** — 27 test, có cả khẳng định thứ tự |
 | **2.6f** | `save_checkout_info` — tạo đơn, tạo `CartOrderItem`, luồng đơn treo | **Tiền đề bắt buộc của 2.11**: bước đó viết lại đúng hàm này | ✅ **Xong 2026-08-26** — 26 test, nhóm `CartOrderItemSnapshotTests` ghi rõ cái gì 2.11 được đổi |
-| **2.6g** | `userauths` — đăng ký, đăng nhập, redirect theo vai trò | `userauths/tests.py` đang là stub rỗng | chưa làm |
+| **2.6g** | `userauths` — đăng ký, đăng nhập, redirect theo vai trò | `userauths/tests.py` đang là stub rỗng | ✅ **Xong 2026-08-26** — 27 test |
 
-**Ghi chú 2.6b** — đã dò thử, chưa sửa. `safe_float` trả `0.0` cho `'1.000.000,50'` (định
-dạng tiền Việt có phần thập phân, đúng thứ hàm này tự nhận là xử lý) và cho `'1,234.56'`;
-`'-5'` ra `5.0` (mất dấu âm); `1e16` ra `116.0`. **Là lỗi tiềm ẩn, không phải đang khai
-thác được**: sau bản vá [S-02](SECURITY.md), giá vào session là `float` đọc từ database
-nên không đi qua nhánh hỏng. Nhưng hàm vẫn nằm trên đường tiền (`save_checkout_info` đọc
-giá từ session qua nó) và **không có gì chốt lại hành vi đó**.
+**Ghi chú 2.6b (sau khi làm xong)** — lần dò đầu tiên ghi bốn hành vi sai: `safe_float`
+trả `0.0` cho `'1.000.000,50'` (định dạng tiền Việt có phần thập phân, đúng thứ hàm này
+tự nhận là xử lý) và cho `'1,234.56'`; `'-5'` ra `5.0` (mất dấu âm); `1e16` ra `116.0`.
+Lúc đó đánh giá là **lỗi tiềm ẩn, không khai thác được**, vì sau bản vá
+[S-02](SECURITY.md) giá vào session là `float` đọc từ database nên không đi qua nhánh
+phân tích chuỗi.
+
+**Đánh giá đó đúng một nửa.** Nhánh chuỗi thì đúng là không ai đi tới nữa, nhưng
+`1e16 → 116.0` **không** thuộc nhánh đó: bản cũ ép mọi thứ qua `str()` trước, và
+`str(1e16)` cho `'1e+16'`. Mà `Product.price` là `DecimalField(max_digits=20)`, tức giá
+1e16 **nằm trong tầm hợp lệ của model**. Chiều ngược lại còn tệ hơn: `str(0.00001)` cho
+`'1e-05'` → `105`, giá bị **thổi lên** chứ không phải giảm đi.
+
+Nên bước này sửa hàm chứ không chỉ chốt hành vi. Ba quy tắc mới: số thì không đi qua
+`str()`; dấu đứng sau là dấu thập phân (`1.000.000,50` và `1,234.56` chỉ khác thứ tự hai
+dấu); đọc không được thì trả `default` chứ **không lọc bỏ ký tự lạ rồi tính trên phần còn
+lại** — chính bước lọc đó biến `'[1]'` thành `1.0` và nuốt dấu trừ.
 
 **Ghi chú 2.6f** — không phải unit test thuần (cần database), nhưng xếp ở đây vì cùng mục
 đích: dựng lưới an toàn trước khi 2.11 đụng vào luồng rủi ro nhất.
@@ -229,7 +241,7 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
       phát hiện ban đầu bị bác bỏ** khi có bước phản biện độc lập. Thấy `@csrf_exempt`
       trong code **chưa đủ để kết luận có lỗ hổng** — còn phải trả lời được request của
       kẻ tấn công có mang được cookie phiên tới không, mà điều đó phụ thuộc `SameSite`
-- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **346 test tự động**
+- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **454 test tự động**
       (số tính tới 2026-08-26), cộng bảng test case cho AI Chatbot và VNPay.
       Điểm mạnh hơn con số: nay trình bày được thành **kim tự tháp test** — unit test
       thuần (`SimpleTestCase`, không DB) / test ở mức model / test hồi quy ở mức HTTP
@@ -242,6 +254,56 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
 ---
 
 ## Đã xong
+
+### 2026-08-26 — Bước 2.6b, 2.6c, 2.6e, 2.6g: đóng nốt tầng unit test
+
+**346 → 454 test.** Nhóm 2.6 khép lại. Ba file mới, và **một hàm trên đường tiền được
+sửa** — phần còn lại chỉ chốt hành vi sẵn có.
+
+Không đụng model nên **không có migration**, và không đụng chức năng nào báo cáo mô tả
+nên **không phải sửa một chữ nào trong báo cáo** — trừ con số ở [bước 4.2](#giai-đoạn-4--nội-dung-mới-cho-kltn).
+
+- **2.6b — `safe_float` phải sửa, không chỉ chốt.** Chi tiết ở *Ghi chú 2.6b* phía trên.
+  Tóm tắt chỗ đáng nhớ: bản cũ ép **mọi** đầu vào qua `str()` rồi lọc bỏ ký tự lạ và tính
+  trên phần còn lại. Cách đó biến `'[1]'` thành `1.0`, nuốt dấu trừ, và — nguy hiểm nhất —
+  đọc `str(1e16) == '1e+16'` thành **116**. Giá 1e16 nằm trong tầm hợp lệ của
+  `DecimalField(max_digits=20)`, nên đây không phải trường hợp giả định.
+
+  Viết test trước: **10/54 đỏ** đúng bốn nhóm hành vi sai, 44 test còn lại chốt những chỗ
+  bản cũ vốn đã đúng để bản mới không làm lệch. Sau khi sửa, toàn bộ 454 test xanh —
+  tức không chỗ nào trong luồng checkout phụ thuộc vào hành vi cũ.
+
+- **2.6c — `vnd` / `mul` không phải sửa gì.** Hai filter này viết bằng `Decimal` và
+  `ROUND_HALF_UP` ngay từ đầu, đúng cả ở chỗ dễ sai nhất: `mul('0.1', 3)` ra `0.3` chứ
+  không phải `0.30000000000000004`.
+
+- **2.6e — và một test trang trí bị bắt tại chỗ.** Bản đầu của nhóm tích hợp dùng
+  `core:index` để chứng minh `RestrictStaffMiddleware` đã được lắp vào settings. Gỡ hẳn
+  middleware khỏi `MIDDLEWARE` thì test đó **vẫn xanh**: `index()` có sẵn nhánh chuyển
+  hướng nhân viên **trùng lặp** với middleware, nên trang chủ là chỗ duy nhất không dùng
+  để kiểm chứng middleware được. Đã đổi sang `core:product-list`, và giữ lại một test ghi
+  rõ sự trùng lặp đó để lần sau không ai mất công dò lại.
+
+  Nhóm này còn khẳng định **thứ tự** trong `settings.MIDDLEWARE` — thứ mà không test đơn
+  lẻ nào thấy được, vì mỗi lớp vẫn đúng chức năng của nó, chỉ là chạy sai lúc.
+
+- **2.6g — và một giả định sai của chính tôi.** Test đầu tiên viết ra khẳng định đăng ký
+  **chấp nhận** trùng `username`, vì model khai đè `username` thành `CharField` thường
+  (bỏ `unique=True` của `AbstractUser`). Test đỏ: `UserCreationForm` của Django mang sẵn
+  `clean_username` từ chối tên đã tồn tại, không phân biệt hoa thường.
+
+  Kết luận đúng là **form chặt hơn database**, nên nay có hai test cho hai mức: form từ
+  chối, còn `User.objects.create_user` / Django Admin / shell thì vẫn tạo được hai người
+  trùng tên. Nghĩa là **đừng viết code nào coi `username` là khóa**.
+
+**Kiểm chứng.** Tám đột biến được áp lần lượt rồi gỡ ra — gỡ `RestrictStaffMiddleware`
+khỏi settings, đảo thứ tự hai middleware ngôn ngữ, bỏ tiền tố sign-out, bỏ lệnh xóa
+`Accept-Language`, bỏ rẽ nhánh theo vai trò khi đăng nhập, bỏ tự-đăng-nhập sau đăng ký,
+gỡ signal tạo `Profile`, bỏ `logout()`. **Cả tám đều làm đỏ ít nhất một test**, và chính
+lượt này đã lộ ra test trang trí ở 2.6e.
+
+Nhắc lại bài học của [bước 4.1](#giai-đoạn-4--nội-dung-mới-cho-kltn): tự gỡ chốt ra thử
+là **điều kiện cần, không phải điều kiện đủ** — nhưng ở đây nó đúng là thứ bắt được lỗi.
 
 ### 2026-08-26 — Bước 2.8 + 2.9: phân trang và mã giảm giá
 
