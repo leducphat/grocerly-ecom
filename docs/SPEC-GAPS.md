@@ -7,7 +7,9 @@
 > ⚠️ **Tiểu luận đã nộp và có điểm.** File này giờ phục vụ **Khóa luận tốt nghiệp** —
 > cùng đề tài, cùng GVHD. Xem [PLAN.md](PLAN.md).
 >
-> Cập nhật 2026-08-26: đóng **A2**, **A8** và **B3**; **B11** xong phần code, chờ deploy.
+> Cập nhật 2026-08-26: đóng **A2**, **A7**, **A8**, **A9** và **B3**; **B11** xong phần code,
+> chờ deploy. Nhóm A còn lại: **A3** (phân trang), **A6** (coupon), **A10** (email hàng loạt),
+> **A11** (cố ý không cài).
 
 > **Ghi chú A2 — "Shipped" hiểu theo nghĩa nào.** UC 3.2.14 viết điều kiện là đơn
 > *Shipped*. Code nhận **cả `shipped` lẫn `delivered`**, vì `delivered` nằm sau `shipped`
@@ -35,9 +37,9 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 | A4 | ~~**"Làm sạch giỏ hàng"** — UC 3.2.6 Alternate Flow~~ | ✅ **Đã đóng 2026-08-26** — `clear_cart` (POST + CSRF), nút ở trang giỏ hàng. Đừng nhầm với `delete_item_from_cart` (xóa **một** sản phẩm) vốn đã có sẵn từ trước và vẫn chạy đúng | `ClearCartTests` |
 | A5 | ~~Cập nhật SL **vượt tồn kho → báo lỗi** — UC 3.2.6 Exception Flow~~ | ✅ **Đã đóng 2026-08-24** — `add_to_cart` và `update_cart` đều kiểm `stock_count`, trả `400` kèm số lượng còn lại | Sửa cùng [S-02](SECURITY.md#s-02--giả-mạo-giá-sản-phẩm) |
 | A6 | Coupon có **ngày hết hạn** và **số lượt đã dùng** — UC 3.2.21 | Model `Coupon` chỉ có `code`, `discount`, `active` | [core/models.py](../grocerly/core/models.py) |
-| A7 | **Hủy đơn (Cancel)** — UC 3.2.25 | `STATUS_CHOICES` chỉ có `processing`/`shipped`/`delivered` | [core/models.py:9](../grocerly/core/models.py#L9) |
+| A7 | ~~**Hủy đơn (Cancel)** — UC 3.2.25~~ | ✅ **Đã đóng 2026-08-26** — thêm trạng thái `cancelled`, khách tự hủy ở trang đơn hàng, nhân viên hủy được từ dashboard. **Hai tiền điều kiện phải bổ sung vào báo cáo**: chỉ hủy đơn còn `processing` và **chưa thanh toán** — xem [ADR-0007](DECISIONS.md) | `core/test_cancel_order.py` |
 | A8 | ~~Không đổi được trạng thái khi đơn đã **Delivered** — UC 3.2.20 Exception Flow~~ | ✅ **Đã đóng 2026-08-26** — chặn ở view và khóa luôn form. Kèm theo: `change_order_status` trước đây nhận **mọi chuỗi** từ POST, mà option đầu của dropdown lại gửi `value="pending"` — giá trị không có trong `STATUS_CHOICES`. Nay option dựng từ model và view lọc qua whitelist | `ChangeOrderStatusTests` |
-| A9 | Cập nhật **mã vận đơn** ở dashboard nhân viên — UC 3.2.20 Alternate Flow | Field `tracking_id` có trong model nhưng `useradmin` không có giao diện nhập (chỉ sửa được qua Django Admin) | — |
+| A9 | ~~Cập nhật **mã vận đơn** ở dashboard nhân viên — UC 3.2.20 Alternate Flow~~ | ✅ **Đã đóng 2026-08-26** — ô nhập ở trang chi tiết đơn (form riêng, POST + CSRF), và mã hiện luôn ở trang đơn hàng của khách. Không phải đụng cơ sở dữ liệu: `tracking_id` vốn đã có trong model, chỉ thiếu giao diện | `useradmin/test_tracking_id.py` |
 | A10 | **Gửi email hàng loạt** cho người dùng — UC 3.2.22 Alternate Flow | Không có | — |
 | A11 | **Quy trình duyệt sản phẩm** (`in_review`) — UC 3.2.19, Hình 28, Hình 40 | ⚠️ **Khoảng cách nay rộng hơn, có chủ ý.** `in_review`/`rejected` đã bị **xóa khỏi code** (2026-08-24); nhân viên tự bấm "Lưu nháp" / "Đăng bán" | [ADR-0002](DECISIONS.md) |
 

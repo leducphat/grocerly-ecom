@@ -42,7 +42,7 @@ quyết định nghiệp vụ, không phải cắt giảm vì thiếu thời gia
 
 - [ ] **1.1** Merge `develop` → `main`, Render tự deploy — **hoãn có chủ ý, 2026-08-26**
 
-`main` đang chậm **28 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
+`main` đang chậm **32 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
 mọi bản vá đã làm **chưa bảo vệ được gì**.
 
 **Quyết định 2026-08-26: hoãn.** Production đang chạy ổn định và chưa cần demo cho GVHD,
@@ -58,6 +58,8 @@ Hệ quả cần nhớ khi deploy:
   phẩm gốc cho từng dòng `CartOrderItem` theo tên. Chỉ ghi vào cột `product`, không đụng
   bản sao tĩnh của hóa đơn — nhưng đây là migration **có ghi dữ liệu** đầu tiên của dự án
   nên đáng soát log sau khi deploy: dòng nào để `NULL` là dòng backfill không dò ra
+- Migration `0008_alter_cartorder_product_status` thêm `cancelled` vào `choices`.
+  `sqlmigrate` xác nhận **no-op DDL**, không sinh câu lệnh nào — an toàn, giống `0005`
 - Trước khi deploy nên soát đơn hàng mắc kẹt ở trạng thái rác:
   `CartOrder.objects.exclude(product_status__in=['processing','shipped','delivered'])`
   — xem bước 2.2
@@ -91,10 +93,10 @@ là đóng gap mà không phải sửa báo cáo.
 | ✅ **2.4** | ~~Drop cột `stripe_payment_intent`~~ **Migration xong 2026-08-26**, chạy khi deploy | ERD + Bảng 32 **không có** cột này | thấp |
 | **2.5** | `except:` trần ([S-07](SECURITY.md)) + `SECRET_KEY`/`DEBUG` ([S-05](SECURITY.md)) | mục 1.2.2 Yêu cầu phi chức năng | thấp |
 | **2.6** | **Tầng unit test** — xem bảng riêng bên dưới | Chương 4 — hai điểm nhấn chưa có test nào | trung bình |
-| **2.7** | Nhập mã vận đơn ở `useradmin` ([A9](SPEC-GAPS.md)) | UC 3.2.20 Alternate Flow | trung bình |
+| ✅ **2.7** | ~~Nhập mã vận đơn ở `useradmin` ([A9](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.20 Alternate Flow | trung bình |
 | **2.8** | Phân trang ([A3](SPEC-GAPS.md)) | UC 3.2.3 Alternate Flow | trung bình |
 | **2.9** | Coupon hạn dùng + số lượt ([A6](SPEC-GAPS.md)) | UC 3.2.21 | trung bình, có migration |
-| **2.10** | Hủy đơn ([A7](SPEC-GAPS.md)) | UC 3.2.25 | trung bình-cao, có migration |
+| ✅ **2.10** | ~~Hủy đơn ([A7](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.25 | trung bình-cao, có migration |
 | ✅ **2.11** | ~~**Khóa ngoại `CartOrderItem` → `Product`**~~ **Xong 2026-08-26** | [ADR-0006](DECISIONS.md); vá nợ kỹ thuật #6 | cao, đụng checkout |
 | ✅ **2.12** | ~~Điều kiện đã mua mới đánh giá ([A2](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.14 + **Hình 21** | phụ thuộc 2.11 |
 | **2.13** | Gửi email hàng loạt ([A10](SPEC-GAPS.md)) | UC 3.2.22 Alternate Flow | cao, cần cấu hình SMTP |
@@ -171,6 +173,10 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
 - [ ] **3.7** **ERD Hình 45** — `tags` không phải cột VARCHAR (django-taggit lưu ở bảng
       riêng); thiếu bảng nối M2M `cartorder ↔ coupon`; bỏ `core_tag` khỏi Bảng 28
 - [ ] **3.8** Bổ sung khóa ngoại mới của 2.11 vào ERD và **Bảng 33**
+- [ ] **3.21** **UC 3.2.25** (Hủy đơn) — bổ sung hai tiền điều kiện vào Pre-Conditions:
+      chỉ hủy đơn còn `processing` và **chưa thanh toán** ([ADR-0007](DECISIONS.md)).
+      Đây là chỗ code **hẹp hơn** báo cáo, ngược chiều với A2
+- [ ] **3.22** **Bảng 32** — bổ sung giá trị `cancelled` vào mô tả `cartorder.product_status`
 
 ### 3D — Định vị và tác nhân ([ADR-0003](DECISIONS.md) đã chốt)
 
@@ -205,7 +211,7 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
       phát hiện ban đầu bị bác bỏ** khi có bước phản biện độc lập. Thấy `@csrf_exempt`
       trong code **chưa đủ để kết luận có lỗ hổng** — còn phải trả lời được request của
       kẻ tấn công có mang được cookie phiên tới không, mà điều đó phụ thuộc `SameSite`
-- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **207 test tự động**
+- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **258 test tự động**
       (số tính tới 2026-08-26), cộng bảng test case cho AI Chatbot và VNPay.
       Điểm mạnh hơn con số: nay trình bày được thành **kim tự tháp test** — unit test
       thuần (`SimpleTestCase`, không DB) / test ở mức model / test hồi quy ở mức HTTP
@@ -218,6 +224,53 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
 ---
 
 ## Đã xong
+
+### 2026-08-26 — Bước 2.10 + 2.7: vòng đời đơn hàng
+
+**207 → 258 test.** Hai bước làm chung một lô vì cùng đụng trang chi tiết đơn ở cả hai
+phía, và vì 2.7 phải biết `cancelled` tồn tại (đơn đã hủy thì không có lô hàng để theo
+dõi). Đóng thêm **hai** mục nhóm A: [A7](SPEC-GAPS.md) và [A9](SPEC-GAPS.md).
+
+- **2.10** — trạng thái `cancelled`, khách tự hủy ở trang đơn hàng, nhân viên hủy được từ
+  dashboard. Điều kiện hủy và lý do chọn chúng nằm ở **[ADR-0007](DECISIONS.md)**; tóm
+  tắt: chỉ hủy đơn còn `processing` và **chưa thanh toán**.
+
+  Cả hai điều kiện được chọn không phải vì đúng nghiệp vụ hơn mà vì chúng **xóa bỏ một
+  lớp lỗi**: không cho hủy sau `shipped` nghĩa là không tồn tại nhánh hoàn kho nào để
+  viết sai; không cho hủy đơn đã trả tiền nghĩa là không sinh ra đơn vừa hủy vừa đã thu
+  tiền mà không màn hình nào xử lý được.
+
+- **Ba đường hồi sinh đơn đã hủy, cả ba đều phải chặn.** `place_cod_order` và
+  `vnpay_payment` đều gán thẳng `product_status = 'processing'` không kiểm gì.
+  `_get_pending_order_from_session` thì tái sử dụng đơn treo cho lần thanh toán sau.
+
+  Chốt thứ ba suýt lọt lưới: test đầu tiên tôi viết cho nó **vẫn xanh khi gỡ chốt**, vì
+  nó đi đường khách-tự-hủy mà đường đó đã dọn `pending_order_oid` khỏi session từ trước.
+  Kịch bản thật là **nhân viên** hủy — khách không đụng gì vào session của mình. Đã viết
+  lại test cho đúng đường đó. Ghi lại vì đây là kiểu test tự-thỏa-mãn khó thấy: nó chạy
+  qua đúng chức năng, chỉ là không chạy qua đúng nhánh.
+
+- **`cancelled` vào `STATUS_CHOICES` là tự động hiện trong dropdown của nhân viên** (danh
+  sách dựng từ model). Đó là điều mong muốn, nhưng kéo theo một hệ quả: whitelist *giá
+  trị hợp lệ* **không đủ**, vì `cancelled` là giá trị hợp lệ mà không phải bước chuyển
+  hợp lệ từ mọi trạng thái. Phải thêm chốt riêng cho bước chuyển `→ cancelled`.
+
+- **2.7** — ô nhập mã vận đơn ở trang nhân viên, và mã hiện luôn ở trang đơn hàng của
+  khách. Không đụng cơ sở dữ liệu: `tracking_id` đã có trong model từ migration đầu tiên,
+  chỉ chưa bao giờ có giao diện (muốn sửa phải vào Django Admin). Đây là mục hiếm trong
+  nhóm A mà báo cáo mô tả **đúng** còn code thiếu.
+
+  Form **riêng**, không gộp vào form đổi trạng thái: hai thao tác độc lập, gộp lại thì
+  sửa mã vận đơn là đơn nhảy trạng thái theo. Chuỗi rỗng lưu thành `NULL` chứ không phải
+  `''`, để trang của khách chỉ phải kiểm một trường hợp "chưa có mã" thay vì hai.
+
+**Kiểm chứng:** bốn chốt chặn mới đều được thử gỡ ra để xác nhận có test bắt được —
+không cái nào là test trang trí.
+
+**Còn nợ lại:** nhãn trạng thái đơn (`Processing`/`Shipped`/`Delivered`/`Cancelled`) lấy
+thẳng từ `choices` của model nên **chưa qua i18n**, hiện tiếng Anh ở cả hai giao diện.
+Đây là tình trạng có sẵn từ trước chứ không phải do bước này sinh ra, nhưng nay nó lộ rõ
+hơn vì trạng thái được hiển thị ở thêm một trang nữa.
 
 ### 2026-08-26 — Bước 2.11 + 2.12: khóa ngoại `CartOrderItem` → `Product`
 

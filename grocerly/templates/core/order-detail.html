@@ -47,6 +47,14 @@
                                                     <strong>{% trans "Order status" %}:</strong>
                                                     {{ order.get_product_status_display }}
                                                 </p>
+                                                <p>
+                                                    <strong>{% trans "Tracking number" %}:</strong>
+                                                    {% if order.tracking_id %}
+                                                    {{ order.tracking_id }}
+                                                    {% else %}
+                                                    <span class="text-muted">{% trans "Not assigned yet." %}</span>
+                                                    {% endif %}
+                                                </p>
                                                 {% if can_cancel %}
                                                 <form method="POST" action="{% url 'core:cancel-order' order.oid %}"
                                                       onsubmit="return confirm('{% trans "Cancel this order? This cannot be undone." %}');">

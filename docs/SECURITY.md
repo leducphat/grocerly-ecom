@@ -27,7 +27,7 @@ mục dưới đây là **lỗi logic nghiệp vụ** mà framework không đỡ
 | S-11 | Cookie phiên không có cờ `Secure` | 🔵 Thấp | Chưa sửa — [PLAN](PLAN.md) bước 2.14 |
 
 ⚠️ **Không mục nào trong bảng này đang được bảo vệ trên production.** Mọi bản vá vẫn nằm
-trên `develop`; `main` chậm 28 commit và việc deploy **đã được hoãn có chủ ý** — xem
+trên `develop`; `main` chậm 32 commit và việc deploy **đã được hoãn có chủ ý** — xem
 [PLAN.md](PLAN.md) giai đoạn 1.
 
 Các mục đã sửa đều có test hồi quy. Chạy toàn bộ:

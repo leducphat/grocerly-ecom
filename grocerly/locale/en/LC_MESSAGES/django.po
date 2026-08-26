@@ -627,14 +627,29 @@ msgstr ""
 msgid "Order %(oid)s has already left the warehouse and can no longer be cancelled."
 msgstr ""
 
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s was cancelled, so it has no shipment to track."
+msgstr ""
 
+#: PLAN 2.7 + 2.10
+msgid "Tracking number saved."
+msgstr ""
 
+#: PLAN 2.7 + 2.10
+msgid "Tracking number cleared."
+msgstr ""
 
 #: PLAN 2.7 + 2.10
 msgid "Order status"
 msgstr ""
 
+#: PLAN 2.7 + 2.10
+msgid "Tracking number"
+msgstr ""
 
+#: PLAN 2.7 + 2.10
+msgid "Not assigned yet."
+msgstr ""
 
 #: PLAN 2.7 + 2.10
 msgid "Cancel this order? This cannot be undone."
@@ -644,7 +659,13 @@ msgstr ""
 msgid "Cancel this order"
 msgstr ""
 
+#: PLAN 2.7 + 2.10
+msgid "e.g. GHN123456789"
+msgstr ""
 
+#: PLAN 2.7 + 2.10
+msgid "This order was cancelled, so it has no shipment to track."
+msgstr ""
 
 #: templates/useradmin/order_detail.html
 msgid "This order is %(order_status_label)s. Its status is final."

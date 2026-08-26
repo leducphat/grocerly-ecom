@@ -34,6 +34,22 @@
                     <div><small class="text-muted">{% blocktrans %}This order is {{ order_status_label }}. Its status is final.{% endblocktrans %}</small></div>
                     {% endif %}
                 </form>
+            </div>
+            {# Mã vận đơn — UC 3.2.20 Alternate Flow, SPEC-GAPS A9 (PLAN 2.7). Form RIÊNG, #}
+            {# không gộp vào form đổi trạng thái ở trên: hai thao tác độc lập với nhau. #}
+            <div class="row align-items-center mt-15">
+                <form method="POST" action="{% url 'useradmin:update_tracking_id' order.oid %}" class="col-12 text-md-end">
+                    {% csrf_token %}
+                    <label class="mr-5" for="tracking_id">{% trans "Tracking number" %}</label>
+                    <input type="text" id="tracking_id" name="tracking_id" maxlength="100"
+                           class="form-control d-inline-block mb-lg-0 mr-5 mw-200"
+                           value="{{ order.tracking_id|default_if_none:'' }}"
+                           placeholder="{% trans 'e.g. GHN123456789' %}"
+                           {% if not can_edit_tracking %}disabled{% endif %}>
+                    <button class="btn btn-primary" type="submit" {% if not can_edit_tracking %}disabled{% endif %}>{% trans "Save" %}</button>
+                    {% if not can_edit_tracking %}
+                    <div><small class="text-muted">{% trans "This order was cancelled, so it has no shipment to track." %}</small></div>
+                    {% endif %}
                 </form>
             </div>
         </header>

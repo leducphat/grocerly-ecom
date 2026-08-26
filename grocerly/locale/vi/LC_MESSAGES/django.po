@@ -1052,14 +1052,29 @@ msgstr "Đơn hàng %(oid)s đang ở trạng thái %(status)s. Không đổi tr
 msgid "Order %(oid)s has already left the warehouse and can no longer be cancelled."
 msgstr "Đơn hàng %(oid)s đã xuất kho, không hủy được nữa."
 
+#: PLAN 2.7 + 2.10
+msgid "Order %(oid)s was cancelled, so it has no shipment to track."
+msgstr "Đơn hàng %(oid)s đã hủy nên không có lô hàng nào để theo dõi."
 
+#: PLAN 2.7 + 2.10
+msgid "Tracking number saved."
+msgstr "Đã lưu mã vận đơn."
 
+#: PLAN 2.7 + 2.10
+msgid "Tracking number cleared."
+msgstr "Đã xóa mã vận đơn."
 
 #: PLAN 2.7 + 2.10
 msgid "Order status"
 msgstr "Trạng thái đơn hàng"
 
+#: PLAN 2.7 + 2.10
+msgid "Tracking number"
+msgstr "Mã vận đơn"
 
+#: PLAN 2.7 + 2.10
+msgid "Not assigned yet."
+msgstr "Chưa có mã."
 
 #: PLAN 2.7 + 2.10
 msgid "Cancel this order? This cannot be undone."
@@ -1069,7 +1084,13 @@ msgstr "Hủy đơn hàng này? Thao tác này không hoàn tác được."
 msgid "Cancel this order"
 msgstr "Hủy đơn hàng này"
 
+#: PLAN 2.7 + 2.10
+msgid "e.g. GHN123456789"
+msgstr "ví dụ GHN123456789"
 
+#: PLAN 2.7 + 2.10
+msgid "This order was cancelled, so it has no shipment to track."
+msgstr "Đơn hàng này đã hủy nên không có lô hàng nào để theo dõi."
 
 #: templates/useradmin/order_detail.html
 msgid "This order is %(order_status_label)s. Its status is final."

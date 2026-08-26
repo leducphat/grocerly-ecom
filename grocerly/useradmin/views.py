@@ -265,8 +265,45 @@ def order_detail(request, id):
         # `cancelled` cũng là trạng thái cuối từ PLAN bước 2.10, không riêng `delivered`.
         'order_is_final': order.product_status in FINAL_ORDER_STATUSES,
         'order_status_label': ORDER_STATUS_LABELS.get(order.product_status, order.product_status),
+        # Đơn đã hủy thì không có lô hàng nào để gắn mã vận đơn.
+        'can_edit_tracking': order.product_status != CANCELLED_ORDER_STATUS,
     }
     return render(request, "useradmin/order_detail.html", context)
+
+
+@admin_required
+@require_POST
+def update_tracking_id(request, oid):
+    """Nhân viên nhập mã vận đơn — UC 3.2.20 Alternate Flow, SPEC-GAPS A9 (PLAN 2.7).
+
+    Trường `tracking_id` đã có trong model từ đầu nhưng chưa bao giờ có ô nhập ở giao
+    diện nhân viên; muốn sửa phải vào trang Django Admin. Đây là chỗ báo cáo mô tả đúng
+    còn code thiếu, nên chỉ phải bù giao diện.
+
+    Không đụng tới `product_status`: gắn mã vận đơn và chuyển trạng thái giao hàng là hai
+    thao tác riêng, gộp lại thì nhân viên sửa nhầm mã là đơn nhảy trạng thái theo.
+    """
+    order = get_object_or_404(CartOrder, oid=oid)
+
+    if order.product_status == CANCELLED_ORDER_STATUS:
+        messages.error(request, _(
+            "Order %(oid)s was cancelled, so it has no shipment to track."
+        ) % {'oid': order.oid})
+        return redirect("useradmin:order_detail", order.id)
+
+    tracking_id = (request.POST.get('tracking_id') or '').strip()
+
+    # Chuỗi rỗng lưu thành NULL chứ không thành '' — để trang của khách chỉ phải kiểm một
+    # trường hợp "chưa có mã" thay vì hai.
+    order.tracking_id = tracking_id or None
+    order.save(update_fields=['tracking_id'])
+
+    if tracking_id:
+        messages.success(request, _("Tracking number saved."))
+    else:
+        messages.success(request, _("Tracking number cleared."))
+    return redirect("useradmin:order_detail", order.id)
+
 # Lấy thẳng từ model để danh sách hợp lệ không lệch được — cùng cách `products()` đã làm
 # với `STATUS`. Lưu ý STATUS_CHOICES là trạng thái GIAO HÀNG, khác hẳn `STATUS` của
 # Product dù hai field cùng tên `product_status` (Bẫy #1).

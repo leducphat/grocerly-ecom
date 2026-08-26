@@ -69,7 +69,7 @@ python manage.py test --settings=grocerly.settings_test
 `manage.py test` sẽ tạo database `test_<tên-db>` **trên máy chủ production Neon** (bẫy #5).
 Module này ép SQLite in-memory.
 
-**207 test** tính đến 2026-08-26, chia hai tầng:
+**258 test** tính đến 2026-08-26, chia hai tầng:
 
 | File | Nội dung |
 |---|---|
@@ -80,6 +80,8 @@ Module này ép SQLite in-memory.
 | [core/test_missing_relations.py](grocerly/core/test_missing_relations.py) | Sản phẩm thiếu `category`/`vendor` không được làm sập storefront |
 | [core/test_migration_0007.py](grocerly/core/test_migration_0007.py) | **Backfill của migration** — chạy migration thật bằng `MigrationExecutor` |
 | [core/test_review_purchase.py](grocerly/core/test_review_purchase.py) | Điều kiện đã mua mới được đánh giá (A2) |
+| [core/test_cancel_order.py](grocerly/core/test_cancel_order.py) | Hủy đơn (A7) — **đọc [ADR-0007](docs/DECISIONS.md) trước khi nới điều kiện hủy** |
+| [useradmin/test_tracking_id.py](grocerly/useradmin/test_tracking_id.py) | Mã vận đơn (A9) |
 | [core/test_contact_form.py](grocerly/core/test_contact_form.py) · [core/test_clear_cart.py](grocerly/core/test_clear_cart.py) · [useradmin/test_delete_product.py](grocerly/useradmin/test_delete_product.py) · [useradmin/test_order_status.py](grocerly/useradmin/test_order_status.py) | Theo chức năng |
 
 **Còn trống:** [userauths/tests.py](grocerly/userauths/tests.py) vẫn là stub rỗng, và
