@@ -5,6 +5,7 @@ from django.db.models.functions import ExtractMonth
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.template.loader import render_to_string
+from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.urls import reverse
@@ -485,11 +486,48 @@ def delete_item_from_cart(request):
         'cart_data': request.session['cart_data_obj'],
         'totalcartitems': len(request.session['cart_data_obj']),
         'cart_total_amount': cart_total_amount,
+        # `{% csrf_token %}` đọc khóa 'csrf_token' từ context. Lời gọi này KHÔNG truyền
+        # `request=` nên context không phải RequestContext và thẻ đó render ra **rỗng** —
+        # form "Xóa sạch giỏ" trong bản async sẽ không có token và POST bị từ chối 403.
+        #
+        # Truyền thẳng token thay vì `request=request`: thêm `request=` sẽ kéo theo
+        # `core.context_processors.default`, mà nó truy vấn Address/Wishlist mỗi lần đổi
+        # số lượng (3 truy vấn thừa cho người đã đăng nhập) — đúng nợ kỹ thuật #2.
+        'csrf_token': get_token(request),
     })
     return JsonResponse({
         'data': context,
         'totalcartitems': len(request.session['cart_data_obj']),
     })
+
+
+@require_POST
+def clear_cart(request):
+    """Xóa sạch giỏ hàng trong một thao tác — UC 3.2.6 Alternate Flow, SPEC-GAPS A4.
+
+    Trước đây khách phải bấm xóa từng sản phẩm một. Cơ chế xóa sạch thì đã có sẵn ở ba
+    chỗ trong file này, nhưng cả ba đều chạy **sau khi thanh toán xong** nên khách không
+    gọi tới được.
+
+    POST chứ không GET: đây là thao tác phá hủy, và thêm một endpoint GET ghi dữ liệu nữa
+    là thêm vào đúng danh sách [S-10](../../docs/SECURITY.md). Không bắt đăng nhập —
+    khách vãng lai cũng có giỏ hàng (giỏ nằm trong session, không có model Cart).
+    """
+    had_items = bool(request.session.get('cart_data_obj'))
+    request.session.pop('cart_data_obj', None)
+
+    # Bỏ luôn con trỏ đơn treo. Nếu không, khách xóa sạch giỏ rồi bấm Thanh toán sẽ bị
+    # `checkout_info_view` đá vào đúng cái đơn chứa những món vừa xóa — bối rối hơn hẳn
+    # so với việc báo giỏ trống.
+    #
+    # Bản ghi `CartOrder` chưa thanh toán vẫn nằm nguyên trong database: xóa giỏ không
+    # phải là hủy đơn. Hủy đơn là chức năng riêng — SPEC-GAPS A7, PLAN bước 2.10.
+    request.session.pop('pending_order_oid', None)
+
+    if had_items:
+        messages.success(request, _("Your cart has been emptied."))
+
+    return redirect("core:index")
 
 
 def update_cart(request):
@@ -524,6 +562,14 @@ def update_cart(request):
         'cart_data': request.session['cart_data_obj'],
         'totalcartitems': len(request.session['cart_data_obj']),
         'cart_total_amount': cart_total_amount,
+        # `{% csrf_token %}` đọc khóa 'csrf_token' từ context. Lời gọi này KHÔNG truyền
+        # `request=` nên context không phải RequestContext và thẻ đó render ra **rỗng** —
+        # form "Xóa sạch giỏ" trong bản async sẽ không có token và POST bị từ chối 403.
+        #
+        # Truyền thẳng token thay vì `request=request`: thêm `request=` sẽ kéo theo
+        # `core.context_processors.default`, mà nó truy vấn Address/Wishlist mỗi lần đổi
+        # số lượng (3 truy vấn thừa cho người đã đăng nhập) — đúng nợ kỹ thuật #2.
+        'csrf_token': get_token(request),
     })
     return JsonResponse({
         'data': context,

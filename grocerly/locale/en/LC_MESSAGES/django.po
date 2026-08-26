@@ -596,3 +596,12 @@ msgstr ""
 
 msgid "Could not send your message. Please try again."
 msgstr ""
+
+msgid "Your cart has been emptied."
+msgstr ""
+
+msgid "Empty your cart? Every product will be removed from it."
+msgstr ""
+
+msgid "Clear Cart"
+msgstr ""

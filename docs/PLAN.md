@@ -83,7 +83,7 @@ là đóng gap mà không phải sửa báo cáo.
 |---|---|---|---|
 | ✅ **2.1** | ~~`delete_product` xóa mềm khi có đơn liên quan ([B3](SPEC-GAPS.md))~~ **Xong 2026-08-26** | **Hình 30 đã vẽ sẵn đúng nhánh này** | thấp |
 | ✅ **2.2** | ~~Chặn đổi trạng thái khi đơn đã `delivered` ([A8](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.20 Exception Flow | thấp |
-| **2.3** | Làm sạch giỏ hàng ([A4](SPEC-GAPS.md)) | UC 3.2.6 Alternate Flow | thấp |
+| ✅ **2.3** | ~~Làm sạch giỏ hàng ([A4](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.6 Alternate Flow | thấp |
 | ✅ **2.4** | ~~Drop cột `stripe_payment_intent`~~ **Migration xong 2026-08-26**, chạy khi deploy | ERD + Bảng 32 **không có** cột này | thấp |
 | **2.5** | `except:` trần ([S-07](SECURITY.md)) + `SECRET_KEY`/`DEBUG` ([S-05](SECURITY.md)) | mục 1.2.2 Yêu cầu phi chức năng | thấp |
 | **2.6** | **Tầng unit test** — xem bảng riêng bên dưới | Chương 4 — hai điểm nhấn chưa có test nào | trung bình |
@@ -200,7 +200,7 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
       phát hiện ban đầu bị bác bỏ** khi có bước phản biện độc lập. Thấy `@csrf_exempt`
       trong code **chưa đủ để kết luận có lỗ hổng** — còn phải trả lời được request của
       kẻ tấn công có mang được cookie phiên tới không, mà điều đó phụ thuộc `SameSite`
-- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **126 test tự động**
+- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **140 test tự động**
       (số tính tới 2026-08-26), cộng bảng test case cho AI Chatbot và VNPay.
       Điểm mạnh hơn con số: nay trình bày được thành **kim tự tháp test** — unit test
       thuần (`SimpleTestCase`, không DB) / test ở mức model / test hồi quy ở mức HTTP
@@ -214,9 +214,29 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
 
 ## Đã xong
 
-### 2026-08-26 — Bước 2.1, 2.2, 2.4, 2.6a, 2.6d + rà soát endpoint
+### 2026-08-26 — Bước 2.1, 2.2, 2.3, 2.4, 2.6a, 2.6d + rà soát endpoint
 
-**49 → 126 test.** Năm commit, `038701f`…`a5682a7`.
+**49 → 140 test.** Sáu commit, `038701f`…`9fd7d0c` và bước 2.3.
+
+- **2.3** — `clear_cart`, POST + CSRF, nút ở trang giỏ hàng. **Đừng nhầm với xóa từng
+  sản phẩm**: `delete_item_from_cart` vốn đã có và vẫn chạy đúng; cái thiếu là xóa **sạch
+  toàn bộ** trong một lần. Cơ chế xóa sạch đã tồn tại sẵn ở ba chỗ trong `core/views.py`
+  nhưng cả ba đều chạy **sau khi thanh toán xong** nên khách không gọi tới được.
+
+  Lộ ra một lỗi cũ: hai lời gọi `render_to_string` cho bản async của giỏ hàng **không
+  truyền `request=`** (khác hai lời gọi tương tự cho product-list và wishlist trong cùng
+  file), nên `{% csrf_token %}` render ra **rỗng**. Không ai trúng vì trước đó bản async
+  chưa có form nào. Đã truyền thẳng token thay vì `request=request`, để không kéo theo
+  context processor truy vấn Address/Wishlist mỗi lần đổi số lượng (nợ kỹ thuật #2).
+
+  Nút phải đặt ở **cả hai** file — `cart.html` và `core/async/cart-list.html` gần như là
+  bản sao của nhau (96 dòng mỗi file); thiếu ở bản async thì nút biến mất ngay sau khi
+  khách xóa một sản phẩm.
+
+  `clear_cart` cũng bỏ luôn `session['pending_order_oid']`, nếu không khách xóa sạch giỏ
+  rồi bấm Thanh toán sẽ bị đá vào đúng cái đơn chứa những món vừa xóa. Bản ghi `CartOrder`
+  chưa thanh toán **vẫn nằm nguyên** — xóa giỏ không phải hủy đơn ([A7](SPEC-GAPS.md),
+  bước 2.10).
 
 - **2.4** — migration `0006_drop_stripe_payment_intent`. Không phải quyết định mới: field
   đã rời `models.py` từ commit `0925f27` mà **chưa bao giờ có migration**, nên model và

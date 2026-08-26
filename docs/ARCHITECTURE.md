@@ -148,6 +148,21 @@ lấy thẳng từ query string — xem [SECURITY.md](SECURITY.md) mục S-02.
 
 Hai JS gọi endpoint này vẫn gửi dư `title`/`price`/`image`; server bỏ qua.
 
+Bốn thao tác trên giỏ: `add_to_cart`, `update_cart`, `delete_item_from_cart` (xóa **một**
+sản phẩm) đều là GET — xem [SECURITY.md](SECURITY.md) mục S-10 — còn `clear_cart` (xóa
+**sạch**, thêm 2026-08-26) là **POST + CSRF**. Chênh lệch này có chủ ý: endpoint mới
+không nên nối dài danh sách ghi dữ liệu bằng GET; bốn cái cũ dọn ở bước 2.14.
+
+`clear_cart` bỏ luôn `session['pending_order_oid']` — không thì khách xóa sạch giỏ rồi
+bấm Thanh toán sẽ bị đá vào đúng cái đơn chứa những món vừa xóa. Bản ghi `CartOrder` chưa
+thanh toán vẫn nằm nguyên: xóa giỏ **không phải** hủy đơn (A7, bước 2.10).
+
+⚠️ Bản async của giỏ (`core/async/cart-list.html`) render qua `render_to_string` **không
+truyền `request=`**, khác hai lời gọi tương tự cho product-list và wishlist trong cùng
+file. Nghĩa là context **không phải** `RequestContext`: `{% csrf_token %}` render ra rỗng
+và không có context processor nào chạy. Token nay được truyền thẳng vào context; giữ vậy
+có chủ ý để không kéo theo truy vấn Address/Wishlist mỗi lần đổi số lượng (nợ kỹ thuật #2).
+
 ### 4.2 Đặt hàng & thanh toán
 
 ```
@@ -254,7 +269,7 @@ khi `settings.py` hiện chỉ hiểu `USE_CLOUDINARY` — cấu hình này đã
 
 | # | Vấn đề | Ảnh hưởng |
 |---|---|---|
-| 1 | **126 test** tính đến 2026-08-26, nhưng **checkout vẫn trống**: không test nào chạm `save_checkout_info`; `userauths/tests.py` còn là stub rỗng | Luồng tạo đơn — chỗ rủi ro nhất — chưa có lưới an toàn, mà bước 2.11 sẽ viết lại đúng hàm đó. Xem [PLAN](PLAN.md) bước 2.6f |
+| 1 | **140 test** tính đến 2026-08-26, nhưng **checkout vẫn trống**: không test nào chạm `save_checkout_info`; `userauths/tests.py` còn là stub rỗng | Luồng tạo đơn — chỗ rủi ro nhất — chưa có lưới an toàn, mà bước 2.11 sẽ viết lại đúng hàm đó. Xem [PLAN](PLAN.md) bước 2.6f |
 | 2 | Truy vấn không `select_related` → N+1 | Chậm khi dữ liệu lớn |
 | 3 | Không phân trang ở mọi trang danh sách | Tải toàn bộ sản phẩm mỗi request |
 | 4 | `useradmin` không giới hạn phạm vi theo nhân viên | Mọi staff thấy toàn bộ dữ liệu |

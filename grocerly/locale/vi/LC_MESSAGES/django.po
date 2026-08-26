@@ -1021,3 +1021,12 @@ msgstr "Đã gửi tin nhắn thành công!"
 
 msgid "Could not send your message. Please try again."
 msgstr "Không gửi được tin nhắn. Vui lòng thử lại."
+
+msgid "Your cart has been emptied."
+msgstr "Đã xóa toàn bộ sản phẩm khỏi giỏ hàng."
+
+msgid "Empty your cart? Every product will be removed from it."
+msgstr "Xóa sạch giỏ hàng? Toàn bộ sản phẩm trong giỏ sẽ bị bỏ đi."
+
+msgid "Clear Cart"
+msgstr "Xóa sạch giỏ hàng"
