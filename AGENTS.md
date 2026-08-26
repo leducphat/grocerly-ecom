@@ -69,12 +69,13 @@ python manage.py test --settings=grocerly.settings_test
 `manage.py test` sẽ tạo database `test_<tên-db>` **trên máy chủ production Neon** (bẫy #5).
 Module này ép SQLite in-memory.
 
-**258 test** tính đến 2026-08-26, chia hai tầng:
+**346 test** tính đến 2026-08-26, chia hai tầng:
 
 | File | Nội dung |
 |---|---|
 | [core/tests.py](grocerly/core/tests.py) · [store_api/tests.py](grocerly/store_api/tests.py) · [useradmin/tests.py](grocerly/useradmin/tests.py) | Hồi quy ở mức HTTP — tái hiện kịch bản khai thác ở [docs/SECURITY.md](docs/SECURITY.md) |
-| [core/test_vnpay.py](grocerly/core/test_vnpay.py) | Unit test thuần (`SimpleTestCase`, **không dựng database**) |
+| [core/test_vnpay.py](grocerly/core/test_vnpay.py) | Unit test thuần (`SimpleTestCase`, **không dựng database**) — chỉ kiểm thuật toán ký |
+| [core/test_vnpay_flow.py](grocerly/core/test_vnpay_flow.py) | Hai callback VNPay ở mức HTTP — **đường thanh toán online**, trước 2026-08-26 không test nào chạm tới |
 | [core/test_softdelete.py](grocerly/core/test_softdelete.py) | Hạ tầng xóa mềm ở mức model, chốt bẫy #3 |
 | [core/test_checkout.py](grocerly/core/test_checkout.py) | Luồng tạo đơn — **đọc trước khi đụng `save_checkout_info`** |
 | [core/test_missing_relations.py](grocerly/core/test_missing_relations.py) | Sản phẩm thiếu `category`/`vendor` không được làm sập storefront |
@@ -82,6 +83,9 @@ Module này ép SQLite in-memory.
 | [core/test_review_purchase.py](grocerly/core/test_review_purchase.py) | Điều kiện đã mua mới được đánh giá (A2) |
 | [core/test_cancel_order.py](grocerly/core/test_cancel_order.py) | Hủy đơn (A7) — **đọc [ADR-0007](docs/DECISIONS.md) trước khi nới điều kiện hủy** |
 | [useradmin/test_tracking_id.py](grocerly/useradmin/test_tracking_id.py) | Mã vận đơn (A9) |
+| [core/test_ordering.py](grocerly/core/test_ordering.py) | Thứ tự truy vấn — **bắt lỗi chỉ xảy ra trên PostgreSQL**, không tái hiện được ở SQLite local |
+| [core/test_pagination.py](grocerly/core/test_pagination.py) · [core/test_product_list_layout.py](grocerly/core/test_product_list_layout.py) | Phân trang (A3) và cấu trúc HTML của vùng bị AJAX ghi đè |
+| [core/test_coupon.py](grocerly/core/test_coupon.py) | Mã giảm giá (A6) — hạn dùng, số lượt, và bộ đếm |
 | [core/test_contact_form.py](grocerly/core/test_contact_form.py) · [core/test_clear_cart.py](grocerly/core/test_clear_cart.py) · [useradmin/test_delete_product.py](grocerly/useradmin/test_delete_product.py) · [useradmin/test_order_status.py](grocerly/useradmin/test_order_status.py) | Theo chức năng |
 
 **Còn trống:** [userauths/tests.py](grocerly/userauths/tests.py) vẫn là stub rỗng, và

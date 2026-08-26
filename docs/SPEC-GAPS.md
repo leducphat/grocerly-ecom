@@ -7,9 +7,19 @@
 > ⚠️ **Tiểu luận đã nộp và có điểm.** File này giờ phục vụ **Khóa luận tốt nghiệp** —
 > cùng đề tài, cùng GVHD. Xem [PLAN.md](PLAN.md).
 >
-> Cập nhật 2026-08-26: đóng **A2**, **A7**, **A8**, **A9** và **B3**; **B11** xong phần code,
-> chờ deploy. Nhóm A còn lại: **A3** (phân trang), **A6** (coupon), **A10** (email hàng loạt),
-> **A11** (cố ý không cài).
+> Cập nhật 2026-08-26: đóng **A2**, **A3**, **A6**, **A7**, **A8**, **A9** và **B3**;
+> **B11** xong phần code, chờ deploy. Nhóm A chỉ còn **A10** (email hàng loạt) và
+> **A11** (cố ý không cài — [ADR-0002](DECISIONS.md)).
+
+> **Ghi chú A6 — `usage_limit` rộng hơn báo cáo.** A6 ghi *"số lượt **đã dùng**"*, tức một
+> bộ đếm. Nhưng bộ đếm không chặn gì thì chỉ là con số hiển thị, UC 3.2.21 không có hành
+> vi nào để demo. Nên code cài **cả** `used_count` (đúng chữ báo cáo) lẫn `usage_limit`
+> (hạn mức để chặn). `usage_limit` là thuộc tính **mới**, phải bổ sung vào ERD Hình 45 và
+> bảng mô tả `core_coupon` — cùng kiểu với ghi chú A2 ở trên.
+>
+> ⚠️ **Chưa tra được số hiệu "Bảng N" của bảng `core_coupon`** trong repo: docs chỉ ánh xạ
+> Bảng 28 = `core_tag`, 30 = `core_product`, 32 = `cartorder`, 33 = `cartorderitem`. Phải
+> mở bản gốc PDF.
 
 > **Ghi chú A2 — "Shipped" hiểu theo nghĩa nào.** UC 3.2.14 viết điều kiện là đơn
 > *Shipped*. Code nhận **cả `shipped` lẫn `delivered`**, vì `delivered` nằm sau `shipped`
@@ -33,10 +43,10 @@ kiểm chứng trước khi khẳng định một chức năng tồn tại.
 |---|---|---|---|
 | A1 | ~~**Sửa & Xóa đánh giá** — UC 3.2.14, Hình 22–23~~ | ✅ **Đã đóng 2026-08-25** — `ajax_edit_review` và `ajax_delete_review` đúng tên báo cáo ghi, kèm nút Sửa/Xóa ở trang chi tiết. Chỉ chủ đánh giá đụng được; của người khác trả 404 | `EditDeleteReviewTests` |
 | A2 | ~~Đánh giá yêu cầu **đã mua hàng (đơn Shipped)** — UC 3.2.14 Pre-Conditions **và Hình 21**~~ | ✅ **Đã đóng 2026-08-26** — `has_purchased` tra theo khóa ngoại mới của `CartOrderItem` ([ADR-0006](DECISIONS.md), bước 2.11). Chưa mua mà POST thẳng vào endpoint thì `403`; trang chi tiết ẩn form **kèm lý do**. Nhận cả `shipped` lẫn `delivered` — xem ghi chú dưới bảng. **Báo cáo giữ nguyên**, không phải sửa chữ nào | `core/test_review_purchase.py` |
-| A3 | **Phân trang** — UC 3.2.3 Alternate Flow | Không có `Paginator` ở đâu | `grep -rn "Paginator\|paginate"` → rỗng |
+| A3 | ~~**Phân trang** — UC 3.2.3 Alternate Flow~~ | ✅ **Đã đóng 2026-08-26** — 8 sản phẩm/trang ở 5 trang: danh sách sản phẩm, theo danh mục, theo thương hiệu, tìm kiếm, theo tag. Danh sách **danh mục** và **thương hiệu** cố ý không phân trang (một siêu thị thì hai danh sách đó nhỏ và ổn định — [ADR-0003](DECISIONS.md)). **Giới hạn đã biết**: URL không phản ánh trạng thái bộ lọc nên F5 mất bộ lọc và không share được link đã lọc — [PLAN](PLAN.md) bước 2.8b | `core/test_pagination.py` |
 | A4 | ~~**"Làm sạch giỏ hàng"** — UC 3.2.6 Alternate Flow~~ | ✅ **Đã đóng 2026-08-26** — `clear_cart` (POST + CSRF), nút ở trang giỏ hàng. Đừng nhầm với `delete_item_from_cart` (xóa **một** sản phẩm) vốn đã có sẵn từ trước và vẫn chạy đúng | `ClearCartTests` |
 | A5 | ~~Cập nhật SL **vượt tồn kho → báo lỗi** — UC 3.2.6 Exception Flow~~ | ✅ **Đã đóng 2026-08-24** — `add_to_cart` và `update_cart` đều kiểm `stock_count`, trả `400` kèm số lượng còn lại | Sửa cùng [S-02](SECURITY.md#s-02--giả-mạo-giá-sản-phẩm) |
-| A6 | Coupon có **ngày hết hạn** và **số lượt đã dùng** — UC 3.2.21 | Model `Coupon` chỉ có `code`, `discount`, `active` | [core/models.py](../grocerly/core/models.py) |
+| A6 | ~~Coupon có **ngày hết hạn** và **số lượt đã dùng** — UC 3.2.21~~ | ✅ **Đã đóng 2026-08-26** — thêm `valid_to`, `used_count`, `usage_limit`. Bộ đếm tăng ở `CartOrder.confirm_paid()` (lúc xác nhận đã thu tiền), không phải lúc áp mã. **`usage_limit` là thuộc tính báo cáo KHÔNG mô tả** — xem ghi chú dưới bảng | `core/test_coupon.py` |
 | A7 | ~~**Hủy đơn (Cancel)** — UC 3.2.25~~ | ✅ **Đã đóng 2026-08-26** — thêm trạng thái `cancelled`, khách tự hủy ở trang đơn hàng, nhân viên hủy được từ dashboard. **Hai tiền điều kiện phải bổ sung vào báo cáo**: chỉ hủy đơn còn `processing` và **chưa thanh toán** — xem [ADR-0007](DECISIONS.md) | `core/test_cancel_order.py` |
 | A8 | ~~Không đổi được trạng thái khi đơn đã **Delivered** — UC 3.2.20 Exception Flow~~ | ✅ **Đã đóng 2026-08-26** — chặn ở view và khóa luôn form. Kèm theo: `change_order_status` trước đây nhận **mọi chuỗi** từ POST, mà option đầu của dropdown lại gửi `value="pending"` — giá trị không có trong `STATUS_CHOICES`. Nay option dựng từ model và view lọc qua whitelist | `ChangeOrderStatusTests` |
 | A9 | ~~Cập nhật **mã vận đơn** ở dashboard nhân viên — UC 3.2.20 Alternate Flow~~ | ✅ **Đã đóng 2026-08-26** — ô nhập ở trang chi tiết đơn (form riêng, POST + CSRF), và mã hiện luôn ở trang đơn hàng của khách. Không phải đụng cơ sở dữ liệu: `tracking_id` vốn đã có trong model, chỉ thiếu giao diện | `useradmin/test_tracking_id.py` |

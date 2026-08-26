@@ -42,7 +42,7 @@ quyết định nghiệp vụ, không phải cắt giảm vì thiếu thời gia
 
 - [ ] **1.1** Merge `develop` → `main`, Render tự deploy — **hoãn có chủ ý, 2026-08-26**
 
-`main` đang chậm **32 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
+`main` đang chậm **40 commit**. Production vẫn chạy code có S-01/S-02 khai thác được —
 mọi bản vá đã làm **chưa bảo vệ được gì**.
 
 **Quyết định 2026-08-26: hoãn.** Production đang chạy ổn định và chưa cần demo cho GVHD,
@@ -60,6 +60,9 @@ Hệ quả cần nhớ khi deploy:
   nên đáng soát log sau khi deploy: dòng nào để `NULL` là dòng backfill không dò ra
 - Migration `0008_alter_cartorder_product_status` thêm `cancelled` vào `choices`.
   `sqlmigrate` xác nhận **no-op DDL**, không sinh câu lệnh nào — an toàn, giống `0005`
+- Migration `0009` thêm ba cột cho `Coupon` (`valid_to`, `usage_limit`, `used_count`).
+  Cả ba đều nullable hoặc có default nên **không backfill**: mã đang có giữ nguyên nghĩa
+  "không hết hạn, không giới hạn lượt". Trên PostgreSQL đây là `ADD COLUMN` thường
 - Trước khi deploy nên soát đơn hàng mắc kẹt ở trạng thái rác:
   `CartOrder.objects.exclude(product_status__in=['processing','shipped','delivered'])`
   — xem bước 2.2
@@ -94,8 +97,9 @@ là đóng gap mà không phải sửa báo cáo.
 | **2.5** | `except:` trần ([S-07](SECURITY.md)) + `SECRET_KEY`/`DEBUG` ([S-05](SECURITY.md)) | mục 1.2.2 Yêu cầu phi chức năng | thấp |
 | **2.6** | **Tầng unit test** — xem bảng riêng bên dưới | Chương 4 — hai điểm nhấn chưa có test nào | trung bình |
 | ✅ **2.7** | ~~Nhập mã vận đơn ở `useradmin` ([A9](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.20 Alternate Flow | trung bình |
-| **2.8** | Phân trang ([A3](SPEC-GAPS.md)) | UC 3.2.3 Alternate Flow | trung bình |
-| **2.9** | Coupon hạn dùng + số lượt ([A6](SPEC-GAPS.md)) | UC 3.2.21 | trung bình, có migration |
+| ✅ **2.8** | ~~Phân trang ([A3](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.3 Alternate Flow | trung bình |
+| **2.8b** | Đẩy trạng thái bộ lọc lên URL (`replaceState` + khôi phục checkbox) | — | trung bình |
+| ✅ **2.9** | ~~Coupon hạn dùng + số lượt ([A6](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.21 | trung bình, có migration |
 | ✅ **2.10** | ~~Hủy đơn ([A7](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.25 | trung bình-cao, có migration |
 | ✅ **2.11** | ~~**Khóa ngoại `CartOrderItem` → `Product`**~~ **Xong 2026-08-26** | [ADR-0006](DECISIONS.md); vá nợ kỹ thuật #6 | cao, đụng checkout |
 | ✅ **2.12** | ~~Điều kiện đã mua mới đánh giá ([A2](SPEC-GAPS.md))~~ **Xong 2026-08-26** | UC 3.2.14 + **Hình 21** | phụ thuộc 2.11 |
@@ -106,6 +110,12 @@ là đóng gap mà không phải sửa báo cáo.
 không. Đã đọc bản gốc: **ERD Hình 45 và Bảng 32 đều không có** `stripe_payment_intent`.
 Nên drop cột làm code **khớp** báo cáo, không phải ngược lại. Đã kiểm production: 11 đơn
 hàng, **0 đơn có dữ liệu** ở cột này.
+
+**Ghi chú 2.8b:** phân trang ở bước 2.8 giữ nguyên cơ chế lọc bằng AJAX, nên **URL không
+phản ánh trạng thái bộ lọc**: F5 là mất bộ lọc, và không share được link đã lọc. Sửa hẳn
+thì phải tách logic lọc thành helper dùng chung cho `product_list_view` và `filter_product`,
+đẩy tham số lên querystring, rồi khôi phục trạng thái `checked` cho ba nhóm checkbox. Đây
+là phương án **đúng hơn**, không phải phương án ít rủi ro hơn — nên tách ra làm bước riêng.
 
 **Ghi chú 2.11 (sau khi làm xong):** hóa ra còn thẳng hơn dự tính — **khóa của giỏ hàng
 chính là khóa chính của sản phẩm** (`add_to_cart` ép `id` phải là chữ số), nên không cần
@@ -177,6 +187,14 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
       chỉ hủy đơn còn `processing` và **chưa thanh toán** ([ADR-0007](DECISIONS.md)).
       Đây là chỗ code **hẹp hơn** báo cáo, ngược chiều với A2
 - [ ] **3.22** **Bảng 32** — bổ sung giá trị `cancelled` vào mô tả `cartorder.product_status`
+- [ ] **3.23** **ERD Hình 45** và bảng mô tả `core_coupon` — bổ sung `valid_to`,
+      `used_count`, `usage_limit`. ⚠️ **Chưa tra được số hiệu "Bảng N" của `core_coupon`**
+      trong repo, phải mở bản gốc PDF
+- [ ] **3.24** **UC 3.2.21** — đối chiếu bản gốc xem "số lượt" là **bộ đếm** hay **hạn
+      mức**. Code cài cả hai; nếu báo cáo chỉ mô tả bộ đếm thì `usage_limit` là thuộc
+      tính mới cần bổ sung ([A6](SPEC-GAPS.md))
+- [ ] **3.25** **UC 3.2.3** — đối chiếu Alternate Flow xem có ghi cỡ trang cụ thể không.
+      Code dùng 8 sản phẩm/trang
 
 ### 3D — Định vị và tác nhân ([ADR-0003](DECISIONS.md) đã chốt)
 
@@ -211,7 +229,7 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
       phát hiện ban đầu bị bác bỏ** khi có bước phản biện độc lập. Thấy `@csrf_exempt`
       trong code **chưa đủ để kết luận có lỗ hổng** — còn phải trả lời được request của
       kẻ tấn công có mang được cookie phiên tới không, mà điều đó phụ thuộc `SameSite`
-- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **258 test tự động**
+- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **346 test tự động**
       (số tính tới 2026-08-26), cộng bảng test case cho AI Chatbot và VNPay.
       Điểm mạnh hơn con số: nay trình bày được thành **kim tự tháp test** — unit test
       thuần (`SimpleTestCase`, không DB) / test ở mức model / test hồi quy ở mức HTTP
@@ -224,6 +242,106 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
 ---
 
 ## Đã xong
+
+### 2026-08-26 — Bước 2.8 + 2.9: phân trang và mã giảm giá
+
+**258 → 346 test**, tám commit. Đóng nốt [A3](SPEC-GAPS.md) và [A6](SPEC-GAPS.md), nên
+**nhóm A chỉ còn A10** (email hàng loạt) và **A11** (cố ý không cài).
+
+Lô này bắt đầu bằng một lượt phân tích song song năm góc nhìn trên repo trước khi viết
+dòng code nào. Nó tìm ra **hai lỗi có sẵn** mà kế hoạch ban đầu không biết, và cả hai đều
+phải sửa trước thì phân trang mới đúng được.
+
+**Lỗi có sẵn #1 — thiếu `order_by` ở 9 truy vấn danh sách.** Không model nào khai
+`Meta.ordering`. Phân trang một queryset không có `ORDER BY` thì PostgreSQL được tự do
+trả bản ghi theo thứ tự bất kỳ, nên cùng một sản phẩm có thể hiện ở cả trang 1 lẫn trang
+2, hoặc không hiện ở trang nào.
+
+Điểm đáng ghi cho [bước 4.1](#giai-đoạn-4--nội-dung-mới-cho-kltn): **lỗi này không tái
+hiện được ở máy local.** SQLite gần như luôn trả bản ghi theo `rowid` nên nhìn y hệt đã
+sắp đúng; nó chỉ xuất hiện sau khi deploy lên Neon. Vì vậy `core/test_ordering.py` khẳng
+định **cấu trúc truy vấn** (`qs.ordered`, `qs.query.order_by`) chứ không khẳng định "mở
+trang 2 thấy có dữ liệu" — kiểu sau vẫn xanh trên SQLite kể cả khi gỡ hết `order_by`.
+
+**Lỗi có sẵn #2 — bộ lọc nuốt mất mục "Khuyến mãi trong ngày".**
+`<div id="filtered-product-grid">` **không được đóng**. Trình duyệt tự vá nên nhìn bằng
+mắt không thấy gì, nhưng jQuery thì tính đúng biên thật của phần tử: vùng bị
+`$(...).html()` ghi đè kéo dài từ dòng 167 tới 232, ôm trọn mục Deals ở dòng 191. Tick
+một checkbox là mục đó biến mất.
+
+Loại lỗi này **test HTTP thông thường không thấy** — HTML server trả về vẫn đủ mọi thứ.
+`core/test_product_list_layout.py` phải tự đếm cân bằng thẻ `<div>` để suy ra biên thật
+của vùng ghi đè rồi mới khẳng định được mục Deals nằm ngoài.
+
+- **2.8** — 8 sản phẩm/trang ở 5 trang phía khách. Danh sách **danh mục** và **thương
+  hiệu** cố ý không phân trang; thay vào đó **gỡ thanh phân trang giả** mà theme để lại:
+  ba template đang render một thanh tĩnh 6 số trang với link `href="#"` trỏ vào hư không.
+  Đó là giao diện nói dối khách hàng thật, và người chấm bấm vào là thấy.
+
+  Chỗ khó nhất là bộ lọc AJAX. Thanh phân trang phải nằm **ngoài** vùng bị ghi đè nên
+  `filter_product` trả nó về dưới một khóa JSON riêng, và trả `paginator.count` chứ không
+  phải độ dài trang — con số đó đi thẳng vào dòng "We found N items". Khi đã lọc thì cú
+  bấm phân trang quay lại đường AJAX, vì `product_list_view` không đọc tham số lọc; chưa
+  lọc thì link server render là link thật, chạy cả khi tắt JS.
+
+- **2.9** — `valid_to`, `usage_limit`, `used_count`. Bộ đếm tăng ở
+  `CartOrder.confirm_paid()`, nay là **chỗ duy nhất** được phép ghi `paid_status=True`.
+
+  Gom về một chỗ vá luôn một lỗ có sẵn: `vnpay_ipn` có chốt `if order.paid_status` còn
+  `vnpay_return` thì **không**, mà VNPay hoàn toàn có thể gọi cả hai cho một đơn.
+
+  Tăng bộ đếm lúc **trả tiền** chứ không lúc **áp mã** — bốn đường làm con số sai nếu
+  tăng lúc áp: đơn treo không bao giờ thanh toán; `save_checkout_info` gọi
+  `coupons.clear()` mỗi lần khách sửa giỏ nên áp lại là +1 cho cùng một đơn; hủy đơn chỉ
+  ghi `product_status`; và trang thanh toán thất bại in sẵn link quay lại checkout.
+
+- **Sót của 2.10 đã vá.** `place_cod_order` và `vnpay_payment` đều từ chối đơn đã hủy,
+  nhưng `checkout()` — **chính là trang áp mã** — thì không. Và đơn COD đã đặt vẫn có
+  `paid_status=False` cho tới lúc giao, nên chốt `paid_status` sẵn có cũng không chặn:
+  khách đặt COD xong quay lại URL cũ là hạ giá được một đơn đang giao.
+
+**Hai lỗ hổng mới ghi nhận, cố ý không vá:** [S-12](SECURITY.md) (`Coupon.discount` không
+có validator → giá đơn âm → gửi số tiền âm sang VNPay) và [S-13](SECURITY.md) (`vnpay_ipn`
+so số tiền theo giá **hiện tại** nên áp mã sau khi đã chuyển sang cổng là đơn không bao
+giờ được ghi nhận đã trả). Cả hai đều là lỗi thật nhưng không neo vào UC nào của 2.8/2.9;
+vá kèm là commit mất khả năng truy nguyên.
+
+**Kiểm chứng, và giới hạn của nó.** Mọi chốt chặn mới đều được thử gỡ ra để xác nhận có
+test bắt được. Nhưng cách làm đó chỉ soi được **những chỗ mình nghĩ tới**, nên sau khi
+xong còn chạy thêm một lượt **review đối kháng** trên toàn bộ diff — bốn góc nhìn song
+song, mỗi phát hiện bị một agent khác cố bác bỏ trước khi được tính. Nó tìm ra **12 vấn
+đề thật**, trong đó có ba thứ đáng ghi lại:
+
+1. **Một hồi quy do chính bước 2.8 gây ra.** Bốn template in `{{ products.count }}`, mà
+   `products` nay là `Page`. `Page` kế thừa `Sequence`, `Sequence.count(value)` bắt buộc
+   một tham số, nên template engine dính `TypeError` rồi thay bằng `string_if_invalid` —
+   **chuỗi rỗng**. Không 500, không log, chỉ mất con số. Trang hiện ra
+   `We found <strong></strong> item for you!` suốt mà 328 test vẫn xanh.
+
+2. **Một lỗ hổng kiểm thử ngay giữa điểm nhấn của đề tài.** `confirm_paid()` sinh ra để
+   xử lý việc `vnpay_return` và `vnpay_ipn` có thể cùng chạy cho một đơn — nhưng **không
+   test nào từng gọi hai endpoint đó**. Đo được: gỡ cả hai lời gọi `confirm_paid()` về
+   như trước bước 2.9 thì **toàn bộ suite vẫn xanh**. Mọi bảo đảm của 2.9 hóa ra chỉ được
+   bảo vệ ở nhánh COD. Nay có `core/test_vnpay_flow.py`, và cùng phép thử đó làm đỏ 5 test.
+
+3. **Bốn test do chính lượt này viết ra là test trang trí.** Ví dụ rõ nhất:
+   `test_the_price_slider_still_sees_every_price` tạo sản phẩm đắt nhất **sau cùng** nên
+   nó rơi đúng vào trang 1 — mà ở đó `aggregate()` chạy nhầm trên `Page` cũng cho ra đúng
+   kết quả. Docstring của test nói nó bắt lỗi ấy; thực tế thì không.
+
+Bài học cho [bước 4.1](#giai-đoạn-4--nội-dung-mới-cho-kltn): **tự gỡ chốt chặn ra thử là
+điều kiện cần, không phải điều kiện đủ.** Nó không phát hiện được thứ mình chưa nghĩ tới
+là phải kiểm — và ba mục trên đều thuộc loại đó.
+
+**Giới hạn đã biết của 2.8:** URL không phản ánh trạng thái bộ lọc → F5 mất bộ lọc, không
+share được link đã lọc. Ghi thành **bước 2.8b**.
+
+**Đánh đổi đã biết của 2.9:** kiểm "còn lượt không" ở lúc áp mã, tăng bộ đếm ở lúc trả
+tiền — hai thời điểm cách nhau tùy ý nên nhiều khách áp cùng lúc vẫn vượt được hạn mức.
+Chấp nhận và giải thích trong phần *hạn chế* của báo cáo: không có luồng hoàn tiền
+([ADR-0007](DECISIONS.md)) nên bộ đếm chỉ đi một chiều. `select_for_update()` cũng **không
+có tác dụng trên SQLite**, nên test chứng minh được tính idempotent chứ không chứng minh
+được chống tranh chấp — docstring của test ghi rõ điều đó.
 
 ### 2026-08-26 — Bước 2.10 + 2.7: vòng đời đơn hàng
 

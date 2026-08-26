@@ -25,9 +25,11 @@ mục dưới đây là **lỗi logic nghiệp vụ** mà framework không đỡ
 | S-09 | Form liên hệ ghi database bằng GET không xác thực | 🟠 Cao | ✅ Đã sửa 2026-08-26 |
 | S-10 | Các endpoint khác đổi dữ liệu bằng GET | 🟡 Trung bình | Chưa sửa — [PLAN](PLAN.md) bước 2.14 |
 | S-11 | Cookie phiên không có cờ `Secure` | 🔵 Thấp | Chưa sửa — [PLAN](PLAN.md) bước 2.14 |
+| S-12 | `Coupon.discount` không giới hạn → giá đơn âm | 🟡 Trung bình | Chưa sửa |
+| S-13 | `vnpay_ipn` so số tiền theo giá **hiện tại** của đơn | 🟡 Trung bình | Chưa sửa |
 
 ⚠️ **Không mục nào trong bảng này đang được bảo vệ trên production.** Mọi bản vá vẫn nằm
-trên `develop`; `main` chậm 32 commit và việc deploy **đã được hoãn có chủ ý** — xem
+trên `develop`; `main` chậm 40 commit và việc deploy **đã được hoãn có chủ ý** — xem
 [PLAN.md](PLAN.md) giai đoạn 1.
 
 Các mục đã sửa đều có test hồi quy. Chạy toàn bộ:
@@ -412,3 +414,60 @@ Bài học nên đưa vào [PLAN.md](PLAN.md) bước 4.1: đọc code thấy `@
 đủ để kết luận có lỗ hổng**. Phải trả lời thêm: request của kẻ tấn công có mang được
 cookie phiên tới không? Với `SameSite=Lax` thì câu trả lời phụ thuộc vào method và vào
 việc đó là điều hướng hay subresource — và đó mới là thứ quyết định.
+
+---
+
+## S-12 — `Coupon.discount` không giới hạn, giá đơn có thể âm
+
+**Vị trí:** [core/models.py](../grocerly/core/models.py) — `Coupon.discount`
+
+```python
+discount = models.IntegerField(default=1)   # không MinValue, không MaxValue
+```
+
+**Vấn đề:** trường này được hiểu là **phần trăm** nhưng không có validator nào. Quản trị
+viên gõ nhầm `1000` là `checkout()` tính `order.price -= order.price * 1000 / 100`, đơn
+hàng thành **giá âm**. Sau đó `vnpay_payment` gửi `amount = int(order.price) * 100` — một
+số âm — sang cổng thanh toán.
+
+Số âm cũng chảy vào `order.saved`, và từ đó vào các thống kê doanh thu ở dashboard nhân
+viên (`CartOrder.objects.filter(paid_status=True).aggregate(Sum("price"))`).
+
+**Mức độ thật:** cần quyền quản trị viên mới khai thác được, nên đây là lỗi *phòng vệ
+chiều sâu* chứ không phải lỗ hổng cho người ngoài. Nhưng nó cũng là lỗi **gõ nhầm** rất
+dễ xảy ra.
+
+**Hướng sửa:** `PositiveIntegerField` kèm `MinValueValidator(1)` và `MaxValueValidator(100)`.
+Không vá kèm bước 2.9 vì như vậy commit đó không neo được vào use case nào — cám dỗ ở đây
+là "đằng nào cũng có migration trên `Coupon`, sửa luôn thể".
+
+---
+
+## S-13 — `vnpay_ipn` so số tiền theo giá hiện tại của đơn
+
+**Vị trí:** [core/views.py](../grocerly/core/views.py) — `vnpay_ipn` và `vnpay_payment`
+
+`vnpay_payment` chốt số tiền **tại thời điểm chuyển hướng** sang cổng:
+
+```python
+amount = int(order.price) * 100
+```
+
+Còn `vnpay_ipn` đối chiếu với giá **đang có trong database lúc nhận callback**:
+
+```python
+if int(amount) != int(order.price) * 100:
+    return JsonResponse({'RspCode': '04', 'Message': 'Invalid amount'})
+```
+
+**Vấn đề:** khách mở `/checkout/<oid>/` ở tab khác và áp thêm mã giảm giá sau khi đã bấm
+sang VNPay thì `order.price` đổi, IPN trả `'04'` và đơn **không bao giờ được đánh dấu đã
+thanh toán** — dù khách đã mất tiền thật. Kéo theo `used_count` của mã cũng không tăng.
+
+Bản vá bước 2.10/2.9 đã bịt đường tương tự cho đơn COD (`checkout()` từ chối đơn có
+`payment_method == 'cod'`), nhưng đơn online đã chuyển sang VNPay thì `payment_method`
+vẫn là `'online'` nên chưa có gì chặn.
+
+**Hướng sửa:** khóa `checkout()` sau khi đã khởi tạo thanh toán online — cần một mốc đánh
+dấu "đã chuyển sang cổng" trên `CartOrder`. Đây là thay đổi **luồng thanh toán**, không
+thuộc phạm vi 2.9, nên ghi lại chứ không vá vội.
