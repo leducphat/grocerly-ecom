@@ -1111,3 +1111,23 @@ msgstr "Trang sau"
 #: core/views.py
 msgid "This order has already been placed."
 msgstr "Đơn hàng này đã được đặt."
+
+#: core/views.py
+msgid "This coupon has expired."
+msgstr "Mã giảm giá này đã hết hạn."
+
+#: core/views.py
+msgid "This coupon has reached its usage limit."
+msgstr "Mã giảm giá này đã hết lượt sử dụng."
+
+#: core/views.py
+msgid "Coupon already activated"
+msgstr "Mã giảm giá đã được áp dụng rồi."
+
+#: core/views.py
+msgid "Coupon Activated"
+msgstr "Đã áp dụng mã giảm giá."
+
+#: core/views.py
+msgid "Coupon Does Not Exist"
+msgstr "Mã giảm giá không tồn tại."

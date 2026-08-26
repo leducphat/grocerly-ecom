@@ -109,8 +109,12 @@ class AddressAdmin(admin.ModelAdmin):
     list_display = ['user', 'address', 'mobile', 'status']
 
 class CouponAdmin(SoftDeleteAdminMixin, admin.ModelAdmin):
-    list_display = ['code', 'discount', 'active', 'is_deleted']
+    list_display = ['code', 'discount', 'active', 'valid_to', 'used_count', 'usage_limit', 'is_deleted']
     list_filter = ['is_deleted', 'active']
+    # `used_count` do hệ thống tăng khi đơn được xác nhận đã thanh toán
+    # (`CartOrder.confirm_paid`). Không khai `fields`/`fieldsets` nên Django tự sinh form
+    # từ MỌI field editable — thiếu dòng này là quản trị viên gõ tay được vào bộ đếm.
+    readonly_fields = ['used_count']
 
 
 admin.site.register(Product, ProductAdmin)

@@ -15,6 +15,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _lazy
 from taggit.models import Tag
 
 import calendar
@@ -880,8 +881,11 @@ def vnpay_return(request):
             if vnp_ResponseCode == "00":
                 try:
                     order = CartOrder.objects.get(oid=order_id)
-                    order.paid_status = True
-                    order.save()
+                    # Trước đây gán thẳng `paid_status = True`, không chốt gì — trong khi
+                    # `vnpay_ipn` thì có. Hai đường cùng chạy cho một đơn là tăng bộ đếm
+                    # mã giảm giá hai lần. `confirm_paid()` idempotent nên gọi mấy lần
+                    # cũng chỉ tính một lượt.
+                    order.confirm_paid()
                     
                     if 'cart_data_obj' in request.session:
                         del request.session['cart_data_obj']
@@ -924,8 +928,7 @@ def vnpay_ipn(request):
                     return JsonResponse({'RspCode': '02', 'Message': 'Order already confirmed'})
                     
                 if vnp_ResponseCode == '00':
-                    order.paid_status = True
-                    order.save()
+                    order.confirm_paid()
                     return JsonResponse({'RspCode': '00', 'Message': 'Confirm Success'})
                 else:
                     return JsonResponse({'RspCode': '00', 'Message': 'Confirm Success'})
@@ -968,6 +971,15 @@ def place_cod_order(request, oid):
     return redirect("core:payment-completed", order.oid)
 
 
+# Model chỉ trả khóa lỗi, view mới dịch sang câu chữ — `Coupon.usable_error()` không nên
+# biết gì về i18n của tầng hiển thị. Khai lười (`gettext_lazy`) vì đây là hằng số module,
+# đọc lúc import nên chưa biết ngôn ngữ của request.
+COUPON_ERROR_MESSAGES = {
+    Coupon.EXPIRED: _lazy("This coupon has expired."),
+    Coupon.EXHAUSTED: _lazy("This coupon has reached its usage limit."),
+}
+
+
 @login_required
 def checkout(request, oid):
     order = _get_checkout_order_or_none(request, oid)
@@ -999,21 +1011,31 @@ def checkout(request, oid):
 
     if request.method == "POST":
         code = request.POST.get("code")
-        coupon = Coupon.objects.filter(code=code, active=True).first()
+        # `.order_by('-id')` vì `Coupon.code` KHÔNG unique: hai bản ghi cùng mã thì
+        # `.first()` trên queryset không thứ tự trả về cái nào là tùy database. Lấy bản
+        # mới nhất là hành vi ít bất ngờ nhất. (Không thêm ràng buộc unique — xem
+        # ARCHITECTURE nợ kỹ thuật.)
+        coupon = Coupon.objects.filter(code=code, active=True).order_by('-id').first()
         if coupon:
             if coupon in order.coupons.all():
-                messages.warning(request, "Coupon already activated")
+                messages.warning(request, _("Coupon already activated"))
                 return redirect("core:checkout", order.oid)
-            else:
-                discount = order.price * coupon.discount / 100
-                order.coupons.add(coupon)
-                order.price -= discount
-                order.saved += discount
-                order.save()
-                messages.success(request, "Coupon Activated")
+
+            # Hạn dùng và số lượt — PLAN bước 2.9, UC 3.2.21 (SPEC-GAPS A6).
+            error = coupon.usable_error()
+            if error is not None:
+                messages.error(request, COUPON_ERROR_MESSAGES[error])
                 return redirect("core:checkout", order.oid)
+
+            discount = order.price * coupon.discount / 100
+            order.coupons.add(coupon)
+            order.price -= discount
+            order.saved += discount
+            order.save()
+            messages.success(request, _("Coupon Activated"))
+            return redirect("core:checkout", order.oid)
         else:
-            messages.error(request, "Coupon Does Not Exist")
+            messages.error(request, _("Coupon Does Not Exist"))
 
     context = {
         'order': order,

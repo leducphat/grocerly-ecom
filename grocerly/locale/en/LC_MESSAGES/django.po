@@ -686,3 +686,23 @@ msgstr ""
 #: core/views.py
 msgid "This order has already been placed."
 msgstr ""
+
+#: core/views.py
+msgid "This coupon has expired."
+msgstr ""
+
+#: core/views.py
+msgid "This coupon has reached its usage limit."
+msgstr ""
+
+#: core/views.py
+msgid "Coupon already activated"
+msgstr ""
+
+#: core/views.py
+msgid "Coupon Activated"
+msgstr ""
+
+#: core/views.py
+msgid "Coupon Does Not Exist"
+msgstr ""

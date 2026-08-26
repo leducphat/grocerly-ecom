@@ -382,12 +382,15 @@ def change_order_status(request, oid):
                 product.stock_count = max(0, product.stock_count - item.quantity)
                 product.save(update_fields=['stock_count'])
 
-    # Đơn COD được coi là đã thu tiền khi giao tới tay khách.
-    if status == FINAL_ORDER_STATUS and order.payment_method == 'cod':
-        order.paid_status = True
-
     order.product_status = status
     order.save()
+
+    # Đơn COD được coi là đã thu tiền khi giao tới tay khách. Qua `confirm_paid()` chứ
+    # không gán thẳng `paid_status`: đó là chỗ duy nhất tăng bộ đếm lượt dùng của mã
+    # giảm giá (PLAN 2.9). Gọi SAU khi lưu trạng thái để nếu bước này hỏng thì đơn vẫn
+    # đã `delivered` — trạng thái giao hàng không phụ thuộc vào việc ghi nhận tiền.
+    if status == FINAL_ORDER_STATUS and order.payment_method == 'cod':
+        order.confirm_paid()
 
     messages.success(request, _("Order status changed to %(status)s.") % {
         'status': ORDER_STATUS_LABELS[status],

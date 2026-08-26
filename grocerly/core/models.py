@@ -327,6 +327,50 @@ class CartOrder(models.Model):
     class Meta:
         verbose_name_plural = "Cart Orders"
 
+    def confirm_paid(self):
+        """Đánh dấu đơn đã thu tiền. **Điểm duy nhất** được phép ghi `paid_status=True`.
+
+        Trả `True` nếu lần này thực sự chuyển trạng thái, `False` nếu đơn vốn đã trả rồi.
+
+        Gom về một chỗ vì đây cũng là nơi tăng bộ đếm lượt dùng của mã giảm giá
+        (PLAN bước 2.9). Ba đường xác nhận thanh toán — `vnpay_return`, `vnpay_ipn`,
+        và nhân viên đánh dấu đơn COD đã giao — nếu mỗi đường tự tăng bộ đếm thì:
+
+        - `vnpay_return` (trình duyệt khách quay về) và `vnpay_ipn` (VNPay gọi server)
+          có thể **cùng chạy cho một đơn**, thành +2 lượt cho một lần mua. Trước bước
+          này `vnpay_ipn` có chốt `if order.paid_status` còn `vnpay_return` thì không.
+        - Thêm một đường thanh toán mới là quên tăng bộ đếm ở đó.
+
+        Tăng bộ đếm ở đây chứ **không** ở lúc áp mã: khách áp mã rồi bỏ đi thì đơn treo
+        mãi ở `paid_status=False`, và `save_checkout_info` gọi `coupons.clear()` mỗi lần
+        khách sửa giỏ nên áp lại là cộng thêm một lượt nữa cho cùng một đơn.
+
+        Đánh đổi đã biết: kiểm "còn lượt không" ở lúc áp mã, tăng ở lúc trả tiền — hai
+        thời điểm cách nhau tùy ý nên vẫn có thể vượt hạn mức nếu nhiều khách áp cùng
+        lúc. Chấp nhận: không có luồng hoàn tiền (ADR-0007) nên bộ đếm chỉ đi một chiều.
+
+        ⚠️ `select_for_update()` **không có tác dụng trên SQLite** (cả `settings_test` lẫn
+        `settings_local` đều ép SQLite). Test chứng minh được tính idempotent, không
+        chứng minh được chống tranh chấp.
+        """
+        from django.db import transaction
+        from django.db.models import F
+
+        with transaction.atomic():
+            locked = CartOrder.objects.select_for_update().get(pk=self.pk)
+            if locked.paid_status:
+                return False
+
+            # `all_objects`: mã bị xóa mềm sau khi khách đã áp thì bộ đếm vẫn phải đúng.
+            Coupon.all_objects.filter(cartorder=locked).update(
+                used_count=F('used_count') + 1
+            )
+            locked.paid_status = True
+            locked.save(update_fields=['paid_status'])
+
+        self.paid_status = True
+        return True
+
 class CartOrderItem(models.Model):
     order = models.ForeignKey(CartOrder, on_delete=models.CASCADE)
 
@@ -419,6 +463,49 @@ class Coupon(SoftDeleteModel):
     code = models.CharField(max_length=1000)
     discount = models.IntegerField(default=1)
     active = models.BooleanField(default=True)
+
+    # PLAN bước 2.9 — UC 3.2.21, SPEC-GAPS A6. Cả ba đều nullable hoặc có default nên
+    # migration KHÔNG cần backfill: mã đang có trên production giữ nguyên nghĩa "không
+    # hết hạn, không giới hạn lượt".
+    #
+    # `default=timezone.now` chứ không `auto_now_add`: `auto_now_add` đánh field thành
+    # non-editable, tức là nó **biến mất khỏi form admin** và quản trị viên không đặt
+    # được hạn dùng. Sáu `DateTimeField` khác trong file này dùng `auto_now_add`, chép
+    # theo thói quen là rơi đúng bẫy đó.
+    valid_to = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Bỏ trống nghĩa là mã không bao giờ hết hạn.",
+    )
+    usage_limit = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text="Số lượt tối đa. Bỏ trống nghĩa là không giới hạn.",
+    )
+    used_count = models.PositiveIntegerField(
+        default=0,
+        help_text="Số lượt đã dùng. Chỉ tăng khi đơn hàng được xác nhận đã thanh toán.",
+    )
+
+    # Khóa lỗi trả về từ `usable_error()`. Để view tự dịch sang thông điệp — model không
+    # nên biết gì về i18n của tầng hiển thị.
+    EXPIRED = 'expired'
+    EXHAUSTED = 'exhausted'
+
+    def usable_error(self):
+        """`None` nếu mã còn dùng được, ngược lại trả khóa lỗi.
+
+        Đặt trên model chứ không viết thẳng `if` vào `checkout()`: như vậy unit test
+        được mà không phải dựng HTTP, và `checkout()` giữ được độ mỏng.
+
+        ⚠️ Hàm này **không** kiểm `active` và **không** kiểm xóa mềm. Hai điều kiện đó
+        nằm ở truy vấn tra mã (`Coupon.objects.filter(code=..., active=True)`) — `objects`
+        là `SoftDeleteManager`. Đừng chuyển chúng vào đây rồi đổi truy vấn sang
+        `all_objects`: `core/test_softdelete.py` chốt đúng hành vi của truy vấn đó.
+        """
+        if self.valid_to is not None and self.valid_to < timezone.now():
+            return self.EXPIRED
+        if self.usage_limit is not None and self.used_count >= self.usage_limit:
+            return self.EXHAUSTED
+        return None
 
     def __str__(self):
         return f"{self.code}"
