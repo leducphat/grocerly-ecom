@@ -328,7 +328,13 @@ class CartOrder(models.Model):
         verbose_name_plural = "Cart Orders"
 
     def confirm_paid(self):
-        """Đánh dấu đơn đã thu tiền. **Điểm duy nhất** được phép ghi `paid_status=True`.
+        """Đánh dấu đơn đã thu tiền. Điểm duy nhất **trong code ứng dụng** được phép ghi
+        `paid_status=True`.
+
+        ⚠️ Django admin **không** đi qua đây: `CartOrderAdmin` không khai `fields` nên
+        form sinh ra có cả ô `paid_status` lẫn ô sửa M2M `coupons`. Quản trị viên tick
+        thẳng vào đó là bộ đếm `used_count` **không tăng**, và hạn mức của mã giảm giá
+        mất hiệu lực im lặng. Xem nợ kỹ thuật #10 ở docs/ARCHITECTURE.md.
 
         Trả `True` nếu lần này thực sự chuyển trạng thái, `False` nếu đơn vốn đã trả rồi.
 

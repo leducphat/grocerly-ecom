@@ -1131,3 +1131,7 @@ msgstr "Đã áp dụng mã giảm giá."
 #: core/views.py
 msgid "Coupon Does Not Exist"
 msgstr "Mã giảm giá không tồn tại."
+
+#: core/views.py
+msgid "This order was cancelled. Please contact us about your payment."
+msgstr "Đơn hàng này đã bị hủy. Vui lòng liên hệ với chúng tôi về khoản thanh toán."

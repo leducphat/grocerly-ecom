@@ -114,20 +114,33 @@ class WishlistOrderingTests(TestCase):
 
         self.assertTrue(response.context['w'].ordered)
 
-    def test_the_wishlist_ajax_list_is_ordered_too(self):
-        other = Product.objects.create(
-            title="Xoài cát", price=Decimal("70000.00"), product_status='published',
-        )
-        Wishlist.objects.create(user=self.user, product=other)
+    def test_the_wishlist_ajax_list_is_ordered_the_same_way(self):
+        """Bản AJAX phải trả về **cùng thứ tự** với trang thường, không chỉ cùng số mục.
 
+        `JsonResponse` không cho đọc queryset, nhưng nó có kèm `w` — bản serialize JSON
+        của chính queryset đó. Đọc thứ tự `pk` trong đó là so được trực tiếp.
+        """
+        import json
+
+        for title in ("Xoài cát", "Cam sành"):
+            product = Product.objects.create(
+                title=title, price=Decimal("70000.00"), product_status='published',
+            )
+            Wishlist.objects.create(user=self.user, product=product)
+
+        page_order = [w.pk for w in self.client.get(
+            reverse("core:wishlist")).context['w']]
+        # Xóa một mục bất kỳ KHÔNG nằm ở hai đầu để thứ tự còn lại vẫn có ý nghĩa.
         response = self.client.get(
-            reverse("core:remove-from-wishlist"), {'id': Wishlist.objects.first().id}
+            reverse("core:remove-from-wishlist"),
+            {'id': Wishlist.objects.order_by('id')[1].pk},
         )
-
         self.assertEqual(response.status_code, 200)
-        # Không đọc được queryset qua JsonResponse, nên chốt gián tiếp: bản async render
-        # ra đúng số mục còn lại và không nổ.
-        self.assertEqual(response.json()['total_wishlist_items'], 1)
+
+        ajax_order = [row['pk'] for row in json.loads(response.json()['w'])]
+
+        self.assertEqual(ajax_order, [pk for pk in page_order if pk in ajax_order])
+        self.assertEqual(len(ajax_order), 2)
 
 
 class StaffListOrderingTests(TestCase):

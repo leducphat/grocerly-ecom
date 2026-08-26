@@ -96,6 +96,27 @@ class ProductListLayoutTests(TestCase):
         self.assertNotIn('shop-filter-toogle', grid)
         self.assertNotIn('id="slider-range"', grid)
 
+    def test_the_pagination_bar_is_outside_the_ajax_grid(self):
+        """Bất biến mà ba chỗ trong code trỏ về file này làm bằng chứng — nhưng trước đó
+        không test nào chốt nó.
+
+        Thanh phân trang nằm trong vùng bị ghi đè thì nó biến mất ngay lần khách tick
+        checkbox đầu tiên, và `filter_product` trả `pagination` về một phần tử không còn
+        tồn tại.
+        """
+        for i in range(20):     # đủ nhiều để thanh phân trang thật sự hiện ra
+            Product.objects.create(
+                title=f"Xoài {i}", price=Decimal("70000.00"), product_status='published',
+                category=Category.objects.first(), vendor=Vendor.objects.first(),
+            )
+        html = self._html()
+        self.assertIn('id="pagination-area"', html)
+
+        grid = block_owned_by(html, "filtered-product-grid")
+
+        self.assertNotIn('id="pagination-area"', grid)
+        self.assertNotIn('class="page-link"', grid)
+
     def test_the_page_has_balanced_div_tags(self):
         """Chốt luôn nguyên nhân, không chỉ triệu chứng.
 

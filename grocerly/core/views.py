@@ -842,6 +842,13 @@ def vnpay_payment(request, oid):
         messages.warning(request, _("This order was cancelled and can no longer be paid."))
         return redirect("core:dashboard")
 
+    # Đơn COD đã đặt thì không lật ngược sang thanh toán online được. Thiếu chốt này thì
+    # chốt "đơn COD đã đặt" ở `checkout()` bị lách chỉ bằng một GET tới đây: dòng dưới
+    # gán `payment_method = 'online'`, và thế là trang checkout hết nhận ra đơn đó là COD.
+    if order.payment_method == 'cod':
+        messages.info(request, _("This order has already been placed."))
+        return redirect("core:payment-completed", order.oid)
+
     order.payment_method = 'online' # vnpay is an online method
     order.product_status = 'processing'
     order.save(update_fields=['payment_method', 'product_status'])
@@ -886,6 +893,15 @@ def vnpay_return(request):
             if vnp_ResponseCode == "00":
                 try:
                     order = CartOrder.objects.get(oid=order_id)
+                    # Đơn đã hủy thì không ghi nhận đã trả: làm vậy là tạo ra một đơn
+                    # vừa `cancelled` vừa `paid_status=True` mà không màn hình nào xử lý
+                    # được, và còn đốt mất một lượt mã giảm giá cho đơn không bao giờ giao.
+                    if order.product_status == CANCELLED_ORDER_STATUS:
+                        messages.warning(request, _(
+                            "This order was cancelled. Please contact us about your payment."
+                        ))
+                        return redirect("core:dashboard")
+
                     # Trước đây gán thẳng `paid_status = True`, không chốt gì — trong khi
                     # `vnpay_ipn` thì có. Hai đường cùng chạy cho một đơn là tăng bộ đếm
                     # mã giảm giá hai lần. `confirm_paid()` idempotent nên gọi mấy lần
@@ -929,6 +945,12 @@ def vnpay_ipn(request):
                 if int(amount) != int(order.price) * 100:
                     return JsonResponse({'RspCode': '04', 'Message': 'Invalid amount'})
                     
+                if order.product_status == CANCELLED_ORDER_STATUS:
+                    # '02' là mã "đã xác nhận rồi" của VNPay — dùng lại ở đây để cổng
+                    # ngừng gọi lại. Đơn đã hủy thì không được đánh dấu đã trả, cũng
+                    # không được đốt lượt mã giảm giá.
+                    return JsonResponse({'RspCode': '02', 'Message': 'Order was cancelled'})
+
                 if order.paid_status:
                     return JsonResponse({'RspCode': '02', 'Message': 'Order already confirmed'})
                     
