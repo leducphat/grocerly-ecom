@@ -82,8 +82,13 @@ def paginate(request, queryset, per_page=PRODUCTS_PER_PAGE):
     ra 300 ô số.
 
     ⚠️ Gọi hàm này **sau** khi đã tính xong mọi `aggregate()`/`count()` trên queryset gốc.
-    Giá trị trả về là `Page`, không phải QuerySet: `.aggregate()` ném `AttributeError`
-    còn `.count()` trả số của **một trang** chứ không phải tổng.
+    Giá trị trả về là `Page`, không phải QuerySet.
+
+    ⚠️ **Trong template, `{{ products.count }}` trở thành CHUỖI RỖNG** một cách im lặng.
+    `Page` kế thừa `collections.abc.Sequence`, mà `Sequence.count(value)` bắt buộc một
+    tham số; template engine gọi không tham số, dính `TypeError`, rồi trả `string_if_invalid`
+    (mặc định là rỗng). Không 500, không log — chỉ mất số. Template phải dùng
+    **`{{ page_obj.paginator.count }}`**, và view nào cần tổng thì tính trước khi cắt trang.
     """
     paginator = Paginator(queryset, per_page)
     try:

@@ -107,13 +107,24 @@ class ProductListPaginationTests(PaginationTestCase):
         Nếu paginate trước thì `aggregate` ném `AttributeError` (đối tượng `Page` không
         phải QuerySet) — hoặc tệ hơn, thanh trượt giá chỉ còn khoảng giá của một trang.
         """
-        Product.objects.create(
+        expensive = Product.objects.create(
             title="Sầu riêng", price=Decimal("900000.00"), product_status='published',
             category=self.category, vendor=self.vendor,
         )
+        # Sắp theo `-id` nên sản phẩm vừa tạo sẽ đứng đầu trang 1. Tạo thêm một trang
+        # sản phẩm mới hơn để đẩy nó ra khỏi trang đang xem — nếu không, `aggregate()`
+        # chạy nhầm trên `Page` cũng cho ra đúng kết quả và test không chứng minh gì.
+        for i in range(PRODUCTS_PER_PAGE):
+            Product.objects.create(
+                title=f"Mới {i}", price=Decimal("10000.00"), product_status='published',
+                category=self.category, vendor=self.vendor,
+            )
 
         response = self.client.get(self.url)
 
+        # Sản phẩm đắt nhất phải nằm NGOÀI trang đang xem, nếu không thì `aggregate` chạy
+        # trên một trang cũng ra đúng kết quả và test không chứng minh được gì.
+        self.assertNotIn(expensive, list(response.context['products']))
         self.assertEqual(response.context['max_price'], Decimal("900000.00"))
 
     def test_the_bar_is_hidden_when_everything_fits_on_one_page(self):
@@ -128,6 +139,67 @@ class ProductListPaginationTests(PaginationTestCase):
         self.assertNotContains(response, 'class="page-link"')
 
 
+    def test_the_bar_renders_a_link_for_every_page(self):
+        """Chốt `elided_page_range`: thiếu nó là thanh còn nút trước/sau nhưng **mất sạch
+        số trang**, mà mọi test khác vẫn xanh."""
+        response = self.client.get(self.url)
+
+        numbers = re.findall(
+            r'<a class="page-link"[^>]*>(\d+)</a>', response.content.decode()
+        )
+        self.assertEqual(sorted(set(numbers)), ['1', '2', '3'])
+
+    def test_the_current_page_is_marked_active(self):
+        response = self.client.get(self.url, {'page': 2})
+
+        self.assertContains(response, 'aria-current="page"')
+
+
+class PaginationBarIsRenderedTests(PaginationTestCase):
+    """Cả năm trang phải THẬT SỰ hiện thanh phân trang.
+
+    Thiếu khóa `page_obj` trong context thì partial render ra rỗng — im lặng, không lỗi.
+    Không có nhóm này thì xóa `page_obj` khỏi bốn view mà mọi test khác vẫn xanh.
+    """
+
+    def _urls(self):
+        self.products[0].tags.add("khuyen-mai")
+        return {
+            'product-list': reverse("core:product-list"),
+            'category': reverse("core:category-product-list", args=[self.category.c_id]),
+            'vendor': reverse("core:vendor-detail", args=[self.vendor.v_id]),
+            'search': reverse("core:search") + "?q=Dưa",
+            'tag': reverse("core:tags", args=["khuyen-mai"]),
+        }
+
+    def test_every_paginated_page_renders_the_bar(self):
+        for name, url in self._urls().items():
+            if name == 'tag':
+                continue     # chỉ 1 sản phẩm gắn tag nên đúng một trang, xem test dưới
+            with self.subTest(page=name):
+                response = self.client.get(url)
+                self.assertContains(response, 'class="pagination-area')
+                self.assertContains(response, 'class="page-link"')
+
+    def test_every_paginated_page_reports_the_total(self):
+        """Dòng "We found N items" — `products` nay là `Page` nên `{{ products.count }}`
+        render ra **chuỗi rỗng** một cách im lặng. Phải dùng `page_obj.paginator.count`.
+        """
+        for name, url in self._urls().items():
+            if name == 'product-list':
+                continue     # trang này dùng biến `product_count` riêng
+            with self.subTest(page=name):
+                response = self.client.get(url)
+                self.assertNotContains(response, 'text-brand"></strong>')
+
+    def test_the_tag_page_reports_its_own_total(self):
+        self.products[0].tags.add("khuyen-mai")
+
+        response = self.client.get(reverse("core:tags", args=["khuyen-mai"]))
+
+        self.assertContains(response, '<strong class="text-brand">1</strong>')
+
+
 class SearchPaginationTests(PaginationTestCase):
 
     def test_the_search_page_paginates(self):
@@ -136,16 +208,26 @@ class SearchPaginationTests(PaginationTestCase):
         self.assertEqual(len(response.context['products']), PRODUCTS_PER_PAGE)
 
     def test_page_two_of_a_search_still_filters_by_the_query(self):
-        Product.objects.create(
-            title="Xoài cát", price=Decimal("70000.00"), product_status='published',
-            category=self.category, vendor=self.vendor,
-        )
+        """Bộ lọc tìm kiếm phải còn hiệu lực ở trang 2, không chỉ ở trang 1.
+
+        Chỉ khẳng định "mọi tên trên trang 2 đều chứa từ khóa" là **chưa đủ**: sắp theo
+        `-date, -id` nên sản phẩm tạo sau cùng nằm ở trang 1, và một sản phẩm không khớp
+        duy nhất sẽ không bao giờ trôi tới trang 2 — bỏ hẳn bộ lọc thì test vẫn xanh.
+        Nên ở đây tạo **đủ 9 sản phẩm không khớp** để chúng chiếm trọn trang 1 và tràn
+        sang trang 2 nếu bộ lọc bị bỏ.
+        """
+        for i in range(9):
+            Product.objects.create(
+                title=f"Xoài cát {i}", price=Decimal("70000.00"),
+                product_status='published', category=self.category, vendor=self.vendor,
+            )
 
         response = self.client.get(reverse("core:search"), {'q': "Dưa", 'page': 2})
 
         titles = [p.title for p in response.context['products']]
         self.assertTrue(titles)
-        self.assertTrue(all("Dưa" in t for t in titles))
+        self.assertTrue(all("Dưa" in t for t in titles), titles)
+        self.assertEqual(response.context['products'].paginator.count, 20)
 
     def test_the_page_links_keep_the_search_query(self):
         """Link phân trang mất `?q=` là trang 2 trả về toàn bộ sản phẩm.

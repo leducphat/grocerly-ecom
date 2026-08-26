@@ -26,7 +26,7 @@
                 <div class="col-12">
                     <div class="shop-product-fillter">
                         <div class="totall-product">
-                            <p>We found <strong class="text-brand">{{ products.count }}</strong> item{{ products.count|pluralize }} for you!</p>
+                            <p>We found <strong class="text-brand">{{ page_obj.paginator.count }}</strong> item{{ page_obj.paginator.count|pluralize }} for you!</p>
                         </div>
                     </div>
                     <div class="row product-grid">
