@@ -1133,7 +1133,13 @@ def checkout(request, oid):
                 messages.error(request, COUPON_ERROR_MESSAGES[error])
                 return redirect("core:checkout", order.oid)
 
-            discount = order.price * coupon.discount / 100
+            # Kẹp vào [0, giá đơn] — SECURITY.md S-12.
+            #
+            # `Coupon.discount` nay có validator 1–100, nhưng validator không chạy trên
+            # `.save()`/`objects.create()`, nên bản ghi cũ và mọi đường tạo ngoài Django
+            # admin vẫn có thể nằm ngoài khoảng đó. Không kẹp thì `discount=1000` cho ra
+            # đơn giá âm, còn `discount=-50` biến mã giảm giá thành mã **tăng** giá.
+            discount = min(max(order.price * coupon.discount / 100, 0), order.price)
             order.coupons.add(coupon)
             order.price -= discount
             order.saved += discount

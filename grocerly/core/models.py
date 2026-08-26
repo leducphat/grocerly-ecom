@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from shortuuid.django_fields import ShortUUIDField
 from django.utils.html import mark_safe
@@ -467,7 +468,23 @@ class Address(models.Model):
 
 class Coupon(SoftDeleteModel):
     code = models.CharField(max_length=1000)
-    discount = models.IntegerField(default=1)
+
+    # Phần trăm giảm, 1–100 — SECURITY.md S-12.
+    #
+    # Trước đây là `IntegerField` không validator. Gõ nhầm `1000` là `checkout()` tính
+    # `order.price -= order.price * 1000 / 100`, đơn thành **giá âm**, rồi `vnpay_payment`
+    # gửi một `amount` âm sang cổng thanh toán và con số đó chảy tiếp vào `order.saved`
+    # cùng thống kê doanh thu ở dashboard.
+    #
+    # ⚠️ Validator **chỉ chạy qua ModelForm** (tức Django admin — đường sửa Coupon duy
+    # nhất), KHÔNG chạy khi gọi `.save()` hay `objects.create()`. Nên `checkout()` còn kẹp
+    # riêng phần giảm giá vào khoảng [0, giá đơn]: bản ghi cũ trên production ra đời trước
+    # validator này, và không có gì bảo đảm chúng nằm trong khoảng.
+    discount = models.PositiveIntegerField(
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        help_text="Phần trăm giảm giá, từ 1 đến 100.",
+    )
     active = models.BooleanField(default=True)
 
     # PLAN bước 2.9 — UC 3.2.21, SPEC-GAPS A6. Cả ba đều nullable hoặc có default nên

@@ -13,6 +13,8 @@ giao hàng, nên chốt `paid_status` sẵn có cũng không chặn được nó
 from datetime import timedelta
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -386,3 +388,92 @@ class CouponCounterTests(CouponTestCase):
 
         self.assertEqual(self.price_of(second), Decimal("100000.00"))
         self.assertEqual(second.coupons.count(), 0)
+
+
+class CouponDiscountBoundsTests(CouponTestCase):
+    """`Coupon.discount` phải là phần trăm thật — [S-12](../../docs/SECURITY.md).
+
+    Trường này luôn được hiểu là phần trăm nhưng trước đây không có validator nào. Quản
+    trị viên gõ nhầm `1000` là `checkout()` tính `order.price -= order.price * 1000 / 100`
+    và đơn hàng thành **giá âm**. Sau đó `vnpay_payment` gửi `amount = int(order.price) * 100`
+    — một số âm — sang cổng thanh toán, và con số âm ấy còn chảy vào `order.saved` rồi vào
+    thống kê doanh thu ở dashboard nhân viên.
+
+    Cần quyền quản trị viên mới gây ra được, nên đây là **phòng vệ chiều sâu** chứ không
+    phải lỗ hổng cho người ngoài. Nhưng nó là lỗi *gõ nhầm*, mà gõ nhầm thì rất dễ xảy ra.
+
+    Vá ở ba mức, vì không mức nào tự đủ:
+
+    - **Validator 1–100** chặn đường nhập liệu. `Coupon` chỉ sửa được qua Django admin
+      (`CouponAdmin`), mà admin dùng ModelForm nên validator chạy thật. Nhưng validator
+      **không** chạy khi gọi `objects.create()` hay `.save()`.
+    - **`CHECK (discount >= 0)`** do `PositiveIntegerField` sinh ra trong migration `0010`
+      chặn chiều âm ở tầng database, tức chặn mọi đường — kể cả shell và fixture.
+    - **Kẹp trong `checkout()`** lo phần còn lại: cận **trên** không có ràng buộc database
+      nào, và bản ghi cũ trên production ra đời trước cả hai mức trên. Giá đơn không được
+      âm dù dữ liệu xấu tới đâu.
+    """
+
+    def full_clean_error_fields(self, discount):
+        coupon = Coupon(code="GIAM", discount=discount, active=True)
+        try:
+            coupon.full_clean()
+        except ValidationError as error:
+            return error.message_dict
+        return {}
+
+    def test_a_discount_over_one_hundred_percent_is_rejected(self):
+        self.assertIn('discount', self.full_clean_error_fields(1000))
+
+    def test_exactly_one_hundred_percent_is_allowed(self):
+        """Giảm 100% là hợp lệ — hàng tặng kèm, đơn 0 đồng."""
+        self.assertNotIn('discount', self.full_clean_error_fields(100))
+
+    def test_zero_percent_is_rejected(self):
+        """Mã giảm 0% không giảm gì; nhận nó vào là bày ra một mã vô nghĩa cho khách."""
+        self.assertIn('discount', self.full_clean_error_fields(0))
+
+    def test_one_percent_is_allowed(self):
+        self.assertNotIn('discount', self.full_clean_error_fields(1))
+
+    def test_a_negative_discount_is_rejected(self):
+        self.assertIn('discount', self.full_clean_error_fields(-10))
+
+    def test_a_bad_legacy_row_cannot_drive_the_price_negative(self):
+        """Đường thứ hai: bản ghi đã có trong database từ trước khi có validator.
+
+        `Coupon.objects.create()` **không** chạy validator, nên đúng cách mà một dòng như
+        thế này ra đời — và cũng đúng cách nó còn nằm đó trên production.
+        """
+        Coupon.objects.create(code="HONG", discount=1000, active=True)
+        self.apply(code="HONG")
+        self.assertGreaterEqual(self.price_of(), 0)
+
+    def test_a_bad_legacy_row_caps_the_discount_at_the_order_total(self):
+        Coupon.objects.create(code="HONG", discount=1000, active=True)
+        self.apply(code="HONG")
+        self.assertEqual(self.price_of(), 0)
+
+    def test_the_database_itself_refuses_a_negative_discount(self):
+        """Chiều âm được database chặn, không phải code — và đó là mức chặn mạnh nhất.
+
+        `PositiveIntegerField` sinh ra `CHECK ("discount" >= 0)` trong migration `0010`,
+        nên `objects.create(discount=-50)` **ném `IntegrityError`** chứ không lặng lẽ ghi
+        vào. Nghĩa là không đường nào — shell, fixture, admin — tạo được bản ghi âm.
+
+        Đáng chốt vì hậu quả của chiều âm khó thấy hơn chiều dương: `discount=-50` biến
+        `order.price -= order.price * -50 / 100` thành phép **cộng**, tức mã "giảm giá"
+        lại tăng tiền khách phải trả.
+
+        ⚠️ Hệ quả cho lúc deploy: `CHECK` này áp lên **dữ liệu đang có**. Coupon nào trên
+        Neon đang mang `discount` âm sẽ làm migration `0010` **thất bại** — phải soát
+        trước, xem PLAN bước 1.1.
+        """
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                Coupon.objects.create(code="AM", discount=-50, active=True)
+
+    def test_a_normal_discount_is_untouched_by_the_cap(self):
+        """Kẹp không được đụng tới đường chạy bình thường."""
+        self.apply()
+        self.assertEqual(self.price_of(), Decimal("90000.00"))
