@@ -69,17 +69,19 @@ python manage.py test --settings=grocerly.settings_test
 `manage.py test` sẽ tạo database `test_<tên-db>` **trên máy chủ production Neon** (bẫy #5).
 Module này ép SQLite in-memory.
 
-**140 test** tính đến 2026-08-26, chia hai tầng:
+**174 test** tính đến 2026-08-26, chia hai tầng:
 
 | File | Nội dung |
 |---|---|
 | [core/tests.py](grocerly/core/tests.py) · [store_api/tests.py](grocerly/store_api/tests.py) · [useradmin/tests.py](grocerly/useradmin/tests.py) | Hồi quy ở mức HTTP — tái hiện kịch bản khai thác ở [docs/SECURITY.md](docs/SECURITY.md) |
 | [core/test_vnpay.py](grocerly/core/test_vnpay.py) | Unit test thuần (`SimpleTestCase`, **không dựng database**) |
 | [core/test_softdelete.py](grocerly/core/test_softdelete.py) | Hạ tầng xóa mềm ở mức model, chốt bẫy #3 |
+| [core/test_checkout.py](grocerly/core/test_checkout.py) | Luồng tạo đơn — **đọc trước khi đụng `save_checkout_info`** |
+| [core/test_missing_relations.py](grocerly/core/test_missing_relations.py) | Sản phẩm thiếu `category`/`vendor` không được làm sập storefront |
 | [core/test_contact_form.py](grocerly/core/test_contact_form.py) · [core/test_clear_cart.py](grocerly/core/test_clear_cart.py) · [useradmin/test_delete_product.py](grocerly/useradmin/test_delete_product.py) · [useradmin/test_order_status.py](grocerly/useradmin/test_order_status.py) | Theo chức năng |
 
-**Còn trống:** `save_checkout_info` và toàn bộ luồng checkout chưa có test nào;
-[userauths/tests.py](grocerly/userauths/tests.py) vẫn là stub rỗng. Xem
+**Còn trống:** [userauths/tests.py](grocerly/userauths/tests.py) vẫn là stub rỗng, và
+các helper `safe_float`/`safe_int`/`vnd` chưa có test dù nằm trên đường tiền. Xem
 [docs/PLAN.md](docs/PLAN.md) bước 2.6.
 
 **Quy ước:** test mới đặt ở file riêng `test_<chủ_đề>.py` trong app tương ứng —

@@ -269,7 +269,7 @@ khi `settings.py` hiện chỉ hiểu `USE_CLOUDINARY` — cấu hình này đã
 
 | # | Vấn đề | Ảnh hưởng |
 |---|---|---|
-| 1 | **140 test** tính đến 2026-08-26, nhưng **checkout vẫn trống**: không test nào chạm `save_checkout_info`; `userauths/tests.py` còn là stub rỗng | Luồng tạo đơn — chỗ rủi ro nhất — chưa có lưới an toàn, mà bước 2.11 sẽ viết lại đúng hàm đó. Xem [PLAN](PLAN.md) bước 2.6f |
+| 1 | **174 test** tính đến 2026-08-26. Checkout nay đã có lưới ([core/test_checkout.py](../grocerly/core/test_checkout.py), bước 2.6f). Còn trống: `userauths/tests.py` là stub rỗng, và các helper `safe_float`/`vnd` vẫn chưa có test | Đăng ký/đăng nhập và các hàm xử lý số trên đường tiền vẫn phải kiểm thử tay. Xem [PLAN](PLAN.md) bước 2.6b, 2.6c, 2.6g |
 | 2 | Truy vấn không `select_related` → N+1 | Chậm khi dữ liệu lớn |
 | 3 | Không phân trang ở mọi trang danh sách | Tải toàn bộ sản phẩm mỗi request |
 | 4 | `useradmin` không giới hạn phạm vi theo nhân viên | Mọi staff thấy toàn bộ dữ liệu |

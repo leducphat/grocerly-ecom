@@ -112,7 +112,7 @@ Ban đầu mục này chỉ là *"unit test VNPay"*. Rà lại thì vấn đề 
 đích của chúng, nhưng **không có tầng unit test nào** dưới đó. Grep xác nhận `safe_float`,
 `vnd`, `vnpay.*`, `SoftDeleteModel.*`, hai middleware — tất cả 0 lần xuất hiện trong test.
 
-Thứ tự trong nhóm là đường găng: **2.6a → 2.6d → 2.6f**.
+Thứ tự trong nhóm là đường găng: **2.6a → 2.6d → 2.6f**. Ba mục này đã xong.
 
 | | Việc | Vì sao | Trạng thái |
 |---|---|---|---|
@@ -121,7 +121,7 @@ Thứ tự trong nhóm là đường găng: **2.6a → 2.6d → 2.6f**.
 | **2.6c** | Filter `vnd` / `mul` | Hiển thị trên **mọi** trang có giá | chưa làm |
 | **2.6d** | `SoftDeleteModel` + cascade/restore của `Vendor` | Chốt **Bẫy #3** thành test; là tiền đề của 2.1 | ✅ **Xong 2026-08-26** — 14 test, phát hiện lỗi thật |
 | **2.6e** | `RestrictStaffMiddleware` (**Bẫy #6**), `ForceDefaultLanguageMiddleware` | Thứ tự middleware bắt buộc mà không gì bảo vệ | chưa làm |
-| **2.6f** | `save_checkout_info` — tạo đơn, tạo `CartOrderItem`, luồng đơn treo | **Tiền đề bắt buộc của 2.11**: bước đó viết lại đúng hàm này, mà hiện không test nào chạm vào checkout | chưa làm |
+| **2.6f** | `save_checkout_info` — tạo đơn, tạo `CartOrderItem`, luồng đơn treo | **Tiền đề bắt buộc của 2.11**: bước đó viết lại đúng hàm này | ✅ **Xong 2026-08-26** — 26 test, nhóm `CartOrderItemSnapshotTests` ghi rõ cái gì 2.11 được đổi |
 | **2.6g** | `userauths` — đăng ký, đăng nhập, redirect theo vai trò | `userauths/tests.py` đang là stub rỗng | chưa làm |
 
 **Ghi chú 2.6b** — đã dò thử, chưa sửa. `safe_float` trả `0.0` cho `'1.000.000,50'` (định
@@ -200,7 +200,7 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
       phát hiện ban đầu bị bác bỏ** khi có bước phản biện độc lập. Thấy `@csrf_exempt`
       trong code **chưa đủ để kết luận có lỗ hổng** — còn phải trả lời được request của
       kẻ tấn công có mang được cookie phiên tới không, mà điều đó phụ thuộc `SameSite`
-- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **140 test tự động**
+- [ ] **4.2** Viết lại **Chương 4** — từ 5 test case thủ công lên **174 test tự động**
       (số tính tới 2026-08-26), cộng bảng test case cho AI Chatbot và VNPay.
       Điểm mạnh hơn con số: nay trình bày được thành **kim tự tháp test** — unit test
       thuần (`SimpleTestCase`, không DB) / test ở mức model / test hồi quy ở mức HTTP
@@ -216,7 +216,7 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
 
 ### 2026-08-26 — Bước 2.1, 2.2, 2.3, 2.4, 2.6a, 2.6d + rà soát endpoint
 
-**49 → 140 test.** Sáu commit, `038701f`…`9fd7d0c` và bước 2.3.
+**49 → 174 test.** Tám commit, `038701f`…`dbf8c3d` cộng bước 2.6f.
 
 - **2.3** — `clear_cart`, POST + CSRF, nút ở trang giỏ hàng. **Đừng nhầm với xóa từng
   sản phẩm**: `delete_item_from_cart` vốn đã có và vẫn chạy đúng; cái thiếu là xóa **sạch
@@ -261,6 +261,15 @@ Nội dung soạn sẵn: **[bao-cao/](bao-cao/)**
   vào trạng thái không tồn tại. Nay option dựng từ model, view lọc qua whitelist, và bỏ
   `@csrf_exempt` (template vốn đã gửi token)
 - **[S-09](SECURITY.md)** — `ajax_contact_form` ghi database bằng GET không xác thực
+- **2.6f** — 26 test cho `save_checkout_info`. Nhóm `CartOrderItemSnapshotTests` ghi rõ
+  cái gì 2.11 **phải giữ nguyên** (bản sao tĩnh của hóa đơn) và cái gì **phải đổi**
+  (`test_there_is_no_link_back_to_the_product`), để 2.11 làm lệch là thấy ngay
+- **Lỗi sập trang chủ** — phát hiện tình cờ khi viết test cho 2.6f. `Product.category` và
+  `Product.vendor` đều `null=True`, `AddProductForm` để cả hai `required=False`, mà 11 chỗ
+  trong template gọi thẳng `{% url ... p.category.c_id %}`. Khi None, template cho ra
+  **chuỗi rỗng** rồi `{% url %}` ném `NoReverseMatch` → **trang chủ 500 cho mọi khách**.
+  Nhân viên chỉ cần thêm sản phẩm mà quên chọn danh mục là sập. `add_product` có giá trị
+  dự phòng cho `vendor` nhưng **không có** cho `category`
 
 **Rà soát endpoint đổi trạng thái** (46 phát hiện thô → 29 qua phản biện → 13 sau khi gộp)
 — kết quả ở [SECURITY.md](SECURITY.md) mục S-09 đến S-11. Đáng ghi lại cho

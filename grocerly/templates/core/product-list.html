@@ -209,7 +209,7 @@
                                         <div class="deals-content">
                                             <h2><a href="{% url 'core:product-detail' deal.p_id %}">{{ deal.title|truncatechars:40 }}</a></h2>
                                             <div>
-                                                <span class="font-small text-muted">{% trans "By" %} <a href="{% url 'core:vendor-detail' deal.vendor.v_id %}">{{ deal.vendor.name }}</a></span>
+                                                {% if deal.vendor %}<span class="font-small text-muted">{% trans "By" %} <a href="{% url 'core:vendor-detail' deal.vendor.v_id %}">{{ deal.vendor.name }}</a></span>{% endif %}
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">

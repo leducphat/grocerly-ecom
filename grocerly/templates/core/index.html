@@ -81,7 +81,7 @@
                                             </div>
                                             <div class="product-content-wrap">
                                                 <div class="product-category">
-                                                    <a href="{% url 'core:category-product-list' p.category.c_id %}">{{ p.category.title }}</a>
+                                                    {% if p.category %}<a href="{% url 'core:category-product-list' p.category.c_id %}">{{ p.category.title }}</a>{% endif %}
                                                 </div>
                                                 <h2><a href="{% url 'core:product-detail' p.p_id %}">{{ p.title }}</a></h2>
                                                 <div class="product-rate-cover">
@@ -91,7 +91,7 @@
                                                     <span class="font-small ml-5 text-muted"> (4.0)</span>
                                                 </div>
                                                 <div>
-                                                    <span class="font-small text-muted">By <a href="{% url 'core:vendor-detail' p.vendor.v_id %}">{{ p.vendor.name }}</a></span>
+                                                    {% if p.vendor %}<span class="font-small text-muted">By <a href="{% url 'core:vendor-detail' p.vendor.v_id %}">{{ p.vendor.name }}</a></span>{% endif %}
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
@@ -144,7 +144,7 @@
                                             </div>
                                             <div class="product-content-wrap">
                                                 <div class="product-category">
-                                                    <a href="{% url 'core:category-product-list' p.category.c_id %}">{{ p.category.title }}</a>
+                                                    {% if p.category %}<a href="{% url 'core:category-product-list' p.category.c_id %}">{{ p.category.title }}</a>{% endif %}
                                                 </div>
                                                 <h2><a href="{% url 'core:product-detail' p.p_id %}">{{ p.title }}</a></h2>
                                                 <div class="product-rate-cover">
@@ -154,7 +154,7 @@
                                                     <span class="font-small ml-5 text-muted"> (4.0)</span>
                                                 </div>
                                                 <div>
-                                                    <span class="font-small text-muted">By <a href="{% url 'core:vendor-detail' p.vendor.v_id %}">{{ p.vendor.name }}</a></span>
+                                                    {% if p.vendor %}<span class="font-small text-muted">By <a href="{% url 'core:vendor-detail' p.vendor.v_id %}">{{ p.vendor.name }}</a></span>{% endif %}
                                                 </div>
                                                 <div class="product-card-bottom">
                                                     <div class="product-price">
@@ -214,7 +214,7 @@
                                                 <span class="font-small ml-5 text-muted"> (4.0)</span>
                                             </div>
                                             <div>
-                                                <span class="font-small text-muted">By <a href="{% url 'core:vendor-detail' p.vendor.v_id %}">{{ p.vendor.name }}</a></span>
+                                                {% if p.vendor %}<span class="font-small text-muted">By <a href="{% url 'core:vendor-detail' p.vendor.v_id %}">{{ p.vendor.name }}</a></span>{% endif %}
                                             </div>
                                             <div class="product-card-bottom">
                                                 <div class="product-price">
