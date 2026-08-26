@@ -83,7 +83,11 @@ class SoftDeleteModel(models.Model):
     Usage:
      - MyModel.objects.all()             → only non-deleted items
      - MyModel.all_objects.all()         → everything (including deleted)
-     - MyModel.all_objects.dead()        → only deleted items
+     - MyModel.all_objects.all().dead()  → only deleted items
+
+    Lưu ý `.all()` ở dòng cuối: `dead()`/`alive()` là phương thức của *QuerySet*, không
+    được proxy lên manager (muốn vậy phải dựng manager bằng `Manager.from_queryset`).
+    Gọi thẳng `all_objects.dead()` sẽ ném `AttributeError`.
      - instance.soft_delete()            → mark as deleted
      - instance.restore()               → undo soft delete
      - instance.hard_delete()            → permanently remove from DB
@@ -171,9 +175,15 @@ class Vendor(SoftDeleteModel):
     def soft_delete(self):
         """Soft-delete this vendor and all their products."""
         super().soft_delete()
-        # Cascade soft-delete to all products belonging to this vendor
+        # Cascade soft-delete to all products belonging to this vendor.
+        #
+        # Phải dùng CHÍNH `self.deleted_at`, không gọi `timezone.now()` lần nữa:
+        # `restore()` bên dưới tìm lại nhóm sản phẩm bằng `filter(deleted_at=...)`, mà
+        # hai lần gọi `now()` luôn lệch nhau vài trăm micro giây. Trước khi sửa, không
+        # dòng nào khớp nên sản phẩm **không bao giờ được khôi phục** — vendor sống lại
+        # một mình với gian hàng trống.
         Product.all_objects.filter(vendor=self, is_deleted=False).update(
-            is_deleted=True, deleted_at=timezone.now()
+            is_deleted=True, deleted_at=self.deleted_at
         )
 
     def restore(self):
